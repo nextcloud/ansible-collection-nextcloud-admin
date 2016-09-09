@@ -1,0 +1,52 @@
+---
+# tasks file for nextcloud
+- include: tasks/setup_env.yml
+  # load os specific variables
+
+- name: Check the environment path
+  stat: "path={{ nextcloud_webroot }}/index.php"
+  register: wroot
+
+- block:
+  - name: "Download & extract Nextcloud to /tmp." 
+    unarchive:
+      copy: no
+      src: "{{ nextcloud_dl_url }}/nextcloud-{{ nextcloud_version }}.tar.bz2"
+      dest: "/tmp/"
+  
+  - name: "Move extracted files to {{ nextcloud_webroot }}."
+    command: "cp -r /tmp/nextcloud/ {{ nextcloud_webroot }}/"
+  
+  - name: Remove nextcloud archive files
+    file: path=/tmp/nextcloud state=absent
+  when: wroot.stat.exists is defined and not wroot.stat.exists
+
+- name: Configure MySQL database
+  include: tasks/mysql_config.yml
+  when: nextcloud_db_backend == "mysql" or nextcloud_db_backend == "mariadb"
+
+- name: configure TLS certificates
+  include: tasks/install_tls.yml
+- name: Configure Nginx web server.
+  include: tasks/nginx_config.yml
+  when: nextcloud_websrv == "nginx"
+
+- name: Configure Apache web server
+  include: tasks/apache_config.yml
+  when: nextcloud_websrv == "apache"
+
+- name: Trigger all pending handlers
+  meta: flush_handlers
+
+- name : "generate {{ nextcloud_admin_name }} password:"
+  set_fact: nextcloud_admin_pwd="{{ lookup( 'password', '/tmp/ncadminpasswordfile' ) }}"
+  when: nextcloud_admin_pwd is not defined
+
+  # will not run occ installation if already installed => config.php exists : 
+- name: Check Nextcloud installation file 
+  stat: "path={{ nextcloud_webroot }}/config/config.php"
+  register: wroot
+
+- name: Run Nextcloud command line installation
+  include: tasks/install_nc.yml
+  when: wroot.stat.exists is defined and not wroot.stat.exists

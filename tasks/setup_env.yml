@@ -1,0 +1,10 @@
+---
+# additionnal setup for OS depedent environment
+
+- name: "[ENV] - Load environment for OS using php 5 "
+  include_vars: defaults/php5_env.yml
+  when: ansible_distribution_release in [ "trusty", "jessie" ]
+  
+- name: "[ENV] - Load environment for OS using php 7.0 "
+  include_vars: defaults/php7.0_env.yml
+  when: ansible_distribution_release in [ "xenial" ]

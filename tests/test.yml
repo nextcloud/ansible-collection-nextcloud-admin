@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  remote_user: root
+  roles:
+   - role: install_nextcloud
+     nextcloud_websrv: "nginx"
+     nextcloud_admin_pwd: "secret007"
+     nextcloud_webroot: "/opt/nextcloud/"
+     nextcloud_data_dir: "/var/ncdata"

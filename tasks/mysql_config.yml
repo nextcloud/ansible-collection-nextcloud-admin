@@ -1,0 +1,77 @@
+---
+#TOTO : need improvments on managing the mysql root password.
+
+- name: "[DB] - {{ nextcloud_db_backend }} service is installed."
+  package: "name={{ nextcloud_db_backend }}-server state=present"
+  
+- name: "[DB] - the python module mysqldb is present"
+  # needed by mysql_* ansible modules
+  package: name=python-mysqldb state=present
+
+- name: "[DB] - Check credentials"
+  stat: "path=/root/.my.cnf"
+  register: mycred
+
+- block:
+  - name: "[DB] - generate {{ nextcloud_db_backend }} root Password:"
+    set_fact: mysql_root_pwd="{{ lookup( 'password', '/tmp/mysqlrootpasswordfile' ) }}"
+  
+  - debug: var=mysql_root_pwd
+  
+  - name: "[DB] - Update {{ nextcloud_db_backend }} root password"
+    mysql_user:
+      name: root
+      host: "{{ item }}"
+      password: "{{ mysql_root_pwd }}"
+      login_user: root
+      login_password: ""
+      check_implicit_admin: yes
+      priv: "*.*:ALL,GRANT"
+    with_items:
+      - 127.0.0.1
+      - ::1
+    ignore_errors: yes
+    
+  - name: "[DB] - Make the file .my.cnf"
+    file: path=/root/.my.cnf state=touch mode="0640"
+  
+  - name: "[DB] - Add content to .my.cnf"
+    blockinfile:
+      dest: /root/.my.cnf
+      block: |
+        [client]
+        user=root
+        password="{{ mysql_root_pwd }}"
+  when: mysql_root_pwd is not defined and (mycred.stat.exists is defined and not mycred.stat.exists)
+
+- name: "[DB] - Delete the anonymous user."
+  mysql_user: user="" state="absent"
+  ignore_errors: yes
+
+- name: "[DB] - Removes the MySQL test database"
+  mysql_db: name=test state=absent
+  ignore_errors: yes
+
+- name: "[DB] - Fix mysql binary logging for nextcloud"
+  copy:
+    dest: /etc/mysql/conf.d/binlog_format_mixed.cnf
+    src: files/binlog_format_mixed.cnf
+  notify: restart mysql
+  when: nextcloud_db_backend == "mysql"
+
+- name: "[DB] - Generate database Password."
+  set_fact: nextcloud_db_pwd="{{ lookup( 'password', '/tmp/mysqlpasswordfile' ) }}"
+  when: nextcloud_db_pwd is not defined
+
+- debug: var=nextcloud_db_pwd
+
+- name: "[DB] - Add Database {{ nextcloud_db_name }}."
+  mysql_db: name={{ nextcloud_db_name }} state=present
+   
+- name: "[DB] - Configure the database user."
+  mysql_user:
+    name: "{{ nextcloud_db_admin }}"
+    password: "{{ nextcloud_db_pwd }}"
+    priv: "{{ nextcloud_db_name }}.*:ALL"
+    state: present
+

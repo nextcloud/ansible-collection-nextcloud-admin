@@ -1,0 +1,94 @@
+---
+#########
+# Run command line installation.
+# the web server must be running by now in order to launch the installation
+- name: "[NC] - Setting directory ownership & permissions for the data folder"
+  file:
+    path: "{{ nextcloud_data_dir }}"
+    mode: u=rwX,g=rX,o-rwx
+    recurse: yes
+    state: directory
+    owner: "{{ websrv_user }}"
+    group: "{{ websrv_group }}"
+
+- name: "[NC] - Set temporary permissions for command line installation."
+  file:
+    path: "{{ nextcloud_webroot }}"
+    state: directory
+    recurse: yes
+    owner: "{{ websrv_user }}"
+    group: "{{ websrv_group }}"
+
+- name: "[NC] - Web services are started"
+  service: "name={{ item }} state=started"
+  with_items:
+    - nginx
+    - php{{ php_ver }}-fpm
+
+- name: "[NC] - Run occ installation command"
+  become: true
+  become_user: "{{ websrv_user }}"
+  command: >
+      php occ  maintenance:install
+      --database {{ nextcloud_db_backend }}
+      --database-name {{ nextcloud_db_name }}
+      --database-user {{ nextcloud_db_admin }}
+      --database-pass {{ nextcloud_db_pwd }}
+      --admin-user {{ nextcloud_admin_name }}
+      --admin-pass {{ nextcloud_admin_pwd }}
+      --data-dir {{ nextcloud_data_dir }}
+  args:
+    chdir: "{{ nextcloud_webroot }}"
+    creates: "{{ nextcloud_webroot }}/config/config.php"
+    
+- name: "[NC] - Add {{ nextcloud_trusted_domain }} in config.php"
+  lineinfile:
+    dest: "{{ nextcloud_webroot }}/config/config.php"
+    line: "    1 => '{{ nextcloud_trusted_domain }}',"
+    insertafter: "0 => '"
+    state: present
+
+- name: "[NC] - Add local cache in config.php"
+  lineinfile:
+    dest: "{{ nextcloud_webroot }}/config/config.php"
+    line: "  'memcache.local' => '\\OC\\Memcache\\APCu',"
+    insertbefore: "\\);"
+    state: present
+
+# Following https://docs.nextcloud.com/server/10/admin_manual/installation/installation_wizard.html#strong-perms-label
+# - name: Setting stronger ownership & permissions
+  # file:
+    # path: "{{ nextcloud_data_dir }}"
+    # recurse: yes
+    # owner: root
+    # group: "{{ websrv_group }}"
+    # mode: u=rwX,g=rX,o-rwx
+
+- name: "[NC] - Ensure Nextcloud directories are 0750"
+  command: find {{ nextcloud_data_dir }} -type d -exec chmod -c 0750 {} \;
+  register: chmod_result
+  changed_when: "chmod_result.stdout != \"\""
+
+- name: "[NC] - Ensure Nextcloud files are 0640"
+  command: find {{ nextcloud_data_dir }} -type f -exec chmod -c 0640 {} \;
+  register: chmod_result
+  changed_when: "chmod_result.stdout != \"\""
+
+- name: "[NC] - Setting stronger directory ownership"
+  file:
+    path: "{{ nextcloud_webroot }}/{{ item }}/"
+    recurse: yes
+    owner: "{{ websrv_user }}"
+    group: "{{ websrv_group }}"
+    state: directory
+  with_items:
+    - apps
+    - assets
+    - config
+    - themes
+    - updater
+
+- name: "[NC] - Give execution permission to occ"
+  file:
+    path: "{{ nextcloud_webroot }}/occ"
+    mode: 0750

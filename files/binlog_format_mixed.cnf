@@ -1,0 +1,4 @@
+# for Nextcloud
+
+[mysqld]
+binlog_format = MIXED

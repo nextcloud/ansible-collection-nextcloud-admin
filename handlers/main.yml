@@ -1,0 +1,16 @@
+---
+# handlers file for nextcloud
+- name: restart mysql
+  service:
+    name: mysql
+    state: restarted
+  
+- name: reload nginx
+  service:
+    name: nginx
+    state: reloaded
+  
+- name: reload php-fpm
+  service: 
+    name: php{{ php_ver }}-fpm
+    state: reloaded

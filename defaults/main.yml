@@ -1,0 +1,31 @@
+---
+# defaults file for nextcloud
+# [CONFIG]
+nextcloud_version: 10.0.0
+nextcloud_trusted_domain: "{{ ansible_default_ipv4.address }}"
+# nextcloud_websrv: "apache" | "nginx"
+nextcloud_websrv: "apache"
+nextcloud_webroot: "/var/www/nextcloud"
+nextcloud_data_dir: "{{ nextcloud_webroot }}/data"
+nextcloud_admin_name: "admin"
+# nextcloud_admin_pwd: "secret"
+nextcloud_dl_url: "https://download.nextcloud.com/server/releases"
+
+# [DATABASE]
+# nextcloud_db_backend: "mysql"/"mariadb" | "PostgreSQL"
+nextcloud_db_backend: "mysql"
+nextcloud_db_name: "nextcloud"
+nextcloud_db_admin: "ncadmin"
+# nextcloud_db_pwd: "secret"
+
+# [TLS]
+nextcloud_enforce_https: true
+nextcloud_cert_method: "self-signed"
+# nextcloud_cert_method: "self-signed" | "signed" | "cerbot" (letsencrypt)
+# nextcloud_cert: /path/to/cert
+# nextcloud_cert_key: /path/to/cert/key
+
+# [SYSTEM]
+websrv_user: "www-data"
+websrv_group: "www-data"
+#mysql_root_pwd: "secret"

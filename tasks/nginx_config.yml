@@ -1,0 +1,73 @@
+---
+- name: "[HTTP] - Set the requires packages."
+  package: "name={{ item }} state=present"
+  with_items:
+    - nginx
+    - "php{{ php_ver }}-fpm"
+    - "php{{ php_ver }}-gd"
+    - "php{{ php_ver }}-json"
+    - "php{{ php_ver }}-mysql"
+    - "php{{ php_ver }}-curl"
+    - "php{{ php_ver }}-xml"
+    - "php{{ php_ver }}-zip"
+    - "php{{ php_ver }}-intl"
+    - "php{{ php_ver }}-mcrypt"
+    - "php{{ php_ver }}-mbstring"
+
+- name: "[HTTP] - APCu is installed."
+  package: "name={{ php_pkg_apcu }} state=present"
+  when : ansible_distribution_release not in [ "trusty" ]
+
+- block:
+  # load APCu from backports as the default version for trusty is obsolete.
+  - name: "[HTTP] - Configure trusty backport."
+    lineinfile:
+      dest: /etc/apt/sources.list
+      line: 'deb .* trusty-backports'
+  - name: "[HTTP] - Install APCu from backports."
+    apt: "name={{ php_pkg_apcu }} state=latest default_release=trusty-backports update_cache=yes"
+  when: ansible_distribution_release == "trusty"
+
+- name: "[HTTP] - remove some commented line in php-fpm conf"
+  lineinfile:
+    dest: "{{ php_dir }}/fpm/pool.d/www.conf"
+    regexp: '^\;env'
+    state: absent
+    # validate: "/usr/sbin/{{ php_bin }} -t #%s"
+  notify: reload php-fpm
+  
+- name: "[HTTP] - Add path variable to php-fpm"
+  blockinfile:
+    dest: "{{ php_dir }}/fpm/pool.d/www.conf"
+    insertafter: '^; Default Value: clean env$'
+    marker: "; {mark} ANSIBLE MANAGED BLOCK"
+    block: |
+      env[HOSTNAME] = $HOSTNAME
+      env[PATH] = $PATH
+      env[TMP] = /tmp
+      env[TMPDIR] = /tmp
+      env[TEMP] = /tmp
+  notify: reload php-fpm
+
+- name: "[HTTP] - enable APC for php CLI"
+  lineinfile: 
+    dest: "{{ php_dir }}/cli/php.ini"
+    line: "apc.enable_cli = 1"
+    insertbefore: "^; End:$"
+    state: present
+    # validate: "/usr/sbin/{{ php_bin }} -t #%s"
+  notify: reload php-fpm
+
+- name: "[HTTP] - generate Nextcloud configuration for nginx"
+  template:
+    dest: /etc/nginx/sites-available/nextcloud.cnf
+    src: templates/nginx_root.j2
+  notify: reload nginx
+
+- name: "[HTTP] - Enable Nextcloud in nginx conf"
+  file:
+    path: /etc/nginx/sites-enabled/nextcloud
+    src: /etc/nginx/sites-available/nextcloud.cnf
+    state: link
+    # validate: "/usr/sbin/nginx -t #%s"
+  notify: reload nginx
