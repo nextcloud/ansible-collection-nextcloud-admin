@@ -1,3 +1,5 @@
+Still a work in progress.
+Lots of features are missing
 install_nextcloud
 =========
 
@@ -53,6 +55,7 @@ Example Playbook
 Some user want to install a new nextcloud server on an existing host with already some services running like mysql and nginx. But he do not want to have redondant services on its host
 
 He can run the role with the following values to install nextcloud accordingly to its server constraints.
+```YAML
 ---
 - hosts: servers
   roles:
@@ -64,7 +67,7 @@ He can run the role with the following values to install nextcloud accordingly t
      nextcloud_data_dir: "/var/ncdata"
      nextcloud_db_pwd: "secretagency"
      mysql_root_pwd: "42h2g2"
-
+```
 License
 -------
 
