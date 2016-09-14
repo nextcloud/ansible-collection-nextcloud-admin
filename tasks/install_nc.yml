@@ -11,6 +11,10 @@
     owner: "{{ websrv_user }}"
     group: "{{ websrv_group }}"
 
+- name: "[NC] - generate {{ nextcloud_admin_name }} password:"
+  set_fact: nextcloud_admin_pwd="{{ lookup( 'password', '/tmp/ncadminpasswordfile' ) }}"
+  when: nextcloud_admin_pwd is not defined
+
 - name: "[NC] - Set temporary permissions for command line installation."
   file:
     path: "{{ nextcloud_webroot }}"

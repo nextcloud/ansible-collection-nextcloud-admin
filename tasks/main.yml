@@ -48,10 +48,6 @@
 - name: Trigger all pending handlers
   meta: flush_handlers
 
-- name : "generate {{ nextcloud_admin_name }} password:"
-  set_fact: nextcloud_admin_pwd="{{ lookup( 'password', '/tmp/ncadminpasswordfile' ) }}"
-  when: nextcloud_admin_pwd is not defined
-
   # will not run occ installation if already installed => config.php exists : 
 - name: Check Nextcloud installation file 
   stat: "path={{ nextcloud_webroot }}/config/config.php"
