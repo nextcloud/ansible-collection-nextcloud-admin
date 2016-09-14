@@ -40,6 +40,10 @@ nextcloud_cert_method: "self-signed" # method for providing certificates : "self
 # nextcloud_cert: /path/to/cert # used by the "signed" method : local path to the certificate.
 # nextcloud_cert_key: /path/to/cert/key # used by the "signed" method : local path to the certificate's key.
 # nextcloud_cert_dir: /remote/path/to/cert/files # used by the "signed" method : path to the certificate's files on the remote files.
+nextcloud_tls_cert_method: "self-signed" # method for providing certificates : "self-signed", "signed" or "cerbot" (letsencrypt)
+# nextcloud_tls_cert: /path/to/cert # used by the "signed" method : local path to the certificate.
+# nextcloud_tls_cert_key: /path/to/cert/key # used by the "signed" method : local path to the certificate's key.
+# nextcloud_tls_cert_dir: /remote/path/to/cert/files # used by the "signed" method : path to the certificate's files on the remote files.
 
 # [SYSTEM]
 websrv_user: "www-data" # system user for the http server

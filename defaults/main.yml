@@ -20,10 +20,12 @@ nextcloud_db_admin: "ncadmin"
 
 # [TLS]
 nextcloud_enforce_https: true
-nextcloud_cert_method: "self-signed"
-# nextcloud_cert_method: "self-signed" | "signed" | "cerbot" (letsencrypt)
-# nextcloud_cert: /path/to/cert
-# nextcloud_cert_key: /path/to/cert/key
+nextcloud_tls_cert_method: "self-signed"
+# nextcloud_tls_cert_method: "self-signed" | "signed" | "cerbot" (letsencrypt) | "installed"
+# nextcloud_tls_cert: /path/to/cert
+# nextcloud_tls_cert_key: /path/to/cert/key
+# nextcloud_tls_src_cert: /path/to/cert
+# nextcloud_tls_src_cert_key: /path/to/cert/key
 
 # [SYSTEM]
 websrv_user: "www-data"

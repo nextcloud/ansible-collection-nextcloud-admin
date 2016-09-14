@@ -25,8 +25,14 @@
   include: tasks/mysql_config.yml
   when: nextcloud_db_backend == "mysql" or nextcloud_db_backend == "mariadb"
 
-- name: configure TLS certificates
-  include: tasks/install_tls.yml
+- name: Instal given signed certificates
+  include: tasks/tls_signed.yml
+  when: nextcloud_tls_cert_method == "signed"
+
+- name: configure self signed TLS certificates
+  include: tasks/tls_selfsigned.yml
+  when: nextcloud_tls_cert_method == "self-signed"
+
 - name: Configure Nginx web server.
   include: tasks/nginx_config.yml
   when: nextcloud_websrv == "nginx"

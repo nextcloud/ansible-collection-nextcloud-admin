@@ -21,6 +21,8 @@ server {
 
     ssl_certificate {{ nextcloud_cert_file }};
     ssl_certificate_key {{ nextcloud_cert_key_file }};
+    ssl_certificate {{ nextcloud_tls_cert_file }};
+    ssl_certificate_key {{ nextcloud_tls_cert_key_file }};
 
     # Add headers to serve security related headers
     # Before enabling Strict-Transport-Security headers please read into this
