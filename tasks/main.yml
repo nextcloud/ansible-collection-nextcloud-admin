@@ -25,6 +25,10 @@
   include: tasks/mysql_config.yml
   when: nextcloud_db_backend == "mysql" or nextcloud_db_backend == "mariadb"
 
+- name: Verify permission for installed TLS certificates
+  include: tasks/tls_installed.yml
+  when: nextcloud_tls_cert_method == "installed"
+  
 - name: Instal given signed certificates
   include: tasks/tls_signed.yml
   when: nextcloud_tls_cert_method == "signed"
