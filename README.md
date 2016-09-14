@@ -35,7 +35,7 @@ nextcloud_db_admin: "ncadmin" # database user login
 # nextcloud_db_pwd: "secret" # database user password. not set by default, a ramdom password will be generated.
 
 # [TLS]
-nextcloud_enforce_https: true # force http trafic to https
+nextcloud_tls_enforce: true # force http trafic to https
 nextcloud_tls_cert_method: "self-signed" # method for providing certificates : "self-signed", "signed" or "cerbot" (letsencrypt)
 # nextcloud_tls_cert: /path/to/cert # used by the "signed" method : local path to the certificate.
 # nextcloud_tls_cert_key: /path/to/cert/key # used by the "signed" method : local path to the certificate's key.

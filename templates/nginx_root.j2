@@ -3,7 +3,7 @@ upstream php-handler {
     server unix:{{ php_socket }};
 }
 
-{% if nextcloud_enforce_https %}
+{% if nextcloud_tls_enforce %}
 server {
     listen 80;
     server_name {{ nextcloud_trusted_domain }};
@@ -13,14 +13,12 @@ server {
 
 {% endif %}
 server {
-{% if not nextcloud_enforce_https %}
+{% if not nextcloud_tls_enforce %}
     listen 80;
 {% endif %}
     listen 443 ssl;
     server_name {{ nextcloud_trusted_domain }};
 
-    ssl_certificate {{ nextcloud_cert_file }};
-    ssl_certificate_key {{ nextcloud_cert_key_file }};
     ssl_certificate {{ nextcloud_tls_cert_file }};
     ssl_certificate_key {{ nextcloud_tls_cert_key_file }};
 

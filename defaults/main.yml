@@ -19,7 +19,7 @@ nextcloud_db_admin: "ncadmin"
 # nextcloud_db_pwd: "secret"
 
 # [TLS]
-nextcloud_enforce_https: true
+nextcloud_tls_enforce: true
 nextcloud_tls_cert_method: "self-signed"
 # nextcloud_tls_cert_method: "self-signed" | "signed" | "cerbot" (letsencrypt) | "installed"
 # nextcloud_tls_cert: /path/to/cert
