@@ -65,15 +65,6 @@
     insertbefore: "\\);"
     state: present
 
-# Following https://docs.nextcloud.com/server/10/admin_manual/installation/installation_wizard.html#strong-perms-label
-# - name: Setting stronger ownership & permissions
-  # file:
-    # path: "{{ nextcloud_data_dir }}"
-    # recurse: yes
-    # owner: root
-    # group: "{{ websrv_group }}"
-    # mode: u=rwX,g=rX,o-rwx
-
 - name: "[NC] - Ensure Nextcloud directories are 0750"
   command: find {{ nextcloud_data_dir }} -type d -exec chmod -c 0750 {} \;
   register: chmod_result
