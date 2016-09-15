@@ -21,25 +21,31 @@ Settable variables and their default
 # [CONFIG]
 nextcloud_version: 10.0.0 # nextcloud version you want to install
 nextcloud_trusted_domain: ansible_default_ipv4.address # the first domain you will use to access the nextcloud server
-nextcloud_websrv: "apache" # the http server nextcloud will run on. values are : apache or nginx
-nextcloud_webroot: "/opt/nextcloud" # nextcloud installation directory. Warning : only the parent directory must exist on the first run.
+nextcloud_websrv: "apache" # the http server nextcloud will run on. values are: apache or nginx
+nextcloud_webroot: "/opt/nextcloud" # nextcloud installation directory. Warning: only the parent directory must exist on the first run.
 nextcloud_data_dir: "{{ nextcloud_webroot }}/data" # nextcloud data directory
 nextcloud_admin_name: "admin" # nextcloud admin login
 # nextcloud_admin_pwd: "secret" # nextcloud admin password. not set by default, a ramdom password will be generated.
 nextcloud_dl_url: "https://download.nextcloud.com/server/releases" # nextcloud repository
 
 # [DATABASE]
-nextcloud_db_backend: "mysql" # database backend used by nextcloud. values are : "mysql"/"mariadb" or "PostgreSQL"
-nextcloud_db_name: "nextcloud" # databse name 
+nextcloud_db_backend: "mysql" # database backend used by nextcloud. values are: "mysql"/"mariadb" or "PostgreSQL"
+nextcloud_db_name: "nextcloud" # database name.
 nextcloud_db_admin: "ncadmin" # database user login
 # nextcloud_db_pwd: "secret" # database user password. not set by default, a ramdom password will be generated.
 
 # [TLS]
 nextcloud_tls_enforce: true # force http trafic to https
-nextcloud_tls_cert_method: "self-signed" # method for providing certificates : "self-signed", "signed" or "cerbot" (letsencrypt)
-# nextcloud_tls_cert: /path/to/cert # used by the "signed" method : local path to the certificate.
-# nextcloud_tls_cert_key: /path/to/cert/key # used by the "signed" method : local path to the certificate's key.
-# nextcloud_tls_cert_dir: /remote/path/to/cert/files # used by the "signed" method : path to the certificate's files on the remote files.
+nextcloud_tls_cert_method: "self-signed" # method for providing certificates:
+# - self-signed: generate a one year self-signed certificate for the trusted domain on the remote host in /etc/ssl.
+# - certbot: Use cerbot/letsencrypt to provide a signed certificate for the trusted domain.
+# - signed: copy provided signed certificate for the trusted domain to the remote host or in /etc/ssl by default.
+# - installed: if the certificate for the trusted domain is already on the remote host specify its location.
+# nextcloud_tls_src_cert: /path/to/cert # local path to the certificate's key. used by "signed" (mandatory)
+# nextcloud_tls_src_cert_key: /path/to/cert/key # local path to the certificate. used by "signed" (mandatory)
+# the following should be absolute path:
+# nextcloud_tls_cert: /path/to/cert # remote path to the certificate's key. used by "signed" (opt) and "installed" (mandatory)
+# nextcloud_tls_cert_key: /path/to/cert/key # remote path to the certificate. used by "signed" (opt) and "installed" (mandatory)
 
 # [SYSTEM]
 websrv_user: "www-data" # system user for the http server
