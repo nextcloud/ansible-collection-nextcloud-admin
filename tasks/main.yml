@@ -46,10 +46,10 @@
   when: nextcloud_db_backend in ["mysql", "mariadb"]
 
   # will not run occ installation if already installed => config.php exists : 
-- name: Check Nextcloud installation file 
-  stat: "path={{ nextcloud_webroot }}/config/config.php"
-  register: wroot
+# - name: Check Nextcloud installation file 
+  # stat: "path={{ nextcloud_webroot }}/config/config.php"
+  # register: wroot
 
 - name: Run Nextcloud command line installation
   include: tasks/install_nc.yml
-  when: wroot.stat.exists is defined and not wroot.stat.exists
+  # when: wroot.stat.exists is defined and not wroot.stat.exists
