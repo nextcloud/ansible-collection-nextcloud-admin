@@ -6,7 +6,6 @@
     - "php{{ php_ver }}-fpm"
     - "php{{ php_ver }}-gd"
     - "php{{ php_ver }}-json"
-    - "php{{ php_ver }}-mysql"
     - "php{{ php_ver }}-curl"
     - "php{{ php_ver }}-xml"
     - "php{{ php_ver }}-zip"

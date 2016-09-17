@@ -3,7 +3,10 @@
 
 - name: "[DB] - {{ nextcloud_db_backend }} service is installed."
   package: "name={{ nextcloud_db_backend }}-server state=present"
-  
+
+- name: "[DB] - PHP module for {{ nextcloud_db_backend }} is installed."
+  package: "name=php{{ php_ver }}-mysql state=present"
+
 - name: "[DB] - the python module mysqldb is present"
   # needed by mysql_* ansible modules
   package: name=python-mysqldb state=present
