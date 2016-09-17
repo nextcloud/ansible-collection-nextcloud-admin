@@ -58,12 +58,15 @@
     insertafter: "0 => '"
     state: present
 
-- name: "[NC] - Add local cache in config.php"
+- name: "[NC] - Add local cache and urandom in config.php"
   lineinfile:
     dest: "{{ nextcloud_webroot }}/config/config.php"
-    line: "  'memcache.local' => '\\OC\\Memcache\\APCu',"
+    line: "{{ item }}"
     insertbefore: "\\);"
     state: present
+  with_items:
+    - "  'memcache.local' => '\\OC\\Memcache\\APCu',"
+    - "  'open_basedir' => '/dev/urandom'"
 
 - name: "[NC] - Ensure Nextcloud directories are 0750"
   command: find {{ nextcloud_data_dir }} -type d -exec chmod -c 0750 {} \;
