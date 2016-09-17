@@ -1,7 +1,7 @@
 Still a work in progress.
-Lots of features are missing
+Some features are missing
 
-Missing values: Apache, PostgreSQL and certbot
+Missing values: PostgreSQL and certbot
 install_nextcloud
 =========
 
