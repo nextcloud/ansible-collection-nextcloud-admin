@@ -68,7 +68,7 @@
 - name: "[HTTP] - generate Nextcloud configuration for nginx"
   template:
     dest: /etc/nginx/sites-available/nextcloud.cnf
-    src: templates/nginx_root.j2
+    src: templates/nginx_nc_root.j2
   notify: reload nginx
 
 - name: "[HTTP] - Enable Nextcloud in nginx conf"
