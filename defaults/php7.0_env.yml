@@ -5,4 +5,7 @@ php_ver: "7.0"
 php_dir: "/etc/php/7.0"
 php_bin: "php-fpm7.0"
 php_pkg_apcu: "php-apcu"
+php_pkg_spe: 
+  - "php-imap"
+  - "php-imagick"
 php_socket: "/run/php/php7.0-fpm.sock"

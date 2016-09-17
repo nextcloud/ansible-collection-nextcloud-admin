@@ -1,10 +1,13 @@
 ---
-- name: "[HTTP] - Set the requires packages."
+- name: "[HTTP] - Requires and recommended packages are installed."
   package: "name={{ item }} state=present"
   with_items:
     - nginx
+    - smbclient
     - "php{{ php_ver }}-fpm"
     - "php{{ php_ver }}-gd"
+    - "php{{ php_ver }}-ldap"
+    - "php{{ php_ver }}-imap"
     - "php{{ php_ver }}-json"
     - "php{{ php_ver }}-curl"
     - "php{{ php_ver }}-xml"
@@ -12,6 +15,10 @@
     - "php{{ php_ver }}-intl"
     - "php{{ php_ver }}-mcrypt"
     - "php{{ php_ver }}-mbstring"
+    
+- name: "[HTTP] - Some other pakages are installed."
+  package: "name={{ item }} state=present"
+  with_items: "{{ php_pkg_spe }}"
 
 - name: "[HTTP] - APCu is installed."
   package: "name={{ php_pkg_apcu }} state=present"

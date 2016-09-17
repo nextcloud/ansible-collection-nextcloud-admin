@@ -5,4 +5,7 @@ php_ver: 5
 php_dir: "/etc/php5"
 php_bin: "php5-fpm"
 php_pkg_apcu: "php5-apcu"
+php_pkg_spe:
+  - "php5-imap"
+  - "php5-imagick"
 php_socket: "/var/run/php5-fpm.sock"
