@@ -41,8 +41,6 @@
   include: tasks/apache_config.yml
   when: nextcloud_websrv == "apache"
 
-- name: Trigger all pending handlers
-  meta: flush_handlers
 - name: Configure {{ nextcloud_db_backend }} database
   include: tasks/mysql_config.yml
   when: nextcloud_db_backend in ["mysql", "mariadb"]

@@ -4,12 +4,22 @@
   service:
     name: mysql
     state: restarted
+
+- name: start nginx
+  service:
+    name: nginx
+    state: started
   
 - name: reload nginx
   service:
     name: nginx
     state: reloaded
-  
+
+- name: start php-fpm
+  service: 
+    name: php{{ php_ver }}-fpm
+    state: started
+
 - name: reload php-fpm
   service: 
     name: php{{ php_ver }}-fpm

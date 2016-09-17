@@ -2,6 +2,9 @@
 #########
 # Run command line installation.
 # the web server must be running by now in order to launch the installation
+- name: Trigger all pending handlers
+  meta: flush_handlers
+
 - name: "[NC] - Setting directory ownership & permissions for the data folder"
   file:
     path: "{{ nextcloud_data_dir }}"
@@ -23,11 +26,6 @@
     owner: "{{ websrv_user }}"
     group: "{{ websrv_group }}"
 
-- name: "[NC] - Web services are started"
-  service: "name={{ item }} state=started"
-  with_items:
-    - nginx
-    - php{{ php_ver }}-fpm
 
 # fix for mariadb with occ    
 - set_fact: nextcloud_tmp_backend="{{ nextcloud_db_backend }}"
