@@ -16,12 +16,11 @@
   register: mycred
 
 - block:
-  - name: "[DB] - generate {{ nextcloud_db_backend }} root Password:"
-    set_fact: mysql_root_pwd="{{ lookup( 'password', '/tmp/mysqlrootpasswordfile' ) }}"
-  
-  - debug: var=mysql_root_pwd
-  
-  - name: "[DB] - Update {{ nextcloud_db_backend }} root password"
+  - name: "[{{ nextcloud_db_backend }}] - generate {{ nextcloud_db_backend }} root Password:"
+    set_fact: mysql_root_pwd="{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_trusted_domain +'/mysql_root.pwd' ) }}"
+    when: mysql_root_pwd is not defined
+
+  - name: "[{{ nextcloud_db_backend }}] - Update {{ nextcloud_db_backend }} root password"
     mysql_user:
       name: root
       host: "{{ item }}"
@@ -62,8 +61,8 @@
   notify: restart mysql
   when: nextcloud_db_backend == "mysql"
 
-  set_fact: nextcloud_db_pwd="{{ lookup( 'password', '/tmp/mysqlpasswordfile' ) }}"
 - name: "[{{ nextcloud_db_backend }}] - Generate database user Password."
+  set_fact: nextcloud_db_pwd="{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_trusted_domain +'/db_admin.pwd' ) }}"
   when: nextcloud_db_pwd is not defined
 
 - debug: var=nextcloud_db_pwd
