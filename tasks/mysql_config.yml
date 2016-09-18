@@ -1,8 +1,7 @@
 ---
-#TOTO : need improvments on managing the mysql root password.
-
 - name: "[{{ nextcloud_db_backend }}] - Service is installed."
   package: "name={{ nextcloud_db_backend }}-server state=present"
+  register: db_install
 
 - name: "[{{ nextcloud_db_backend }}] - PHP module is installed."
   package: "name=php{{ php_ver }}-mysql state=present"
@@ -10,10 +9,6 @@
 - name: "[{{ nextcloud_db_backend }}] - the python module mysqldb is present"
   # needed by mysql_* ansible modules
   package: name=python-mysqldb state=present
-
-- name: "[DB] - Check credentials"
-  stat: "path=/root/.my.cnf"
-  register: mycred
 
 - block:
   - name: "[{{ nextcloud_db_backend }}] - generate {{ nextcloud_db_backend }} root Password:"
@@ -32,8 +27,23 @@
     with_items:
       - 127.0.0.1
       - ::1
+      - localhost
     ignore_errors: yes
-    
+  
+  - name: "[{{ nextcloud_db_backend }}] - Delete the anonymous user."
+    mysql_user: user="" state="absent"
+    ignore_errors: yes
+  
+  - name: "[{{ nextcloud_db_backend }}] - Removes the MySQL test database"
+    mysql_db: name=test state=absent
+    ignore_errors: yes
+  when: db_install.changed
+  
+- name: "[{{ nextcloud_db_backend }}] - Check credentials"
+  stat: "path=/root/.my.cnf"
+  register: mycred
+
+- block:
   - name: "[{{ nextcloud_db_backend }}] - Make the file .my.cnf"
     file: path=/root/.my.cnf state=touch mode="0640"
   
@@ -44,22 +54,13 @@
         [client]
         user=root
         password="{{ mysql_root_pwd }}"
-  when: mysql_root_pwd is not defined and (mycred.stat.exists is defined and not mycred.stat.exists)
-
-- name: "[DB] - Delete the anonymous user."
-  mysql_user: user="" state="absent"
-  ignore_errors: yes
-
-- name: "[DB] - Removes the MySQL test database"
-  mysql_db: name=test state=absent
-  ignore_errors: yes
+  when: mycred.stat.exists is defined and not mycred.stat.exists
 
 - name: "[{{ nextcloud_db_backend }}] - Fix mysql binary logging for nextcloud"
   copy:
     dest: /etc/mysql/conf.d/binlog_format_mixed.cnf
     src: files/binlog_format_mixed.cnf
   notify: restart mysql
-  when: nextcloud_db_backend == "mysql"
 
 - name: "[{{ nextcloud_db_backend }}] - Generate database user Password."
   set_fact: nextcloud_db_pwd="{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_trusted_domain +'/db_admin.pwd' ) }}"
