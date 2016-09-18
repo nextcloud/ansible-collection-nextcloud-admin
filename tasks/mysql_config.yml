@@ -1,13 +1,13 @@
 ---
 #TOTO : need improvments on managing the mysql root password.
 
-- name: "[DB] - {{ nextcloud_db_backend }} service is installed."
+- name: "[{{ nextcloud_db_backend }}] - Service is installed."
   package: "name={{ nextcloud_db_backend }}-server state=present"
 
-- name: "[DB] - PHP module for {{ nextcloud_db_backend }} is installed."
+- name: "[{{ nextcloud_db_backend }}] - PHP module is installed."
   package: "name=php{{ php_ver }}-mysql state=present"
 
-- name: "[DB] - the python module mysqldb is present"
+- name: "[{{ nextcloud_db_backend }}] - the python module mysqldb is present"
   # needed by mysql_* ansible modules
   package: name=python-mysqldb state=present
 
@@ -35,10 +35,10 @@
       - ::1
     ignore_errors: yes
     
-  - name: "[DB] - Make the file .my.cnf"
+  - name: "[{{ nextcloud_db_backend }}] - Make the file .my.cnf"
     file: path=/root/.my.cnf state=touch mode="0640"
   
-  - name: "[DB] - Add content to .my.cnf"
+  - name: "[{{ nextcloud_db_backend }}] - Add content to .my.cnf"
     blockinfile:
       dest: /root/.my.cnf
       block: |
@@ -55,23 +55,23 @@
   mysql_db: name=test state=absent
   ignore_errors: yes
 
-- name: "[DB] - Fix mysql binary logging for nextcloud"
+- name: "[{{ nextcloud_db_backend }}] - Fix mysql binary logging for nextcloud"
   copy:
     dest: /etc/mysql/conf.d/binlog_format_mixed.cnf
     src: files/binlog_format_mixed.cnf
   notify: restart mysql
   when: nextcloud_db_backend == "mysql"
 
-- name: "[DB] - Generate database Password."
   set_fact: nextcloud_db_pwd="{{ lookup( 'password', '/tmp/mysqlpasswordfile' ) }}"
+- name: "[{{ nextcloud_db_backend }}] - Generate database user Password."
   when: nextcloud_db_pwd is not defined
 
 - debug: var=nextcloud_db_pwd
 
-- name: "[DB] - Add Database {{ nextcloud_db_name }}."
+- name: "[{{ nextcloud_db_backend }}] - Add Database {{ nextcloud_db_name }}."
   mysql_db: name={{ nextcloud_db_name }} state=present
    
-- name: "[DB] - Configure the database user."
+- name: "[{{ nextcloud_db_backend }}] - Configure the database user."
   mysql_user:
     name: "{{ nextcloud_db_admin }}"
     password: "{{ nextcloud_db_pwd }}"
