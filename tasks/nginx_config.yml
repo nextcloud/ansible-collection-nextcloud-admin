@@ -64,7 +64,20 @@
     state: present
     # validate: "/usr/sbin/{{ php_bin }} -t #%s"
   notify: reload php-fpm
+  
+- name: "[HTTP] - php handler configuration is present."
+  template:
+    dest: /etc/nginx/sites-available/php_handler.cnf
+    src: templates/nginx_php_handler.j2
+  notify: reload nginx
 
+- name: "[HTTP] - php handler is enabled"
+  file:
+    path: /etc/nginx/sites-enabled/php_handler
+    src: /etc/nginx/sites-available/php_handler.cnf
+    state: link
+  notify: reload nginx
+  
 - name: "[HTTP] - generate Nextcloud configuration for nginx"
   template:
     dest: /etc/nginx/sites-available/nextcloud.cnf
