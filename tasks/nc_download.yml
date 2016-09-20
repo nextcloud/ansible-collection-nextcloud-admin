@@ -1,0 +1,21 @@
+---
+- name: "[NC-DL] - Nextcloud is not installed "
+  stat: "path={{ nextcloud_webroot }}/index.php"
+  register: wroot
+
+- name: "[NC-DL] - Unzip is installed"
+  package: name=unzip state=installed
+  
+- block:
+  - name: "Download & extract Nextcloud to /tmp." 
+    unarchive:
+      copy: no
+      src: "{{ nextcloud_dl_url }}/nextcloud-{{ nextcloud_version }}.zip"
+      dest: "/tmp/"
+  
+  - name: "[NC-DL] - Move extracted files to {{ nextcloud_webroot }}."
+    command: "cp -r /tmp/nextcloud/ {{ nextcloud_webroot }}/"
+  
+  - name: "[NC-DL] - Remove nextcloud archive files"
+    file: path=/tmp/nextcloud state=absent
+  when: wroot.stat.exists is defined and not wroot.stat.exists

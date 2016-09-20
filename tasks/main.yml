@@ -3,27 +3,6 @@
 - include: tasks/setup_env.yml
   # load os specific variables
 
-- name: Check the environment path
-  stat: "path={{ nextcloud_webroot }}/index.php"
-  register: wroot
-
-- name: Unzip is installed
-  package: name=unzip state=installed
-  
-- block:
-  - name: "Download & extract Nextcloud to /tmp." 
-    unarchive:
-      copy: no
-      src: "{{ nextcloud_dl_url }}/nextcloud-{{ nextcloud_version }}.zip"
-      dest: "/tmp/"
-  
-  - name: "Move extracted files to {{ nextcloud_webroot }}."
-    command: "cp -r /tmp/nextcloud/ {{ nextcloud_webroot }}/"
-  
-  - name: Remove nextcloud archive files
-    file: path=/tmp/nextcloud state=absent
-  when: wroot.stat.exists is defined and not wroot.stat.exists
-
 - name: Verify permission for installed TLS certificates
   include: tasks/tls_installed.yml
   when: nextcloud_tls_cert_method == "installed"
@@ -56,7 +35,10 @@
 # - name: Check Nextcloud installation file 
   # stat: "path={{ nextcloud_webroot }}/config/config.php"
   # register: wroot
+  
+- name: Downloading Nextcloud 
+  include: tasks/nc_download.yml
 
-- name: Run Nextcloud command line installation
+- name: Nextcloud installation
   include: tasks/nc_installation.yml
   # when: wroot.stat.exists is defined and not wroot.stat.exists
