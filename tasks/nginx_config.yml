@@ -65,6 +65,11 @@
     # validate: "/usr/sbin/{{ php_bin }} -t #%s"
   notify: reload php-fpm
   
+- name: "[HTTP] - Public Diffie-Hellman Parameter are generated. This might take a while."
+  command: "openssl dhparam -out {{ nextcloud_tls_dhparam }} 2048"
+  args:
+    creates: "{{ nextcloud_tls_dhparam }}"
+
 - name: "[HTTP] - php handler configuration is present."
   template:
     dest: /etc/nginx/sites-available/php_handler.cnf
