@@ -55,6 +55,7 @@
   args:
     chdir: "{{ nextcloud_webroot }}"
     creates: "{{ nextcloud_webroot }}/config/config.php"
+  notify: "reload {{ nextcloud_websrv }}"
     
 - name: "[NC] - Add {{ nextcloud_trusted_domain }} in config.php"
   lineinfile:
