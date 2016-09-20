@@ -83,14 +83,14 @@
   
 - name: "[NGINX] -  generate Nextcloud configuration for nginx"
   template:
-    dest: /etc/nginx/sites-available/nextcloud.cnf
+    dest: /etc/nginx/sites-available/nc_{{ nextcloud_trusted_domain }}.cnf
     src: templates/nginx_nc_root.j2
   notify: reload nginx
 
 - name: "[NGINX] -  Enable Nextcloud in nginx conf"
   file:
-    path: /etc/nginx/sites-enabled/nextcloud
-    src: /etc/nginx/sites-available/nextcloud.cnf
+    path: /etc/nginx/sites-enabled/nc_{{ nextcloud_trusted_domain }}
+    src: /etc/nginx/sites-available/nc_{{ nextcloud_trusted_domain }}.cnf
     state: link
     # validate: "/usr/sbin/nginx -t #%s"
   notify: reload nginx

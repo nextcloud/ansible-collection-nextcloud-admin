@@ -43,13 +43,13 @@
 
 - name: "[APACHE] -  generate Nextcloud configuration for apache"
   template:
-    dest: /etc/apache2/sites-available/nextcloud.conf
+    dest: /etc/apache2/sites-available/nc_{{ nextcloud_trusted_domain }}.conf
     src: templates/apache_nc.j2
 
 - name: "[APACHE] -  Enable Nextcloud site in apache conf"
   file:
-    path: /etc/apache2/sites-enabled/nextcloud.conf
-    src: /etc/apache2/sites-available/nextcloud.conf
+    path: /etc/apache2/sites-enabled/nc_{{ nextcloud_trusted_domain }}.conf
+    src: /etc/apache2/sites-available/nc_{{ nextcloud_trusted_domain }}.conf
     state: link
     # validate: "/usr/sbin/nginx -t #%s"
   notify: restart apache
