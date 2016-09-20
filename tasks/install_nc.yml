@@ -26,6 +26,13 @@
     owner: "{{ websrv_user }}"
     group: "{{ websrv_group }}"
 
+# fix for ubuntu 14.04 with permission issue for unprivileged user :
+- name: "[NC] - Adding ACL on trusty."
+  apt:
+    name: acl
+    state: installed
+    update_cache: yes
+  when: ansible_distribution_release == "trusty"
 
 # fix for mariadb with occ    
 - set_fact: nextcloud_tmp_backend="{{ nextcloud_db_backend }}"
@@ -34,7 +41,7 @@
   when: nextcloud_db_backend == "mariadb"
 
 - name: "[NC] - Run occ installation command"
-  become: true
+  # become: true
   become_user: "{{ websrv_user }}"
   command: >
       php occ  maintenance:install
