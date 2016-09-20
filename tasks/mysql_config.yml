@@ -31,11 +31,19 @@
     ignore_errors: yes
   
   - name: "[{{ nextcloud_db_backend }}] - Delete the anonymous user."
-    mysql_user: user="" state="absent"
+    mysql_user:
+      user: ""
+      state: "absent"
+      login_password: "{{ mysql_root_pwd }}"
+      login_user: root
     ignore_errors: yes
   
   - name: "[{{ nextcloud_db_backend }}] - Removes the MySQL test database"
-    mysql_db: name=test state=absent
+    mysql_db:
+      name: test
+      state: absent
+      login_password: "{{ mysql_root_pwd }}"
+      login_user: root
     ignore_errors: yes
   when: db_install.changed
   
