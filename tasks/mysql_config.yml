@@ -66,8 +66,6 @@
   set_fact: nextcloud_db_pwd="{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_trusted_domain +'/db_admin.pwd' ) }}"
   when: nextcloud_db_pwd is not defined
 
-- debug: var=nextcloud_db_pwd
-
 - name: "[{{ nextcloud_db_backend }}] - Add Database {{ nextcloud_db_name }}."
   mysql_db: name={{ nextcloud_db_name }} state=present
    
