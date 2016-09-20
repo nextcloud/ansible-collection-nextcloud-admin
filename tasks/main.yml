@@ -7,11 +7,14 @@
   stat: "path={{ nextcloud_webroot }}/index.php"
   register: wroot
 
+- name: Unzip is installed
+  package: name=unzip state=installed
+  
 - block:
   - name: "Download & extract Nextcloud to /tmp." 
     unarchive:
       copy: no
-      src: "{{ nextcloud_dl_url }}/nextcloud-{{ nextcloud_version }}.tar.bz2"
+      src: "{{ nextcloud_dl_url }}/nextcloud-{{ nextcloud_version }}.zip"
       dest: "/tmp/"
   
   - name: "Move extracted files to {{ nextcloud_webroot }}."
