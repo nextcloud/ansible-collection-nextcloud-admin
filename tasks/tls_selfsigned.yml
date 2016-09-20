@@ -1,7 +1,7 @@
 ---
 - set_fact: nextcloud_tls_cert_file="/etc/ssl/{{ nextcloud_trusted_domain }}.crt"
 - set_fact: nextcloud_tls_cert_key_file="/etc/ssl/{{ nextcloud_trusted_domain }}.key"
-- name: "[TLS] - create self-signed SSL cert"
+- name: "[selfsigned TLS] - create self-signed SSL cert"
   command: >
     openssl req -new -nodes -x509 
     -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=${hostname --fqdn}"
@@ -12,13 +12,13 @@
   args:
     creates: "{{ nextcloud_tls_cert_key_file }}"
 
-- name: "[TLS] - check TLS certicate permissions"
+- name: "[selfsigned TLS] - check TLS certicate permissions"
   file:
     path: "{{ nextcloud_tls_cert_file }}"
     mode: 0644
     group: "{{ websrv_group }}"
 
-- name: "[TLS] - check TLS key permissions"
+- name: "[selfsigned TLS] - check TLS key permissions"
   file:
     path: "{{ nextcloud_tls_cert_key_file }}"
     mode: 0640

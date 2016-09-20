@@ -1,5 +1,5 @@
 ---
-- name: "[HTTP] - Requires and recommended packages are installed."
+- name: "[APACHE] -  Requires and recommended packages are installed."
   package: "name={{ item }} state=present"
   with_items:
     - apache2
@@ -14,26 +14,26 @@
     - "php{{ php_ver }}-mcrypt"
   notify: start apache
 
-- name: "[HTTP] - Some other pakages are installed."
+- name: "[APACHE] -  Some other pakages are installed."
   package: "name={{ item }} state=present"
   with_items: "{{ php_pkg_spe }}"
 
-- name: "[HTTP] - APCu is installed."
+- name: "[APACHE] -  APCu is installed."
   package: "name={{ php_pkg_apcu }} state=present"
   when : ansible_distribution_release not in [ "trusty" ]
 
 - block:
   # load APCu from backports as the default version for trusty is obsolete.
-  - name: "[HTTP] - Configure trusty backport."
+  - name: "[APACHE] -  Configure trusty backport."
     apt_repository:
       repo: "deb http://fr.archive.ubuntu.com/ubuntu/ trusty-backports main restricted universe multiverse"
       state: present
       update_cache: yes
-  - name: "[HTTP] - Install APCu from backports."
+  - name: "[APACHE] -  Install APCu from backports."
     apt: "name={{ php_pkg_apcu }} state=latest default_release=trusty-backports"
   when: ansible_distribution_release == "trusty"
 
-- name: "[HTTP] - enable APC for php CLI"
+- name: "[APACHE] -  enable APC for php CLI"
   lineinfile: 
     dest: "{{ php_dir }}/cli/php.ini"
     line: "apc.enable_cli = 1"
@@ -41,12 +41,12 @@
     state: present
     # validate: "/usr/sbin/{{ php_bin }} -t #%s"
 
-- name: "[HTTP] - generate Nextcloud configuration for apache"
+- name: "[APACHE] -  generate Nextcloud configuration for apache"
   template:
     dest: /etc/apache2/sites-available/nextcloud.conf
     src: templates/apache_nc.j2
 
-- name: "[HTTP] - Enable Nextcloud site in apache conf"
+- name: "[APACHE] -  Enable Nextcloud site in apache conf"
   file:
     path: /etc/apache2/sites-enabled/nextcloud.conf
     src: /etc/apache2/sites-available/nextcloud.conf
@@ -54,7 +54,7 @@
     # validate: "/usr/sbin/nginx -t #%s"
   notify: restart apache
 
-- name: "[HTTP] - Required Apache2 modules are enabled"
+- name: "[APACHE] -  Required Apache2 modules are enabled"
   apache2_module: state="present" name="{{ item }}"
   with_items:
     - rewrite
