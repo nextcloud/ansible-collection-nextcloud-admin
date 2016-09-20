@@ -28,11 +28,12 @@
 - block:
   # load APCu from backports as the default version for trusty is obsolete.
   - name: "[HTTP] - Configure trusty backport."
-    lineinfile:
-      dest: /etc/apt/sources.list
-      line: 'deb .* trusty-backports'
+    apt_repository:
+      repo: "deb http://fr.archive.ubuntu.com/ubuntu/ trusty-backports main restricted universe multiverse"
+      state: present
+      update_cache: yes
   - name: "[HTTP] - Install APCu from backports."
-    apt: "name={{ php_pkg_apcu }} state=latest default_release=trusty-backports update_cache=yes"
+    apt: "name={{ php_pkg_apcu }} state=latest default_release=trusty-backports"
   when: ansible_distribution_release == "trusty"
 
 - name: "[HTTP] - enable APC for php CLI"
