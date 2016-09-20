@@ -36,16 +36,20 @@
   include: tasks/tls_selfsigned.yml
   when: nextcloud_tls_cert_method == "self-signed"
 
+- name: Install certificates with letsencrypt
+  include: tasks/tls_certbot.yml
+  when: nextcloud_tls_cert_method == "certbot"
+
 - name: Configure Nginx web server.
-  include: tasks/nginx_config.yml
+  include: tasks/http_nginx.yml
   when: nextcloud_websrv == "nginx"
 
 - name: Configure Apache web server
-  include: tasks/apache_config.yml
+  include: tasks/http_apache.yml
   when: nextcloud_websrv == "apache"
 
 - name: Configure {{ nextcloud_db_backend }} database
-  include: tasks/mysql_config.yml
+  include: tasks/db_mysql.yml
   when: nextcloud_db_backend in ["mysql", "mariadb"]
 
   # will not run occ installation if already installed => config.php exists : 
@@ -54,5 +58,5 @@
   # register: wroot
 
 - name: Run Nextcloud command line installation
-  include: tasks/install_nc.yml
+  include: tasks/nc_installation.yml
   # when: wroot.stat.exists is defined and not wroot.stat.exists
