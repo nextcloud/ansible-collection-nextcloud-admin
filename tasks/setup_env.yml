@@ -1,9 +1,10 @@
 ---
-# additionnal setup for OS depedent environment
+# additionnal setup and fixes for OS depedent environment
 
 
 - name: "[ENV] - ca-certificate are up to date"
-  # needed for downloading from download.nextcloud.com : letsencrypt may not be trusted on older OS
+  # needed for downloading from download.nextcloud.com as the isite use letsencrypt certificates
+  # letsencrypt may not be trusted on older OS
   apt: update_cache=yes name=ca-certificates state=latest
   when: ansible_os_family in [ "Debian" ]
   
@@ -14,3 +15,11 @@
 - name: "[ENV] - Load environment for OS using php 7.0 "
   include_vars: defaults/php7.0_env.yml
   when: ansible_distribution_release in [ "xenial" ]
+  
+# fix for ubuntu 14.04 with permission issue for unprivileged user :
+- name: "[NC] - Adding ACL on trusty."
+  apt:
+    name: acl
+    state: installed
+    update_cache: yes
+  when: ansible_distribution_release == "trusty"
