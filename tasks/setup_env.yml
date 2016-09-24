@@ -16,6 +16,21 @@
   include_vars: defaults/php7.0_env.yml
   when: ansible_distribution_release in [ "xenial" ]
   
+  # fix for debian not using sudo : 
+  # defining if sudo is installed or not
+- name: "[PostgreSQL] - Debian only : checking sudo."
+  shell: "dpkg -l sudo"
+  changed_when: False
+  register: command_result
+  failed_when: False
+  when: ansible_distribution == "Debian"
+
+- debug: var=command_result
+
+- name: "[PostgreSQL] - rolling back to su."
+  set_fact: ansible_become_method="su"
+  when: command_result is defined and command_result.rc != 0
+  
 # fix for ubuntu 14.04 with permission issue for unprivileged user :
 - name: "[NC] - Adding ACL on trusty."
   apt:
