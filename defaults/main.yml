@@ -12,7 +12,7 @@ nextcloud_admin_name: "admin"
 nextcloud_dl_url: "https://download.nextcloud.com/server/releases"
 
 # [DATABASE]
-# nextcloud_db_backend: "mysql"/"mariadb" | "PostgreSQL"
+# nextcloud_db_backend: "mysql"/"mariadb" | "pgsql"
 nextcloud_db_backend: "mysql"
 nextcloud_db_name: "nextcloud"
 nextcloud_db_admin: "ncadmin"

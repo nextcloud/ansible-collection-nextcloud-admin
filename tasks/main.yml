@@ -30,7 +30,11 @@
 - name: Configure {{ nextcloud_db_backend }} database
   include: tasks/db_mysql.yml
   when: nextcloud_db_backend in ["mysql", "mariadb"]
-
+  
+- name: Configure PostgreSQL database
+  include: tasks/db_postgresql.yml
+  when: nextcloud_db_backend in ["pgsql"]
+  
   # will not run occ installation if already installed => config.php exists : 
 # - name: Check Nextcloud installation file 
   # stat: "path={{ nextcloud_webroot }}/config/config.php"
