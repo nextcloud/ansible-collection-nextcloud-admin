@@ -1,5 +1,5 @@
 ---
-- name: "[NGINX] -  Requires and recommended packages are installed."
+- name: "[NGINX] -  Required and recommended packages are installed."
   package: "name={{ item }} state=present"
   with_items:
     - nginx

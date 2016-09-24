@@ -1,5 +1,5 @@
 ---
-- name: "[APACHE] -  Requires and recommended packages are installed."
+- name: "[APACHE] -  Required and recommended packages are installed."
   package: "name={{ item }} state=present"
   with_items:
     - apache2
