@@ -1,7 +1,7 @@
 Still a work in progress.
 Some features are missing
 
-**Missing functionalities**: PostgreSQL and certbot
+**Missing functionalities**: Certbot
 
 ## install_nextcloud
 
