@@ -25,8 +25,6 @@
   failed_when: False
   when: ansible_distribution == "Debian"
 
-- debug: var=command_result
-
 - name: "[PostgreSQL] - rolling back to su."
   set_fact: ansible_become_method="su"
   when: command_result is defined and command_result.rc != 0
