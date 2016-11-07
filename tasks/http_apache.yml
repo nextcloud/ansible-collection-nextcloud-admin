@@ -41,6 +41,17 @@
     state: present
     # validate: "/usr/sbin/{{ php_bin }} -t #%s"
 
+- name: "[APACHE] -  Required Apache2 modules are enabled"
+  apache2_module: state=present name={{ item }}
+  with_items:
+    - ssl
+    - rewrite
+    - headers
+    - env
+    - dir
+    - mime
+  notify: restart apache
+
 - name: "[APACHE] -  generate Nextcloud configuration for apache"
   template:
     dest: /etc/apache2/sites-available/nc_{{ nextcloud_trusted_domain }}.conf
@@ -52,15 +63,6 @@
     src: /etc/apache2/sites-available/nc_{{ nextcloud_trusted_domain }}.conf
     state: link
     # validate: "/usr/sbin/nginx -t #%s"
-  #notify: restart apache
-
-- name: "[APACHE] -  Required Apache2 modules are enabled"
-  apache2_module: state="present" name="{{ item }}"
-  with_items:
-    - rewrite
-    - headers
-    - env
-    - dir
-    - mime
-    - ssl
   notify: restart apache
+
+
