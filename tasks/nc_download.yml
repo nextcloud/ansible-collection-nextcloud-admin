@@ -14,7 +14,7 @@
       dest: "/tmp/"
   
   - name: "[NC-DL] - Move extracted files to {{ nextcloud_webroot }}."
-    command: "cp -r /tmp/nextcloud/ {{ nextcloud_webroot }}/"
+    command: "cp -r /tmp/nextcloud/. {{ nextcloud_webroot }}/"
   
   - name: "[NC-DL] - Remove nextcloud archive files"
     file: path=/tmp/nextcloud state=absent

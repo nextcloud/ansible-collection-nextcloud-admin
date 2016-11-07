@@ -56,7 +56,8 @@
         state: absent
       # will always set the state to failed.
       failed_when: True
-    
+
+
 - name: "[NC] - Add {{ nextcloud_trusted_domain }} in config.php"
   lineinfile:
     dest: "{{ nextcloud_webroot }}/config/config.php"
@@ -102,3 +103,4 @@
   file:
     path: "{{ nextcloud_webroot }}/occ"
     mode: 0750
+

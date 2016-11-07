@@ -52,7 +52,7 @@
     src: /etc/apache2/sites-available/nc_{{ nextcloud_trusted_domain }}.conf
     state: link
     # validate: "/usr/sbin/nginx -t #%s"
-  notify: restart apache
+  #notify: restart apache
 
 - name: "[APACHE] -  Required Apache2 modules are enabled"
   apache2_module: state="present" name="{{ item }}"

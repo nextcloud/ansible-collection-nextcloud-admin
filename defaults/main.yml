@@ -13,6 +13,8 @@ nextcloud_dl_url: "https://download.nextcloud.com/server/releases"
 
 # [DATABASE]
 # nextcloud_db_backend: "mysql"/"mariadb" | "pgsql"
+nextcloud_install_db: false
+nextcloud_db_host: "127.0.0.1"
 nextcloud_db_backend: "mysql"
 nextcloud_db_name: "nextcloud"
 nextcloud_db_admin: "ncadmin"
@@ -32,3 +34,4 @@ nextcloud_tls_dhparam: "/etc/ssl/dhparam.pem"
 websrv_user: "www-data"
 websrv_group: "www-data"
 #mysql_root_pwd: "secret"
+
