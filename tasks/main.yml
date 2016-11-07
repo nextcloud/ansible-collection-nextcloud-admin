@@ -29,11 +29,11 @@
 
 - name: Configure {{ nextcloud_db_backend }} database
   include: tasks/db_mysql.yml
-  when: nextcloud_db_backend in ["mysql", "mariadb"]
+  when: nextcloud_db_backend in ["mysql", "mariadb"] and nextcloud_install_db == true
   
 - name: Configure PostgreSQL database
   include: tasks/db_postgresql.yml
-  when: nextcloud_db_backend in ["pgsql"]
+  when: nextcloud_db_backend in ["pgsql"] and nextcloud_install_db == true
   
   # will not run occ installation if already installed => config.php exists : 
 # - name: Check Nextcloud installation file 
