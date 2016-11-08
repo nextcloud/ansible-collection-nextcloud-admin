@@ -39,6 +39,7 @@
     command: >
         php occ  maintenance:install
         --database {{ nextcloud_tmp_backend }}
+        --database-host {{ nextcloud_db_host }}
         --database-name {{ nextcloud_db_name }}
         --database-user {{ nextcloud_db_admin }}
         --database-pass {{ nextcloud_db_pwd }}
@@ -49,6 +50,22 @@
       chdir: "{{ nextcloud_webroot }}"
       creates: "{{ nextcloud_webroot }}/config/config.php"
     notify: "reload {{ nextcloud_websrv }}"
+
+  - name: "[NC] - Verify config.php"
+    stat: path="{{ nextcloud_webroot }}/config/config.php"
+    register: conf
+
+  - name: "[NC] - Verify config.php - check filesize"
+    file:
+      path: "{{ nextcloud_webroot }}/config/config.php"
+      state: absent
+      # will always set the state to failed.
+      failed_when: True
+    when: conf.stat.size is undefined or conf.stat.size <= 100
+
+  - name: "[NC] - Verify config.php - php syntax check"
+    command: "php -l {{ nextcloud_webroot }}/config/config.php"
+
   rescue:
     - name: "[NC] - removing config.php when occ fail"
       file:
@@ -56,7 +73,6 @@
         state: absent
       # will always set the state to failed.
       failed_when: True
-
 
 - name: "[NC] - Add {{ nextcloud_trusted_domain }} in config.php"
   lineinfile:
