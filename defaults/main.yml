@@ -13,7 +13,7 @@ nextcloud_dl_url: "https://download.nextcloud.com/server/releases"
 
 # [DATABASE]
 # nextcloud_db_backend: "mysql"/"mariadb" | "pgsql"
-nextcloud_install_db: false
+nextcloud_install_db: true
 nextcloud_db_host: "127.0.0.1"
 nextcloud_db_backend: "mysql"
 nextcloud_db_name: "nextcloud"
