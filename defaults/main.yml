@@ -1,7 +1,7 @@
 ---
 # defaults file for nextcloud
 # [CONFIG]
-nextcloud_version: 10.0.0
+nextcloud_version: 10.0.1
 nextcloud_trusted_domain: "{{ ansible_default_ipv4.address }}"
 # nextcloud_websrv: "apache" | "nginx"
 nextcloud_websrv: "apache"
