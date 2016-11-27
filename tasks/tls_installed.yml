@@ -1,6 +1,8 @@
 ---
 - set_fact: nextcloud_tls_cert_file="{{ nextcloud_tls_cert }}"
 - set_fact: nextcloud_tls_cert_key_file="{{ nextcloud_tls_cert_key }}"
+- set_fact: nextcloud_tls_cert_chain_file="{{ nextcloud_tls_cert_chain }}"
+  when: nextcloud_tls_cert_chain is defined
 # - name: "[INSTALLED TLS] - check TLS certicate permissions"
   # file:
     # path: "{{ nextcloud_tls_cert_file }}"

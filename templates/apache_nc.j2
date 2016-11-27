@@ -29,6 +29,9 @@
   SSLEngine on
   SSLCertificateFile      {{ nextcloud_tls_cert_file }}
   SSLCertificateKeyFile   {{ nextcloud_tls_cert_key_file }}
+  {% if nextcloud_tls_cert_chain_file is defined %}
+  SSLCertificateChainFile {{ nextcloud_tls_cert_chain_file }}
+  {% endif %}
 
   <IfModule mod_headers.c>
   # HSTS (mod_headers is required) (15768000 seconds = 6 months)
