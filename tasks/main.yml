@@ -34,15 +34,19 @@
 - name: Configure PostgreSQL database
   include: tasks/db_postgresql.yml
   when: nextcloud_db_backend in ["pgsql"] and nextcloud_install_db == true
-  
-  # will not run occ installation if already installed => config.php exists : 
-# - name: Check Nextcloud installation file 
-  # stat: "path={{ nextcloud_webroot }}/config/config.php"
-  # register: wroot
-  
-- name: Downloading Nextcloud 
+
+- name: Check Nextcloud installed
+  stat: "path={{ nextcloud_webroot }}/index.php"
+  register: _nextcloud_installed
+
+- name: Downloading Nextcloud
   include: tasks/nc_download.yml
+  when: not _nextcloud_installed.stat.exists
+
+- name: Check Nextcloud configured
+  stat: "path={{ nextcloud_webroot }}/config/config.php"
+  register: _nextcloud_configured
 
 - name: Nextcloud installation
   include: tasks/nc_installation.yml
-  # when: wroot.stat.exists is defined and not wroot.stat.exists
+  when: not _nextcloud_configured.stat.exists
