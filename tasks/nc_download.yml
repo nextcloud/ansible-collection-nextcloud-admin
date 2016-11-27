@@ -1,8 +1,4 @@
 ---
-- name: "[NC-DL] - Nextcloud is not installed "
-  stat: "path={{ nextcloud_webroot }}/index.php"
-  register: wroot
-
 - name: "[NC-DL] - Unzip is installed"
   package: name=unzip state=installed
   
@@ -18,4 +14,3 @@
   
   - name: "[NC-DL] - Remove nextcloud archive files"
     file: path=/tmp/nextcloud state=absent
-  when: wroot.stat.exists is defined and not wroot.stat.exists
