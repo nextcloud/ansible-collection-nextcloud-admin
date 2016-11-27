@@ -44,9 +44,12 @@
   when: not _nextcloud_installed.stat.exists
 
 - name: Check Nextcloud configured
-  stat: "path={{ nextcloud_webroot }}/config/config.php"
+  command: grep -q "{{ nextcloud_trusted_domain }}" {{ nextcloud_webroot }}/config/config.php
+  always_run: True
+  ignore_errors: True
+  changed_when: False
   register: _nextcloud_configured
 
 - name: Nextcloud installation
   include: tasks/nc_installation.yml
-  when: not _nextcloud_configured.stat.exists
+  when: _nextcloud_configured.rc == 1
