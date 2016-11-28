@@ -3,11 +3,11 @@
 This role installs an Nextcloud instance for a debian/Ubuntu server.
 
 The role's main actions are:
-[x]- Packages dependencies installation.
-[x]- Database configuration (if located on the same host).
-[x]- Strengthened files permissions and ownership following Nextcloud recommendations.
-[x]- Web server configuration.
-[x]- Strengthened TLS configuration following _Mozilla SSL Configuration Generator_, intermediate profile.
+- [x] Packages dependencies installation.
+- [x] Database configuration (if located on the same host).
+- [x] Strengthened files permissions and ownership following Nextcloud recommendations.
+- [x] Web server configuration.
+- [x] Strengthened TLS configuration following _Mozilla SSL Configuration Generator_, intermediate profile.
 
 ### Requirements
 #### Ansible version
@@ -190,7 +190,7 @@ This role is not designed to manage letsencrypt certificates. However you can st
 
 You must create first your certificates using a letsencrypt ACME client or an Ansible role like [ this one] (https://github.com/jaywink/ansible-letsencrypt)
 
-then call _install_nextcloud_ by setting `nextcloud_tls_cert_method: "signed"`
+then call _install_nextcloud_ by setting `nextcloud_tls_cert_method: "installed"`
 
 Here 2 examples for apache and nginx (because their have slightly different configuration)
 ```YAML
