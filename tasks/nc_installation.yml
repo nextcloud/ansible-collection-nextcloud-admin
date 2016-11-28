@@ -26,7 +26,7 @@
     owner: "{{ websrv_user }}"
     group: "{{ websrv_group }}"
 
-# fix for mariadb with occ    
+# fix for mariadb with occ
 - set_fact: nextcloud_tmp_backend="{{ nextcloud_db_backend }}"
   when: nextcloud_db_backend != "mariadb"
 - set_fact: nextcloud_tmp_backend="mysql"
@@ -54,27 +54,22 @@
       creates: "{{ nextcloud_webroot }}/config/config.php"
     notify: "reload {{ nextcloud_websrv }}"
 
-  - name: "[NC] - Verify config.php"
-    stat: path="{{ nextcloud_webroot }}/config/config.php"
-    register: conf
-
   - name: "[NC] - Verify config.php - check filesize"
-    file:
-      path: "{{ nextcloud_webroot }}/config/config.php"
-      state: absent
-    # will always set the state to failed.
-    failed_when: True
-    when: conf.stat.size is undefined or conf.stat.size <= 100
+    stat: path="{{ nextcloud_webroot }}/config/config.php"
+    register: _confsize
+    failed_when: _confsize.stat.size is undefined or _confsize.stat.size <= 100
 
   - name: "[NC] - Verify config.php - php syntax check"
     command: "php -l {{ nextcloud_webroot }}/config/config.php"
+    register: _confphp
+    changed_when: False
+    failed_when: _confphp.rc is defined and _confphp.rc != 0
 
   rescue:
     - name: "[NC] - removing config.php when occ fail"
       file:
         path: "{{ nextcloud_webroot }}/config/config.php"
         state: absent
-      # will always set the state to failed.
       failed_when: True
 
 - name: "[NC] - Add {{ nextcloud_trusted_domain }} in config.php"
@@ -118,7 +113,7 @@
     - themes
     - updater
 
-- name: "[NC] - Give execution permission to occ"
+- name: "[NC] - Give back execution permission to occ"
   file:
     path: "{{ nextcloud_webroot }}/occ"
     mode: 0750
