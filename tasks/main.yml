@@ -3,6 +3,9 @@
 - include: tasks/setup_env.yml
   # load os specific variables
 
+- include: tasks/user.yml
+  when: nextcloud_os_user is defined
+
 - name: Verify permission for installed TLS certificates
   include: tasks/tls_installed.yml
   when: nextcloud_tls_cert_method == "installed"

@@ -10,6 +10,10 @@ nextcloud_data_dir: "/var/ncdata"
 nextcloud_admin_name: "admin"
 # nextcloud_admin_pwd: "secret"
 nextcloud_dl_url: "https://download.nextcloud.com/server/releases"
+# Set a username here if a user with home folder should be created
+# This then allows setting nextcloud_webroot and/or nextcloud_data_dir
+# under the user home folder
+#nextcloud_os_user: nextcloud
 
 # [DATABASE]
 # nextcloud_db_backend: "mysql"/"mariadb" | "pgsql"
