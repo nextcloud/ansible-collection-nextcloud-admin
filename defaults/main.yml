@@ -22,18 +22,18 @@ nextcloud_db_admin: "ncadmin"
 
 # [TLS]
 nextcloud_tls_enforce: true
+nextcloud_force_strong_apache_ssl: true
 nextcloud_tls_cert_method: "self-signed"
 nextcloud_tls_dhparam: "/etc/ssl/dhparam.pem"
-# nextcloud_tls_cert_method: "self-signed" | "signed" | "cerbot" (letsencrypt) | "installed"
+# nextcloud_tls_cert_method: "self-signed" | "signed" | "installed"
 # nextcloud_tls_cert: /path/to/cert
 # nextcloud_tls_cert_key: /path/to/cert/key
 # nextcloud_tls_cert_chain: /path/to/cert/chain
 # nextcloud_tls_src_cert: /path/to/cert
 # nextcloud_tls_src_cert_key: /path/to/cert/key
-nextcloud_force_strong_apache_ssl: true
+
 
 # [SYSTEM]
 websrv_user: "www-data"
 websrv_group: "www-data"
 #mysql_root_pwd: "secret"
-

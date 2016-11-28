@@ -6,7 +6,7 @@
 - name: Verify permission for installed TLS certificates
   include: tasks/tls_installed.yml
   when: nextcloud_tls_cert_method == "installed"
-  
+
 - name: Instal given signed certificates
   include: tasks/tls_signed.yml
   when: nextcloud_tls_cert_method == "signed"
@@ -14,10 +14,6 @@
 - name: configure self signed TLS certificates
   include: tasks/tls_selfsigned.yml
   when: nextcloud_tls_cert_method == "self-signed"
-
-- name: Install certificates with letsencrypt
-  include: tasks/tls_certbot.yml
-  when: nextcloud_tls_cert_method == "certbot"
 
 - name: Configure Nginx web server.
   include: tasks/http_nginx.yml
@@ -30,7 +26,7 @@
 - name: Configure {{ nextcloud_db_backend }} database
   include: tasks/db_mysql.yml
   when: nextcloud_db_backend in ["mysql", "mariadb"] and nextcloud_install_db == true
-  
+
 - name: Configure PostgreSQL database
   include: tasks/db_postgresql.yml
   when: nextcloud_db_backend in ["pgsql"] and nextcloud_install_db == true
