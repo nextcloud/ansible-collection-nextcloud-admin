@@ -1,9 +1,11 @@
 ---
 language: python
 python: "2.7"
+os: linux
+dist: trusty
 
 # Use the new container infrastructure
-sudo: false
+sudo: required
 
 # Install ansible
 addons:
@@ -24,6 +26,10 @@ install:
 script:
   # Basic role syntax check
   - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
+  # Test Demo case 1
+  - ansible-playbook tests/test.yml -i tests/inventory
+  # test home
+  #- curl -IsL -w "%{http_code}" "http://127.0.0.1/" -o /dev/null | grep -q 200
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
