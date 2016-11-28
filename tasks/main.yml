@@ -41,11 +41,11 @@
 
 - name: Check Nextcloud configured
   command: grep -q "{{ nextcloud_trusted_domain }}" {{ nextcloud_webroot }}/config/config.php
-  always_run: True
+  check_mode: no
   ignore_errors: True
   changed_when: False
   register: _nextcloud_configured
 
 - name: Nextcloud installation
   include: tasks/nc_installation.yml
-  when: _nextcloud_configured.rc == 1
+  when: _nextcloud_configured.rc != 0
