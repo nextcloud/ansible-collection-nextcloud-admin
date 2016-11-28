@@ -39,12 +39,17 @@
   include: tasks/nc_download.yml
   when: not _nextcloud_installed.stat.exists
 
-- name: Check Nextcloud configured
+- name: Check Nextcloud configuration exists.
+  stat: path="{{ nextcloud_webroot }}/config/config.php"
+  register: _nextcloud_conf
+
+- name: Check Nextcloud is configured
   command: grep -q "{{ nextcloud_trusted_domain }}" {{ nextcloud_webroot }}/config/config.php
   check_mode: no
-  ignore_errors: True
+  failed_when: False
   changed_when: False
   register: _nextcloud_configured
+  when: _nextcloud_conf.stat.exists
 
 - name: Nextcloud installation
   include: tasks/nc_installation.yml
