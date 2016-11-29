@@ -53,4 +53,4 @@
 
 - name: Nextcloud installation
   include: tasks/nc_installation.yml
-  when: _nextcloud_configured.rc != 0
+  when: (not _nextcloud_conf.stat.exists) or (_nextcloud_configured.rc is defined and _nextcloud_configured.rc != 0)  
