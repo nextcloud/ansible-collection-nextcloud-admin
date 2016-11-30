@@ -1,7 +1,16 @@
 ---
 # defaults file for nextcloud
 # [CONFIG]
+nextcloud_channel: "releases"
+# nextcloud_channel: releases | prereleases | daily | latest
 nextcloud_version: 10.0.1
+# nextcloud_version for releases, prereleases and daily channel
+nextcloud_branch: "stable"
+# specified branch for daily & latest channel
+nextcloud_dl_url: "https://download.nextcloud.com"
+# Domain URL where to download Nextcloud.
+# Path will be calculated following channel, version and branch.
+
 nextcloud_trusted_domain: "{{ ansible_default_ipv4.address }}"
 # nextcloud_websrv: "apache" | "nginx"
 nextcloud_websrv: "apache"
@@ -9,7 +18,6 @@ nextcloud_webroot: "/opt/nextcloud"
 nextcloud_data_dir: "/var/ncdata"
 nextcloud_admin_name: "admin"
 # nextcloud_admin_pwd: "secret"
-nextcloud_dl_url: "https://download.nextcloud.com/server/releases"
 
 # [DATABASE]
 # nextcloud_db_backend: "mysql"/"mariadb" | "pgsql"

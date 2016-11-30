@@ -34,5 +34,4 @@
   apt:
     name: acl
     state: installed
-    update_cache: yes
   when: ansible_distribution_release == "trusty"
