@@ -28,12 +28,28 @@ This role requires root access, so either configure it in your inventory files, 
 ## Role Variables
 
 Role's variables (and their default value):
-### Main configuration
 
+### Installation configuration
+> Source location will be calculated following channel, version and branch values.
+
+```YAML
+nextcloud_channel: "releases"
+```
+Defines the version channel you want to use for the installation
+Available : releases | prereleases | daily | latest
 ```YAML
 nextcloud_version: 10.0.1
 ```
-The Nextcloud version you want to install.
+Specify the version name for **channels** **releases**, **prereleases** and **daily*. (it may not be numbers at all)
+```YAML
+nextcloud_branch: "stable"
+```
+Specify the branch name for **daily** & **latest** channel
+```YAML
+nextcloud_repository: "https://download.nextcloud.com/server"
+```
+The Nextcloud's official repository. You may change it if you have the sources somewhere else.
+### Main configuration
 ```YAML
 nextcloud_trusted_domain: {{ ansible_default_ipv4.address }}
 ```
@@ -46,7 +62,6 @@ The http server used by nextcloud. Available values are: **apache** or **nginx**
 nextcloud_webroot: "/opt/nextcloud"
 ```
 The Nextcloud root directory.
-
 ```YAML
 nextcloud_data_dir: "/var/ncdata"
 ```
@@ -63,10 +78,6 @@ Defines the Nextcloud admin's password.
 **Not defined by default**
 
 If not defined by the user, a random password will be generated.
-```YAML
-nextcloud_dl_url: "https://download.nextcloud.com/server/releases" #
-```
-The Nextcloud repository URL where to download the archive.
 ### Database configuration
 ```YAML
 nextcloud_install_db: true

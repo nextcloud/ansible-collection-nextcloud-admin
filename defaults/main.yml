@@ -7,7 +7,7 @@ nextcloud_version: 10.0.1
 # nextcloud_version for releases, prereleases and daily channel
 nextcloud_branch: "stable"
 # specified branch for daily & latest channel
-nextcloud_dl_url: "https://download.nextcloud.com"
+nextcloud_repository: "https://download.nextcloud.com/server"
 # Domain URL where to download Nextcloud.
 # Path will be calculated following channel, version and branch.
 
