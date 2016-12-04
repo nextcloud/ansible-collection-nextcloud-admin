@@ -51,9 +51,13 @@ nextcloud_repository: "https://download.nextcloud.com/server"
 The Nextcloud's official repository. You may change it if you have the sources somewhere else.
 ### Main configuration
 ```YAML
-nextcloud_trusted_domain: {{ ansible_default_ipv4.address }}
+nextcloud_trusted_domain: ["{{ ansible_default_ipv4.address }}"]
 ```
-The first domain you will use to access the Nextcloud server.
+The list of domains you will use to access the same Nextcloud instance.
+```YAML
+nextcloud_instance_name: "{{ nextcloud_trusted_domain | first }}"
+```
+The name of the Nextcloud instance. By default, the first element in the list of trusted domains
 ```YAML
 nextcloud_websrv: "apache"
 ```
@@ -193,9 +197,19 @@ In some case, you may want to deploy quickly many instances of Nextcloud on mult
    - role: aalaesar.install_nextcloud
 ```
 
-- This will install a Nextcloud instance in /opt/nextcloud using apache2 and mysql.
+- This will install a Nextcloud 10.0.1 instance in /opt/nextcloud using apache2 and mysql.
 - it will be available at **https://{{ ansible default ipv4 }}**  using a self signed certificate.
 - Generated passwords are stored in **nextcloud_instances/{{ nextcloud_trusted_domain }}/** from your working directory.
+### Case 1.1: specifying the version channel, branch, etc.
+You can choose the version channel to download a specific version of nextcloud. Here's a variation of the previous case, this time installing the latest nightly in master.
+```YAML
+---
+- hosts: server
+  roles:
+   - role: aalaesar.install_nextcloud
+     nextcloud_channel: "latest"
+     nextcloud_branch: "master"
+```
 
 ### Case 2: Using letsencrypt with this role.
 This role is not designed to manage letsencrypt certificates. However you can still use your certificates with nextcloud.
@@ -210,7 +224,8 @@ Here 2 examples for apache and nginx (because their have slightly different conf
 - hosts: apache_server
   roles:
    - role: aalaesar.install_nextcloud
-     nextcloud_trusted_domain: "example.com"
+     nextcloud_trusted_domain:
+       - "example.com"
      nextcloud_tls_cert_method: "installed"
      nextcloud_tls_cert: "/etc/letsencrypt/live/example.com/cert.pem"
      nextcloud_tls_cert_key: "/etc/letsencrypt/live/example.com/privkey.pem"
@@ -219,7 +234,8 @@ Here 2 examples for apache and nginx (because their have slightly different conf
 - hosts: nginx_server
   roles:
     - role: aalaesar.install_nextcloud
-      nextcloud_trusted_domain: "example2.com"
+      nextcloud_trusted_domain:
+        - "example2.com"
       nextcloud_tls_cert_method: "installed"
       nextcloud_tls_cert: "/etc/letsencrypt/live/example2.com/fullchain.pem"
       nextcloud_tls_cert_key: "/etc/letsencrypt/live/example2.com/privkey.pem"
@@ -234,7 +250,8 @@ Here 2 examples for apache and nginx (because their have slightly different conf
 - hosts: server
   roles:
    - role: aalaesar.install_nextcloud
-     nextcloud_trusted_domain: "cloud.example.tld"
+     nextcloud_trusted_domain:
+       - "cloud.example.tld"
      nextcloud_websrv: "nginx"
      nextcloud_admin_pwd: "secret007"
      nextcloud_webroot: "/var/www/nextcloud/"

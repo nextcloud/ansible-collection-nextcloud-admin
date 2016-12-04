@@ -1,9 +1,9 @@
 ---
-- set_fact: nextcloud_tls_cert_file="/etc/ssl/{{ nextcloud_trusted_domain }}.crt"
-- set_fact: nextcloud_tls_cert_key_file="/etc/ssl/{{ nextcloud_trusted_domain }}.key"
+- set_fact: nextcloud_tls_cert_file="/etc/ssl/{{ nextcloud_instance_name }}.crt"
+- set_fact: nextcloud_tls_cert_key_file="/etc/ssl/{{ nextcloud_instance_name }}.key"
 - name: "[selfsigned TLS] - create self-signed SSL cert"
   command: >
-    openssl req -new -nodes -x509 
+    openssl req -new -nodes -x509
     -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=${hostname --fqdn}"
     -days 365
     -keyout {{ nextcloud_tls_cert_key_file }}

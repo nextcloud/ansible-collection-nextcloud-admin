@@ -1,9 +1,12 @@
 ---
 # additionnal setup and fixes for OS depedent environment
-
+- name: "controls nextcloud_trusted_domain type"
+  fail:
+    msg: "New versions requires nextcloud_trusted_domain to be declared as a list."
+  when: nextcloud_trusted_domain is string
 
 - name: "[ENV] - ca-certificate are up to date"
-  # needed for downloading from download.nextcloud.com as the isite use letsencrypt certificates
+  # needed for downloading from download.nextcloud.com as the site use letsencrypt certificates
   # letsencrypt may not be trusted on older OS
   apt: cache_valid_time=86400 update_cache=yes name=ca-certificates state=latest
   when: ansible_os_family in [ "Debian" ]

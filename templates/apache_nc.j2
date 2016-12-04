@@ -1,29 +1,44 @@
-<VirtualHost *:80>
-  ServerName {{ nextcloud_trusted_domain }}
 {% if nextcloud_tls_enforce %}
-  Redirect permanent / https://{{ nextcloud_trusted_domain }}/
+{% for domain in nextcloud_trusted_domain %}
+<VirtualHost *:80>
+  ServerName {{ domain }}
+  Redirect permanent / https://{{ domain }}/
+</VirtualHost>
+{% endfor %}
 {% else %}
+<VirtualHost *:80>
+  ServerName {{ nextcloud_trusted_domain[0] }}
+{% if nextcloud_trusted_domain|length > 1 %}
+{% for index in range(1, nextcloud_trusted_domain|length -1) %}
+  ServerAlias {{ nextcloud_trusted_domain[index]}}
+{% endfor %}
+{% endif %}
   DocumentRoot {{ nextcloud_webroot }}
   <Directory {{ nextcloud_webroot }}>
     Allow from all
     Satisfy Any
     Options +FollowSymlinks
     AllowOverride All
-  
+
    <IfModule mod_dav.c>
     Dav off
    </IfModule>
-  
+
    SetEnv HOME {{ nextcloud_webroot }}
    SetEnv HTTP_HOME {{ nextcloud_webroot }}
-  
-  </Directory>
 
-{% endif %}
+  </Directory>
 </VirtualHost>
+{% endif %}
+
 
 <VirtualHost *:443>
-  ServerName {{ nextcloud_trusted_domain }}
+  ServerName {{ nextcloud_trusted_domain[0] }}
+{% if nextcloud_trusted_domain|length > 1 %}
+{% for index in range(1, nextcloud_trusted_domain|length -1) %}
+  ServerAlias {{ nextcloud_trusted_domain[index]}}
+{% endfor %}
+{% endif %}
   DocumentRoot {{ nextcloud_webroot }}
 
   SSLEngine on
@@ -42,14 +57,14 @@
     Satisfy Any
     Options +FollowSymlinks
     AllowOverride All
-  
+
    <IfModule mod_dav.c>
     Dav off
    </IfModule>
-  
+
    SetEnv HOME {{ nextcloud_webroot }}
    SetEnv HTTP_HOME {{ nextcloud_webroot }}
-  
+
   </Directory>
 </VirtualHost>
 

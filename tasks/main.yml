@@ -44,7 +44,7 @@
   register: _nextcloud_conf
 
 - name: Check Nextcloud is configured
-  command: grep -q "{{ nextcloud_trusted_domain }}" {{ nextcloud_webroot }}/config/config.php
+  command: grep -q "{{ nextcloud_trusted_domain| first }}" {{ nextcloud_webroot }}/config/config.php
   check_mode: no
   failed_when: False
   changed_when: False
@@ -53,4 +53,4 @@
 
 - name: Nextcloud installation
   include: tasks/nc_installation.yml
-  when: (not _nextcloud_conf.stat.exists) or (_nextcloud_configured.rc is defined and _nextcloud_configured.rc != 0)  
+  when: (not _nextcloud_conf.stat.exists) or (_nextcloud_configured.rc is defined and _nextcloud_configured.rc != 0)

@@ -13,7 +13,7 @@
     - "php{{ php_ver }}-intl"
     - "php{{ php_ver }}-mcrypt"
   notify: [ "start nginx", "start php-fpm" ]
-    
+
 - name: "[NGINX] -  Some other pakages are installed."
   package: "name={{ item }} state=present"
   with_items: "{{ php_pkg_spe }}"
@@ -40,7 +40,7 @@
     state: absent
     # validate: "/usr/sbin/{{ php_bin }} -t #%s"
   notify: reload php-fpm
-  
+
 - name: "[NGINX] -  Add path variable to php-fpm"
   blockinfile:
     dest: "{{ php_dir }}/fpm/pool.d/www.conf"
@@ -55,14 +55,14 @@
   notify: reload php-fpm
 
 - name: "[NGINX] -  enable APC for php CLI"
-  lineinfile: 
+  lineinfile:
     dest: "{{ php_dir }}/cli/php.ini"
     line: "apc.enable_cli = 1"
     insertbefore: "^; End:$"
     state: present
     # validate: "/usr/sbin/{{ php_bin }} -t #%s"
   notify: reload php-fpm
-  
+
 - name: "[NGINX] -  Public Diffie-Hellman Parameter are generated. This might take a while."
   command: "openssl dhparam -out {{ nextcloud_tls_dhparam }} 2048"
   args:
@@ -80,17 +80,17 @@
     src: /etc/nginx/sites-available/php_handler.cnf
     state: link
   notify: reload nginx
-  
+
 - name: "[NGINX] -  generate Nextcloud configuration for nginx"
   template:
-    dest: /etc/nginx/sites-available/nc_{{ nextcloud_trusted_domain }}.cnf
+    dest: /etc/nginx/sites-available/nc_{{ nextcloud_instance_name }}.cnf
     src: templates/nginx_nc_root.j2
   notify: reload nginx
 
 - name: "[NGINX] -  Enable Nextcloud in nginx conf"
   file:
-    path: /etc/nginx/sites-enabled/nc_{{ nextcloud_trusted_domain }}
-    src: /etc/nginx/sites-available/nc_{{ nextcloud_trusted_domain }}.cnf
+    path: /etc/nginx/sites-enabled/nc_{{ nextcloud_instance_name }}
+    src: /etc/nginx/sites-available/nc_{{ nextcloud_instance_name }}.cnf
     state: link
     # validate: "/usr/sbin/nginx -t #%s"
   notify: reload nginx

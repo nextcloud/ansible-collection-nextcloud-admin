@@ -1,6 +1,6 @@
 ---
 - name: "[PostgreSQL] - PostgreSQL packages are installed"
-  package: 
+  package:
     name: "{{ item }}"
     state: "installed"
   with_items:
@@ -9,7 +9,7 @@
     - "python-psycopg2"
 
 - name: "[PostgreSQL] - generate nextcloud role password."
-  set_fact: nextcloud_db_pwd="{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_trusted_domain +'/pgsql_nc.pwd' ) }}"
+  set_fact: nextcloud_db_pwd="{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/pgsql_nc.pwd' ) }}"
   when: nextcloud_db_pwd is not defined
 
 - name: "[PostgreSQL] - nextcloud role is created."
@@ -20,7 +20,7 @@
     role_attr_flags: CREATEDB
   become_user: postgres
   become: yes
- 
+
 - name: "[PostgreSQL] - nextcloud database is created."
   postgresql_db:
     name: "{{ nextcloud_db_name }}"

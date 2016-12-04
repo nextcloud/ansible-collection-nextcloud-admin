@@ -15,7 +15,7 @@
     group: "{{ websrv_group }}"
 
 - name: "[NC] - generate {{ nextcloud_admin_name }} password:"
-  set_fact: nextcloud_admin_pwd="{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_trusted_domain +'/web_admin.pwd length=10' ) }}"
+  set_fact: nextcloud_admin_pwd="{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/web_admin.pwd length=10' ) }}"
   when: nextcloud_admin_pwd is not defined
 
 - name: "[NC] - Set temporary permissions for command line installation."
@@ -72,12 +72,22 @@
         state: absent
       failed_when: True
 
-- name: "[NC] - Add {{ nextcloud_trusted_domain }} in config.php"
+- name: "[NC] - Add trusted domain in config.php"
   lineinfile:
     dest: "{{ nextcloud_webroot }}/config/config.php"
     line: "    1 => '{{ nextcloud_trusted_domain }}',"
     insertafter: "0 => '"
     state: present
+  when: nextcloud_trusted_domain is string
+
+- name: "[NC] - Add trusted domains in config.php"
+  lineinfile:
+    dest: "{{ nextcloud_webroot }}/config/config.php"
+    line: "    {{ item.0 +1 }} => '{{ item.1 }}',"
+    insertafter: "{{ item.0 }} => '"
+    state: present
+  with_indexed_items: "{{ nextcloud_trusted_domain }}"
+  when: not nextcloud_trusted_domain is string
 
 - name: "[NC] - Add local cache and urandom in config.php"
   lineinfile:

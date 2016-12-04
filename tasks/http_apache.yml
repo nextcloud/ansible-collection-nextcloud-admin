@@ -34,7 +34,7 @@
   when: ansible_distribution_release == "trusty"
 
 - name: "[APACHE] -  enable APC for php CLI"
-  lineinfile: 
+  lineinfile:
     dest: "{{ php_dir }}/cli/php.ini"
     line: "apc.enable_cli = 1"
     insertbefore: "^; End:$"
@@ -54,15 +54,13 @@
 
 - name: "[APACHE] -  generate Nextcloud configuration for apache"
   template:
-    dest: /etc/apache2/sites-available/nc_{{ nextcloud_trusted_domain }}.conf
+    dest: /etc/apache2/sites-available/nc_{{ nextcloud_instance_name }}.conf
     src: templates/apache_nc.j2
 
 - name: "[APACHE] -  Enable Nextcloud site in apache conf"
   file:
-    path: /etc/apache2/sites-enabled/nc_{{ nextcloud_trusted_domain }}.conf
-    src: /etc/apache2/sites-available/nc_{{ nextcloud_trusted_domain }}.conf
+    path: /etc/apache2/sites-enabled/nc_{{ nextcloud_instance_name }}.conf
+    src: /etc/apache2/sites-available/nc_{{ nextcloud_instance_name }}.conf
     state: link
     # validate: "/usr/sbin/nginx -t #%s"
   notify: restart apache
-
-
