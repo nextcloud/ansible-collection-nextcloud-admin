@@ -2,7 +2,15 @@
 language: python
 python: "2.7"
 os: linux
-dist: trusty
+dist:
+  - trusty
+  - jessie
+  - xenial
+env:
+  - ansible_version="2.0.0.2"
+  - ansible_version="2.0.2.0"
+  - ansible_version="2.1.3.0"
+  - ansible_version="2.2.0.0"
 
 # Use the new container infrastructure
 sudo: required
@@ -13,9 +21,11 @@ addons:
     packages:
     - python-pip
 
-install:
+before_install:
   # Install ansible
-  - pip install ansible
+  - pip install -I "ansible==$ansible_version"
+
+install:
 
   # Check ansible version
   - ansible --version
@@ -23,9 +33,11 @@ install:
   # Create ansible.cfg with correct roles_path
   - printf '[defaults]\nroles_path=../' >ansible.cfg
 
+before_script:
+  - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
+
 script:
   # Basic role syntax check
-  - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
   # Test Demo case 1
   - ansible-playbook tests/test.yml -i tests/inventory
   # test login pages
