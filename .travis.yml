@@ -2,10 +2,7 @@
 language: python
 python: "2.7"
 os: linux
-dist:
-  - trusty
-  - jessie
-  - xenial
+dist: trusty
 env:
   - ansible_version="2.0.0.2"
   - ansible_version="2.0.2.0"
