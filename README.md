@@ -40,7 +40,7 @@ Available : releases | prereleases | daily | latest
 ```YAML
 nextcloud_version: 10.0.1
 ```
-Specify the version name for **channels** **releases**, **prereleases** and **daily*. (it may not be numbers at all)
+Specify the version name for channels **releases**, **prereleases** and **daily**. (it may not be numbers at all)
 ```YAML
 nextcloud_branch: "stable"
 ```
@@ -200,6 +200,7 @@ In some case, you may want to deploy quickly many instances of Nextcloud on mult
 - This will install a Nextcloud 10.0.1 instance in /opt/nextcloud using apache2 and mysql.
 - it will be available at **https://{{ ansible default ipv4 }}**  using a self signed certificate.
 - Generated passwords are stored in **nextcloud_instances/{{ nextcloud_trusted_domain }}/** from your working directory.
+
 ### Case 1.1: specifying the version channel, branch, etc.
 You can choose the version channel to download a specific version of nextcloud. Here's a variation of the previous case, this time installing the latest nightly in master.
 ```YAML
