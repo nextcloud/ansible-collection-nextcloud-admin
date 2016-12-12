@@ -45,7 +45,6 @@
 
 - name: Check Nextcloud is configured
   command: grep -q "{{ nextcloud_trusted_domain| first }}" {{ nextcloud_webroot }}/config/config.php
-  check_mode: no
   failed_when: False
   changed_when: False
   register: _nextcloud_configured
