@@ -21,7 +21,7 @@
 
 - name: Configure Apache web server
   include: tasks/http_apache.yml
-  when: nextcloud_websrv == "apache"
+  when: nextcloud_websrv in ["apache", "apache2"]
 
 - name: Configure {{ nextcloud_db_backend }} database
   include: tasks/db_mysql.yml

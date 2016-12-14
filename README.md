@@ -38,7 +38,7 @@ nextcloud_channel: "releases"
 Defines the version channel you want to use for the installation
 Available : releases | prereleases | daily | latest
 ```YAML
-nextcloud_version: 10.0.1
+nextcloud_version: 10.0.2
 ```
 Specify the version name for channels **releases**, **prereleases** and **daily**. (it may not be numbers at all)
 ```YAML
@@ -59,9 +59,9 @@ nextcloud_instance_name: "{{ nextcloud_trusted_domain | first }}"
 ```
 The name of the Nextcloud instance. By default, the first element in the list of trusted domains
 ```YAML
-nextcloud_websrv: "apache"
+nextcloud_websrv: "apache2"
 ```
-The http server used by nextcloud. Available values are: **apache** or **nginx**.
+The http server used by nextcloud. Available values are: **apache2** or **nginx**.
 ```YAML
 nextcloud_webroot: "/opt/nextcloud"
 ```
