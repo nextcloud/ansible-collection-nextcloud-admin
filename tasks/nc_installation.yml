@@ -52,7 +52,6 @@
     args:
       chdir: "{{ nextcloud_webroot }}"
       creates: "{{ nextcloud_webroot }}/config/config.php"
-    notify: "reload {{ nextcloud_websrv }}"
 
   - name: "[NC] - Verify config.php - check filesize"
     stat: path="{{ nextcloud_webroot }}/config/config.php"
