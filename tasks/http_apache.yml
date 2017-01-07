@@ -14,7 +14,7 @@
     - "php{{ php_ver }}-mcrypt"
   notify: start apache
 
-- name: "[APACHE] -  Some other pakages are installed."
+- name: "[APACHE] -  Some other packages are installed."
   package: "name={{ item }} state=present"
   with_items: "{{ php_pkg_spe }}"
 
@@ -24,7 +24,7 @@
 
 - block:
   # load APCu from backports as the default version for trusty is obsolete.
-  - name: "[APACHE] -  Configure trusty backport."
+  - name: "[APACHE] -  Configure trusty backports."
     apt_repository:
       repo: "deb http://fr.archive.ubuntu.com/ubuntu/ trusty-backports main restricted universe multiverse"
       state: present

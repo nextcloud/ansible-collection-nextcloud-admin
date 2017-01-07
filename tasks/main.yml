@@ -7,7 +7,7 @@
   include: tasks/tls_installed.yml
   when: nextcloud_tls_cert_method == "installed"
 
-- name: Instal given signed certificates
+- name: Install given signed certificates
   include: tasks/tls_signed.yml
   when: nextcloud_tls_cert_method == "signed"
 

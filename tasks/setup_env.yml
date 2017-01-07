@@ -1,8 +1,8 @@
 ---
-# additionnal setup and fixes for OS depedent environment
+# additionnal setup and fixes for OS dependent environment
 - name: "controls nextcloud_trusted_domain type"
   fail:
-    msg: "New versions requires nextcloud_trusted_domain to be declared as a list."
+    msg: "New versions require nextcloud_trusted_domain to be declared as a list."
   when: nextcloud_trusted_domain is string
 
 - name: "[ENV] - ca-certificate are up to date"
