@@ -13,7 +13,9 @@ nextcloud_repository: "https://download.nextcloud.com/server"
 
 nextcloud_trusted_domain: ["{{ ansible_default_ipv4.address }}"]
 nextcloud_instance_name: "{{ nextcloud_trusted_domain | first }}"
+
 # nextcloud_websrv: "apache2" | "nginx"
+nextcloud_install_websrv: true
 nextcloud_websrv: "apache2"
 nextcloud_webroot: "/opt/nextcloud"
 nextcloud_data_dir: "/var/ncdata"
@@ -30,6 +32,7 @@ nextcloud_db_admin: "ncadmin"
 # nextcloud_db_pwd: "secret"
 
 # [TLS]
+nextcloud_install_tls: true
 nextcloud_tls_enforce: true
 nextcloud_force_strong_apache_ssl: true
 nextcloud_tls_cert_method: "self-signed"
