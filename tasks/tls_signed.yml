@@ -2,7 +2,7 @@
 - set_fact: nextcloud_tls_cert_file="{{ nextcloud_tls_cert | default("/etc/ssl/" + nextcloud_instance_name + ".crt") }}"
 - set_fact: nextcloud_tls_cert_key_file="{{ nextcloud_tls_cert_key | default("/etc/ssl/" + nextcloud_instance_name + ".key") }}"
 
-- name: "[SIGNED TLS] - Certificat is on the host"
+- name: "[SIGNED TLS] - Certificate is on the host"
   copy:
     dest: "{{ nextcloud_tls_cert_file }}"
     src: "{{ nextcloud_tls_src_cert }}"
@@ -12,7 +12,7 @@
     dest: "{{ nextcloud_tls_cert_key_file }}"
     src: "{{ nextcloud_tls_src_cert_key }}"
 
-- name: "[SIGNED TLS] - check TLS certicate permissions"
+- name: "[SIGNED TLS] - check TLS certificate permissions"
   file:
     path: "{{ nextcloud_tls_cert_file }}"
     mode: 0644

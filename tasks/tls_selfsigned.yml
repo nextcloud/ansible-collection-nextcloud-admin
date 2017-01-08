@@ -12,7 +12,7 @@
   args:
     creates: "{{ nextcloud_tls_cert_key_file }}"
 
-- name: "[selfsigned TLS] - check TLS certicate permissions"
+- name: "[selfsigned TLS] - check TLS certificate permissions"
   file:
     path: "{{ nextcloud_tls_cert_file }}"
     mode: 0644
