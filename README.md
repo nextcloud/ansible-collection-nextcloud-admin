@@ -27,7 +27,7 @@ This role requires root access, so either configure it in your inventory files, 
 
 ## Role Variables
 
-Role's variables (and their default value):
+Role's variables (and their default values):
 
 ### Installation configuration
 > Source location will be calculated following channel, version and branch values.
@@ -58,6 +58,10 @@ The list of domains you will use to access the same Nextcloud instance.
 nextcloud_instance_name: "{{ nextcloud_trusted_domain | first }}"
 ```
 The name of the Nextcloud instance. By default, the first element in the list of trusted domains
+```YAML
+nextcloud_install_websrv: true
+```
+The webserver setup can be skipped if you have one installed already.
 ```YAML
 nextcloud_websrv: "apache2"
 ```
@@ -119,6 +123,10 @@ The Nextcloud instance's database user's password.
 If not defined by the user, a random password will be generated.
 
 ### TLS configuration
+```YAML
+nextcloud_install_tls: true
+```
+TLS setup can be skipped if you manage it separately (e.g. behind a reverse proxy).
 ```YAML
 nextcloud_tls_enforce: true
 ```
@@ -219,7 +227,7 @@ You must create first your certificates using a letsencrypt ACME client or an An
 
 then call _install_nextcloud_ by setting `nextcloud_tls_cert_method: "installed"`
 
-Here 2 examples for apache and nginx (because their have slightly different configuration)
+Here 2 examples for apache and nginx (because they have slightly different configurations)
 ```YAML
 ---
 - hosts: apache_server

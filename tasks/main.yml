@@ -5,31 +5,31 @@
 
 - name: Verify permission for installed TLS certificates
   include: tasks/tls_installed.yml
-  when: nextcloud_tls_cert_method == "installed"
+  when: nextcloud_install_tls and nextcloud_tls_cert_method == "installed"
 
 - name: Install given signed certificates
   include: tasks/tls_signed.yml
-  when: nextcloud_tls_cert_method == "signed"
+  when: nextcloud_install_tls and nextcloud_tls_cert_method == "signed"
 
 - name: configure self signed TLS certificates
   include: tasks/tls_selfsigned.yml
-  when: nextcloud_tls_cert_method == "self-signed"
+  when: nextcloud_install_tls and nextcloud_tls_cert_method == "self-signed"
 
 - name: Configure Nginx web server.
   include: tasks/http_nginx.yml
-  when: nextcloud_websrv == "nginx"
+  when: nextcloud_install_websrv and nextcloud_websrv in ["nginx"]
 
 - name: Configure Apache web server
   include: tasks/http_apache.yml
-  when: nextcloud_websrv in ["apache", "apache2"]
+  when: nextcloud_install_websrv and nextcloud_websrv in ["apache", "apache2"]
 
 - name: Configure {{ nextcloud_db_backend }} database
   include: tasks/db_mysql.yml
-  when: nextcloud_db_backend in ["mysql", "mariadb"] and nextcloud_install_db == true
+  when: nextcloud_install_db and nextcloud_db_backend in ["mysql", "mariadb"]
 
 - name: Configure PostgreSQL database
   include: tasks/db_postgresql.yml
-  when: nextcloud_db_backend in ["pgsql"] and nextcloud_install_db == true
+  when: nextcloud_install_db and nextcloud_db_backend in ["pgsql"]
 
 - name: Check Nextcloud installed
   stat: "path={{ nextcloud_webroot }}/index.php"
