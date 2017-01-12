@@ -37,6 +37,7 @@ nextcloud_tls_enforce: true
 nextcloud_force_strong_apache_ssl: true
 nextcloud_tls_cert_method: "self-signed"
 nextcloud_tls_dhparam: "/etc/ssl/dhparam.pem"
+nextcloud_hsts: false
 # nextcloud_tls_cert_method: "self-signed" | "signed" | "installed"
 # nextcloud_tls_cert: /path/to/cert
 # nextcloud_tls_cert_key: /path/to/cert/key

@@ -44,12 +44,11 @@
   SSLCertificateChainFile {{ nextcloud_tls_cert_chain_file }}
 {% endif %}
 
-  # <IfModule mod_headers.c>
-  # HSTS (mod_headers is required) (15768000 seconds = 6 months)
-  # Before enabling Strict-Transport-Security headers please read into this
-  # topic first.
-  # Header always set Strict-Transport-Security "max-age=15768000; includeSubDomains; preload"
-  #</IfModule>
+{% if nextcloud_hsts is string %}
+  <IfModule mod_headers.c>
+    Header always set Strict-Transport-Security "{{ nextcloud_hsts }}"
+  </IfModule>
+{% endif %}
 
   <Directory {{ nextcloud_webroot }}>
     Allow from all

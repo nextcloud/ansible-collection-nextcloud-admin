@@ -134,7 +134,13 @@ Force http to https.
 ```YAML
 nextcloud_force_strong_apache_ssl: true
 ```
-force strong ssl configuration in the virtualhost file
+Force strong ssl configuration in the virtualhost file.
+```YAML
+nextcloud_hsts: false
+```
+Set HTTP Strict-Transport-Security header (e.g. "max-age=15768000; includeSubDomains; preload").
+
+*(Before enabling HSTS, please read into this topic first)*
 ```YAML
 nextcloud_tls_cert_method: "self-signed"
 ```
