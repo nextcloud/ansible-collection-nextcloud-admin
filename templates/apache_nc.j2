@@ -1,4 +1,4 @@
-{% if nextcloud_tls_enforce %}
+{% if nextcloud_install_tls and nextcloud_tls_enforce %}
 {% for domain in nextcloud_trusted_domain %}
 <VirtualHost *:80>
   ServerName {{ domain }}
@@ -8,11 +8,9 @@
 {% else %}
 <VirtualHost *:80>
   ServerName {{ nextcloud_trusted_domain[0] }}
-{% if nextcloud_trusted_domain|length > 1 %}
-{% for index in range(1, nextcloud_trusted_domain|length -1) %}
+{% for index in range(1, nextcloud_trusted_domain|length) %}
   ServerAlias {{ nextcloud_trusted_domain[index]}}
 {% endfor %}
-{% endif %}
   DocumentRoot {{ nextcloud_webroot }}
   <Directory {{ nextcloud_webroot }}>
     Allow from all
@@ -31,27 +29,27 @@
 </VirtualHost>
 {% endif %}
 
-
+{% if nextcloud_install_tls %}
 <VirtualHost *:443>
   ServerName {{ nextcloud_trusted_domain[0] }}
-{% if nextcloud_trusted_domain|length > 1 %}
-{% for index in range(1, nextcloud_trusted_domain|length -1) %}
+{% for index in range(1, nextcloud_trusted_domain|length) %}
   ServerAlias {{ nextcloud_trusted_domain[index]}}
 {% endfor %}
-{% endif %}
   DocumentRoot {{ nextcloud_webroot }}
 
   SSLEngine on
   SSLCertificateFile      {{ nextcloud_tls_cert_file }}
   SSLCertificateKeyFile   {{ nextcloud_tls_cert_key_file }}
-  {% if nextcloud_tls_cert_chain_file is defined %}
+{% if nextcloud_tls_cert_chain_file is defined %}
   SSLCertificateChainFile {{ nextcloud_tls_cert_chain_file }}
-  {% endif %}
+{% endif %}
 
+{% if nextcloud_hsts is string %}
   <IfModule mod_headers.c>
-  # HSTS (mod_headers is required) (15768000 seconds = 6 months)
-  Header always set Strict-Transport-Security "max-age=15768000; includeSubDomains; preload"
+    Header always set Strict-Transport-Security "{{ nextcloud_hsts }}"
   </IfModule>
+{% endif %}
+
   <Directory {{ nextcloud_webroot }}>
     Allow from all
     Satisfy Any
@@ -67,8 +65,9 @@
 
   </Directory>
 </VirtualHost>
+{% endif %}
 
-{% if nextcloud_force_strong_apache_ssl %}
+{% if nextcloud_install_tls and nextcloud_force_strong_apache_ssl %}
 # intermediate configuration, tweak to your needs
 SSLProtocol             all -SSLv3
 SSLCipherSuite          ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS

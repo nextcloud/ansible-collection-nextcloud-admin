@@ -1,4 +1,4 @@
-{% if nextcloud_tls_enforce %}
+{% if nextcloud_install_tls and nextcloud_tls_enforce %}
 server {
     listen 80;
     server_name {{ nextcloud_trusted_domain | join(' ') }};
@@ -8,12 +8,13 @@ server {
 
 {% endif %}
 server {
-{% if not nextcloud_tls_enforce %}
-    listen 80;
-{% endif %}
-    listen 443 ssl;
     server_name {{ nextcloud_trusted_domain | join(' ') }};
 
+{% if not nextcloud_install_tls or not nextcloud_tls_enforce %}
+    listen 80;
+{% endif %}
+{% if nextcloud_install_tls %}
+    listen 443 ssl;
     ssl_certificate {{ nextcloud_tls_cert_file }};
     ssl_certificate_key {{ nextcloud_tls_cert_key_file }};
     ssl_session_timeout 1d;
@@ -30,10 +31,10 @@ server {
     ssl_prefer_server_ciphers on;
 
     # Add headers to serve security related headers
-    # Before enabling Strict-Transport-Security headers please read into this
-    # topic first.
-    add_header Strict-Transport-Security "max-age=15768000;
-    includeSubDomains; preload;";
+{% if nextcloud_hsts is string %}
+    add_header Strict-Transport-Security "{{ nextcloud_hsts }}";
+{% endif %}
+{% endif %}
     add_header X-Content-Type-Options nosniff;
     add_header X-Frame-Options "SAMEORIGIN";
     add_header X-XSS-Protection "1; mode=block";
@@ -94,7 +95,7 @@ server {
         include fastcgi_params;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
         fastcgi_param PATH_INFO $fastcgi_path_info;
-        fastcgi_param HTTPS on;
+        fastcgi_param HTTPS $https if_not_empty;
         #Avoid sending the security headers twice
         fastcgi_param modHeadersAvailable true;
         fastcgi_param front_controller_active true;
@@ -115,10 +116,9 @@ server {
         add_header Cache-Control "public, max-age=7200";
         # Add headers to serve security related headers (It is intended to
         # have those duplicated to the ones above)
-        # Before enabling Strict-Transport-Security headers please read into
-        # this topic first.
-        # add_header Strict-Transport-Security "max-age=15768000;
-        #  includeSubDomains; preload;";
+{% if nextcloud_install_tls and nextcloud_hsts is string %}
+        add_header Strict-Transport-Security "{{ nextcloud_hsts }}";
+{% endif %}
         add_header X-Content-Type-Options nosniff;
         add_header X-Frame-Options "SAMEORIGIN";
         add_header X-XSS-Protection "1; mode=block";
