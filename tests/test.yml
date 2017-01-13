@@ -5,3 +5,8 @@
   roles:
    - role: install_nextcloud
      nextcloud_db_backend: "pgsql"
+     nextcloud_apps:
+       files: ""
+       files-external: ""
+       calendar: ""
+       direct_menu: "https://github.com/juliushaertl/direct_menu/releases/download/0.10.0/direct_menu.tar.gz"

@@ -1,6 +1,8 @@
 ---
 # tasks file for nextcloud
 - include: tasks/setup_env.yml
+  tags:
+    - install_apps
   # load os specific variables
 
 - name: Verify permission for installed TLS certificates
@@ -53,3 +55,26 @@
 - name: Nextcloud installation
   include: tasks/nc_installation.yml
   when: (not nc_nextcloud_conf.stat.exists) or (nc_nextcloud_configured.rc is defined and nc_nextcloud_configured.rc != 0)
+
+- block:
+  - name: "[NC apps] - lists the number of apps available in the instance."
+    command: php occ app:list --output=json_pretty --no-warnings
+    args:
+      chdir: "{{ nextcloud_webroot }}"
+    become_user: "{{ websrv_user }}"
+    changed_when: false
+    register: _nc_apps
+
+  - name: "[NC apps] - convert list to yaml."
+    set_fact: nc_available_apps="{{ _nc_apps.stdout | from_json }}"
+
+  - debug :
+      var: nextcloud_apps
+
+  - name: "[NC apps] - installation."
+    include: tasks/nc_apps.yml
+    # do if the app is not enabled and ( (archive path is not "") or (app is disabled) )
+    when: (item.key not in nc_available_apps.enabled) and ((item.value != "") or (item.key in nc_available_apps.disabled))
+    with_dict: "{{nextcloud_apps}}"
+  when: (nextcloud_apps is defined) and nextcloud_apps
+  tags: install_apps

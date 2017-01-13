@@ -1,0 +1,13 @@
+---
+- name: "[ App {{ item.key}} ] - Download Archive in apps folder."
+  unarchive:
+    copy: no
+    src: "{{ item.value }}"
+    dest: "{{nextcloud_webroot}}/apps/"
+  when: item.value != ""
+
+- name: "[ App {{ item.key}} ] - enable the application."
+  become_user: "{{ websrv_user }}"
+  command: php occ app:enable "{{item.key}}" -q
+  args:
+    chdir: "{{ nextcloud_webroot }}"
