@@ -55,14 +55,14 @@
 
   - name: "[NC] - Verify config.php - check filesize"
     stat: path="{{ nextcloud_webroot }}/config/config.php"
-    register: _confsize
-    failed_when: _confsize.stat.size is undefined or _confsize.stat.size <= 100
+    register: nc_installation_confsize
+    failed_when: nc_installation_confsize.stat.size is undefined or nc_installation_confsize.stat.size <= 100
 
   - name: "[NC] - Verify config.php - php syntax check"
     command: "php -l {{ nextcloud_webroot }}/config/config.php"
-    register: _confphp
+    register: nc_installation_confphp
     changed_when: False
-    failed_when: _confphp.rc is defined and _confphp.rc != 0
+    failed_when: nc_installation_confphp.rc is defined and nc_installation_confphp.rc != 0
 
   rescue:
     - name: "[NC] - removing config.php when occ fail"
@@ -100,13 +100,13 @@
 
 - name: "[NC] - Ensure Nextcloud directories are 0750"
   command: find {{ nextcloud_data_dir }} -type d -exec chmod -c 0750 {} \;
-  register: chmod_result
-  changed_when: "chmod_result.stdout != \"\""
+  register: nc_installation_chmod_result
+  changed_when: "nc_installation_chmod_result.stdout != \"\""
 
 - name: "[NC] - Ensure Nextcloud files are 0640"
   command: find {{ nextcloud_data_dir }} -type f -exec chmod -c 0640 {} \;
-  register: chmod_result
-  changed_when: "chmod_result.stdout != \"\""
+  register: nc_installation_chmod_result
+  changed_when: "nc_installation_chmod_result.stdout != \"\""
 
 - name: "[NC] - Setting stronger directory ownership"
   file:

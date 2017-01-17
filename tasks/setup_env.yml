@@ -24,13 +24,13 @@
 - name: "[PostgreSQL] - Debian only : checking sudo."
   shell: "dpkg -l sudo"
   changed_when: False
-  register: command_result
+  register: nc_sudo_installed_result
   failed_when: False
   when: ansible_distribution == "Debian"
 
 - name: "[PostgreSQL] - rolling back to su."
   set_fact: ansible_become_method="su"
-  when: command_result is defined and command_result.rc != 0
+  when: nc_sudo_installed_result is defined and nc_sudo_installed_result.rc != 0
 
 # fix for ubuntu 14.04 with permission issue for unprivileged user :
 - name: "[NC] - Adding ACL on trusty."

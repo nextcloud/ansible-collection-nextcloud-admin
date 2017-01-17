@@ -1,7 +1,7 @@
 ---
 - name: "[mySQL] - Service is installed."
   package: "name={{ nextcloud_db_backend }}-server state=present"
-  register: db_install
+  register: nc_mysql_db_install
 
 - name: "[mySQL] - PHP module is installed."
   package: "name=php{{ php_ver }}-mysql state=present"
@@ -45,11 +45,11 @@
       login_password: "{{ nextcloud_mysql_root_pwd }}"
       login_user: root
     ignore_errors: yes
-  when: db_install.changed
+  when: nc_mysql_db_install.changed
 
 - name: "[mySQL] - Check credentials"
   stat: "path=/root/.my.cnf"
-  register: mycred
+  register: nc_mysql_mycred
 
 - block:
   - name: "[mySQL] - Make the file .my.cnf"
@@ -62,7 +62,7 @@
         [client]
         user=root
         password="{{ nextcloud_mysql_root_pwd }}"
-  when: mycred.stat.exists is defined and not mycred.stat.exists
+  when: nc_mysql_mycred.stat.exists is defined and not nc_mysql_mycred.stat.exists
 
 - name: "[mySQL] - Fix mysql binary logging for nextcloud"
   copy:
