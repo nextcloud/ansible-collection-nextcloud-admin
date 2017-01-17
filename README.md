@@ -174,15 +174,15 @@ Defines various method for retrieving a TLS certificate.
 
 ### System configuration
 ```YAML
-websrv_user: "www-data"
+nextcloud_websrv_user: "www-data"
 ```
 system user for the http server
 ```YAML
-websrv_group: "www-data"
+nextcloud_websrv_group: "www-data"
 ```
 system group for the http server
 ```YAML
-mysql_root_pwd: "secret"
+nextcloud_mysql_root_pwd: "secret"
 ```
 root password for the mysql server
 
@@ -275,7 +275,7 @@ Here 2 examples for apache and nginx (because they have slightly different confi
      nextcloud_tls_cert_method: "installed"
      nextcloud_tls_cert: "/etc/nginx/certs/nextcloud.crt"
      nextcloud_tls_cert_key: "/etc/nginx/certs/nextcloud.key"
-     mysql_root_pwd: "42h2g2"
+     nextcloud_mysql_root_pwd: "42h2g2"
 ```
 
 License

@@ -11,8 +11,8 @@
     mode: u=rwX,g=rX,o-rwx
     recurse: yes
     state: directory
-    owner: "{{ websrv_user }}"
-    group: "{{ websrv_group }}"
+    owner: "{{ nextcloud_websrv_user }}"
+    group: "{{ nextcloud_websrv_group }}"
 
 - name: "[NC] - generate {{ nextcloud_admin_name }} password:"
   set_fact: nextcloud_admin_pwd="{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/web_admin.pwd length=10' ) }}"
@@ -23,8 +23,8 @@
     path: "{{ nextcloud_webroot }}"
     state: directory
     recurse: yes
-    owner: "{{ websrv_user }}"
-    group: "{{ websrv_group }}"
+    owner: "{{ nextcloud_websrv_user }}"
+    group: "{{ nextcloud_websrv_group }}"
 
 # fix for mariadb with occ
 - set_fact: nextcloud_tmp_backend="{{ nextcloud_db_backend }}"
@@ -38,7 +38,7 @@
       path: "{{ nextcloud_webroot }}/config/config.php"
       state: absent
   - name: "[NC] - Run occ installation command"
-    become_user: "{{ websrv_user }}"
+    become_user: "{{ nextcloud_websrv_user }}"
     command: >
         php occ maintenance:install
         --database={{ nextcloud_tmp_backend }}
@@ -112,8 +112,8 @@
   file:
     path: "{{ nextcloud_webroot }}/{{ item }}/"
     recurse: yes
-    owner: "{{ websrv_user }}"
-    group: "{{ websrv_group }}"
+    owner: "{{ nextcloud_websrv_user }}"
+    group: "{{ nextcloud_websrv_group }}"
     state: directory
   with_items:
     - apps
