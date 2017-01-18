@@ -7,7 +7,7 @@
   when: item.value != ""
 
 - name: "[ App {{ item.key}} ] - enable the application."
-  become_user: "{{ websrv_user }}"
+  become_user: "{{ nextcloud_websrv_user }}"
   command: php occ app:enable "{{item.key}}" -q
   args:
     chdir: "{{ nextcloud_webroot }}"

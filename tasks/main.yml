@@ -61,12 +61,12 @@
     command: php occ app:list --output=json_pretty --no-warnings
     args:
       chdir: "{{ nextcloud_webroot }}"
-    become_user: "{{ websrv_user }}"
+    become_user: "{{ nextcloud_websrv_user }}"
     changed_when: false
-    register: _nc_apps
+    register: nc_apps_list
 
   - name: "[NC apps] - convert list to yaml."
-    set_fact: nc_available_apps="{{ _nc_apps.stdout | from_json }}"
+    set_fact: nc_available_apps="{{ nc_apps_list.stdout | from_json }}"
 
   - debug :
       var: nextcloud_apps
