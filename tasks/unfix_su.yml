@@ -1,0 +1,9 @@
+---
+- name: "[Unfix su] - Check current shell for {{ nextcloud_websrv_user }}."
+  shell: getent passwd "{{ nextcloud_websrv_user }}" | cut -d ':' -f 7
+  register: nc_websrv_new_shell
+  changed_when: false
+
+- name: "[Unfix su] - Restore {{ nextcloud_websrv_user }} shell."
+  command: chsh -s "{{nc_websrv_user_shell.stdout}}" "{{ nextcloud_websrv_user }}"
+  when: not ('false' in nc_websrv_new_shell.stdout) or ('nologin' in nc_websrv_new_shell.stdout)

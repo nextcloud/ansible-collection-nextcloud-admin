@@ -50,6 +50,14 @@
   register: nc_nextcloud_configured
   when: nc_nextcloud_conf.stat.exists
 
+- name: Fix su issue with occ
+  include: tasks/fix_su.yml
+  when: ansible_become_method == "su"
+
 - name: Nextcloud installation
   include: tasks/nc_installation.yml
   when: (not nc_nextcloud_conf.stat.exists) or (nc_nextcloud_configured.rc is defined and nc_nextcloud_configured.rc != 0)
+
+- name: Unfix su issue with occ
+  include: tasks/unfix_su.yml
+  when: ansible_become_method == "su"
