@@ -1,7 +1,7 @@
 ---
 - name: "[mySQL] - Service is installed."
   package: "name={{ nextcloud_db_backend }}-server state=present"
-  register: db_install
+  register: nc_mysql_db_install
 
 - name: "[mySQL] - PHP module is installed."
   package: "name=php{{ php_ver }}-mysql state=present"
@@ -12,14 +12,14 @@
 
 - block:
   - name: "[mySQL] - generate {{ nextcloud_db_backend }} root Password:"
-    set_fact: mysql_root_pwd="{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/mysql_root.pwd' ) }}"
-    when: mysql_root_pwd is not defined
+    set_fact: nextcloud_mysql_root_pwd="{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/mysql_root.pwd' ) }}"
+    when: nextcloud_mysql_root_pwd is not defined
 
   - name: "[mySQL] - Update {{ nextcloud_db_backend }} root password"
     mysql_user:
       name: root
       host: "{{ item }}"
-      password: "{{ mysql_root_pwd }}"
+      password: "{{ nextcloud_mysql_root_pwd }}"
       login_user: root
       login_password: ""
       check_implicit_admin: yes
@@ -34,7 +34,7 @@
     mysql_user:
       user: ""
       state: "absent"
-      login_password: "{{ mysql_root_pwd }}"
+      login_password: "{{ nextcloud_mysql_root_pwd }}"
       login_user: root
     ignore_errors: yes
 
@@ -42,14 +42,14 @@
     mysql_db:
       name: test
       state: absent
-      login_password: "{{ mysql_root_pwd }}"
+      login_password: "{{ nextcloud_mysql_root_pwd }}"
       login_user: root
     ignore_errors: yes
-  when: db_install.changed
+  when: nc_mysql_db_install.changed
 
 - name: "[mySQL] - Check credentials"
   stat: "path=/root/.my.cnf"
-  register: mycred
+  register: nc_mysql_mycred
 
 - block:
   - name: "[mySQL] - Make the file .my.cnf"
@@ -61,8 +61,8 @@
       block: |
         [client]
         user=root
-        password="{{ mysql_root_pwd }}"
-  when: mycred.stat.exists is defined and not mycred.stat.exists
+        password="{{ nextcloud_mysql_root_pwd }}"
+  when: nc_mysql_mycred.stat.exists is defined and not nc_mysql_mycred.stat.exists
 
 - name: "[mySQL] - Fix mysql binary logging for nextcloud"
   copy:

@@ -16,10 +16,10 @@
   file:
     path: "{{ nextcloud_tls_cert_file }}"
     mode: 0644
-    group: "{{ websrv_group }}"
+    group: "{{ nextcloud_websrv_group }}"
 
 - name: "[selfsigned TLS] - check TLS key permissions"
   file:
     path: "{{ nextcloud_tls_cert_key_file }}"
     mode: 0640
-    group: "{{ websrv_group }}"
+    group: "{{ nextcloud_websrv_group }}"
