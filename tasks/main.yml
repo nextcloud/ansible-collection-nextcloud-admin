@@ -52,7 +52,7 @@
 
 - name: Fix su issue with occ
   include: tasks/fix_su.yml
-  when: ansible_become_method == "su"
+  when: ansible_become_method is defined and ansible_become_method == "su"
 
 - name: Nextcloud installation
   include: tasks/nc_installation.yml
@@ -60,4 +60,4 @@
 
 - name: Unfix su issue with occ
   include: tasks/unfix_su.yml
-  when: ansible_become_method == "su"
+  when: ansible_become_method is defined and ansible_become_method == "su"
