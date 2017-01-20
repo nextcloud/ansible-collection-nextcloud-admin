@@ -15,7 +15,7 @@ galaxy_info:
   # - CC-BY
   license: BSD
 
-  min_ansible_version: 2.0
+  min_ansible_version: 2.2
 
   # Optionally specify the branch Galaxy will use when accessing the GitHub
   # repo for this role. During role install, if no tags are available,

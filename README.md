@@ -12,7 +12,7 @@ The role's main actions are:
 
 ## Requirements
 ### Ansible version
-Ansible 2.0
+Ansible 2.2
 ### Setup module:
 The role uses facts gathered by Ansible on the remote host. If you disable the Setup module in your playbook, the role will not work properly.
 ### Root access

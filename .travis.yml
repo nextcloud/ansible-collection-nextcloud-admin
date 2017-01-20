@@ -4,10 +4,8 @@ python: "2.7"
 os: linux
 dist: trusty
 env:
-  - ansible_version="2.0.0.2"
-  - ansible_version="2.0.2.0"
-  - ansible_version="2.1.3.0"
-  - ansible_version="2.2.0.0"
+  - ansible_version="2.1.4.0"
+  - ansible_version="2.2.1.0"
 
 # Use the new container infrastructure
 sudo: required
