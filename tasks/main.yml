@@ -1,8 +1,7 @@
 ---
 # tasks file for nextcloud
 - include: tasks/setup_env.yml
-  tags:
-    - install_apps
+  tags: always
   # load os specific variables
 
 - name: Verify permission for installed TLS certificates
@@ -55,6 +54,7 @@
 - name: Fix su issue with occ
   include: tasks/fix_su.yml
   when: ansible_become_method is defined and ansible_become_method == "su"
+  tags: always
 
 - name: Nextcloud installation
   include: tasks/nc_installation.yml
@@ -72,9 +72,6 @@
   - name: "[NC apps] - convert list to yaml."
     set_fact: nc_available_apps="{{ nc_apps_list.stdout | from_json }}"
 
-  - debug :
-      var: nextcloud_apps
-
   - name: "[NC apps] - installation."
     include: tasks/nc_apps.yml
     # do if the app is not enabled and ( (archive path is not "") or (app is disabled) )
@@ -82,7 +79,14 @@
     with_dict: "{{nextcloud_apps}}"
   when: (nextcloud_apps is defined) and nextcloud_apps is mapping
   tags: install_apps
+  rescue:
+  - name: Unfix su issue with occ
+    include: tasks/unfix_su.yml
+    when: ansible_become_method is defined and ansible_become_method == "su"
+  - fail:
+      msg: "An error Occured during Apps installation."
 
 - name: Unfix su issue with occ
   include: tasks/unfix_su.yml
   when: ansible_become_method is defined and ansible_become_method == "su"
+  tags: always
