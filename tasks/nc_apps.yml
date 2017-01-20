@@ -1,0 +1,55 @@
+---
+- set_fact:
+    nc_app_name: "{{item.key}}"
+    nc_app_cfg: "{{item.value}}"
+
+- block:
+  - name: "[ App {{nc_app_name}} ] - Download Archive in apps folder."
+    unarchive:
+      copy: no
+      src: "{{ nc_app_cfg }}"
+      dest: "{{nextcloud_webroot}}/apps/"
+      owner: "{{ nextcloud_websrv_user }}"
+      group: "{{ nextcloud_websrv_group }}"
+      creates: "{{nextcloud_webroot}}/apps/{{nc_app_name}}"
+    when: nc_app_cfg != ""
+
+  - name: "[ App {{nc_app_name}} ] - enable the application."
+    become_user: "{{ nextcloud_websrv_user }}"
+    command: php occ app:enable "{{nc_app_name}}"
+    args:
+      chdir: "{{ nextcloud_webroot }}"
+  when: nc_app_cfg is string
+
+- block:
+  - assert:
+      that:
+        - (nc_app_cfg.source is defined) and (nc_app_cfg.source is string)
+      msg: "{{nc_app_name}} is not well declared."
+
+  - name: "[ App {{nc_app_name}} ] - Download Archive in apps folder."
+    unarchive:
+      copy: no
+      src: "{{ nc_app_cfg.source }}"
+      dest: "{{nextcloud_webroot}}/apps/"
+      owner: "{{ nextcloud_websrv_user }}"
+      group: "{{ nextcloud_websrv_group }}"
+      creates: "{{nextcloud_webroot}}/apps/{{nc_app_name}}"
+    when: nc_app_cfg.source != ""
+
+  - name: "[ App {{nc_app_name}} ] - enable the application."
+    become_user: "{{ nextcloud_websrv_user }}"
+    command: php occ app:enable "{{nc_app_name}}"
+    args:
+      chdir: "{{ nextcloud_webroot }}"
+  - block:
+    - name: "[ App {{nc_app_name}} ] - Configure the application "
+      become_user: "{{ nextcloud_websrv_user }}"
+      command: php occ config:app:set {{nc_app_name}} {{item_cfg.key}} --value={{item_cfg.value}}
+      args:
+        chdir: "{{ nextcloud_webroot }}"
+      with_dict: "{{nc_app_cfg.conf | default({})}}"
+      loop_control:
+        loop_var: item_cfg
+    when: nc_app_cfg.conf is defined
+  when: (nc_app_cfg is mapping)
