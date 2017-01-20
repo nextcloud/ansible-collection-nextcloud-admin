@@ -65,6 +65,10 @@
     failed_when: nc_installation_confphp.rc is defined and nc_installation_confphp.rc != 0
 
   rescue:
+    - name: Unfix su issue with occ
+      include: tasks/unfix_su.yml
+      when: ansible_become_method == "su"
+
     - name: "[NC] - removing config.php when occ fail"
       file:
         path: "{{ nextcloud_webroot }}/config/config.php"

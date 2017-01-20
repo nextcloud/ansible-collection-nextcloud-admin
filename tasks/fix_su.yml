@@ -1,0 +1,9 @@
+---
+- name: "[Fix su] - Save current shell for {{ nextcloud_websrv_user }}."
+  shell: getent passwd "{{ nextcloud_websrv_user }}" | cut -d ':' -f 7
+  register: nc_websrv_user_shell
+  changed_when: false
+
+- name: "[Fix su] - Temporary change {{ nextcloud_websrv_user }} shell."
+  command: chsh -s /bin/sh "{{ nextcloud_websrv_user }}"
+  when: ('false' in nc_websrv_user_shell.stdout) or ('nologin' in nc_websrv_user_shell.stdout)
