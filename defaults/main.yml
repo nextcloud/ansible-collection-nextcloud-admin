@@ -46,7 +46,7 @@ nextcloud_hsts: false
 # nextcloud_tls_src_cert_key: /path/to/cert/key
 
 # [APPS]
-nextcloud_apps: false
+nextcloud_apps: {}
 
 # [SYSTEM]
 nextcloud_websrv_user: "www-data"
