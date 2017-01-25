@@ -84,7 +84,7 @@
 - name: "[NGINX] -  generate Nextcloud configuration for nginx"
   template:
     dest: /etc/nginx/sites-available/nc_{{ nextcloud_instance_name }}.cnf
-    src: templates/nginx_nc_root.j2
+    src: "{{nextcloud_websrv_template}}"
   notify: reload nginx
 
 - name: "[NGINX] -  Enable Nextcloud in nginx conf"
