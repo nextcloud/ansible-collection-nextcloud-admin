@@ -14,4 +14,3 @@
     # path: "{{ nextcloud_tls_cert_key_file }}"
     # mode: 0640
     # group: "{{ nextcloud_websrv_group }}"
-
