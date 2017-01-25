@@ -68,6 +68,11 @@ nextcloud_websrv: "apache2"
 ```
 The http server used by nextcloud. Available values are: **apache2** or **nginx**.
 ```YAML
+nextcloud_websrv_template: "templates/{{nextcloud_websrv}}_nc.j2"
+```
+The jinja2 template creating the instance configuration for your webserver.
+You can provide your own through this parameter.
+```YAML
 nextcloud_webroot: "/opt/nextcloud"
 ```
 The Nextcloud root directory.

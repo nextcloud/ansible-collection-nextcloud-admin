@@ -17,6 +17,7 @@ nextcloud_instance_name: "{{ nextcloud_trusted_domain | first }}"
 # nextcloud_websrv: "apache2" | "nginx"
 nextcloud_install_websrv: true
 nextcloud_websrv: "apache2"
+nextcloud_websrv_template: "templates/{{nextcloud_websrv}}_nc.j2"
 nextcloud_webroot: "/opt/nextcloud"
 nextcloud_data_dir: "/var/ncdata"
 nextcloud_admin_name: "admin"
@@ -31,7 +32,7 @@ nextcloud_db_name: "nextcloud"
 nextcloud_db_admin: "ncadmin"
 # nextcloud_db_pwd: "secret"
 
-# [TLS]
+# [TLS] parameters used in the apache2 & nginx templates
 nextcloud_install_tls: true
 nextcloud_tls_enforce: true
 nextcloud_force_strong_apache_ssl: true
