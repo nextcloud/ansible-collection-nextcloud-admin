@@ -9,6 +9,7 @@ The role's main actions are:
 - [x] Strengthened files permissions and ownership following Nextcloud recommendations.
 - [x] Web server configuration.
 - [x] Strengthened TLS configuration following _Mozilla SSL Configuration Generator_, intermediate profile.
+- [x] Post installation of Nextcloud applications
 
 ## Requirements
 ### Ansible version
@@ -196,9 +197,10 @@ The role uses Ansible's password Lookup:
 - if the file already exist, it reuse its content
 - see http://docs.ansible.com/ansible/playbooks_lookups.html#the-password-lookup for more info
 
-### Applications installation
+### Post installation:
+#### Applications installation
 
-Sincev1.3.0, it is possible to download, install and enable nextcloud applications as a post-install process.
+Since __v1.3.0__, it is possible to download, install and enable nextcloud applications during a post-install process.
 
 The application (app) to install have to be declared in the `nextcloud_apps` dictionary in a "key:value" pair.
 - The app name is the key
@@ -313,7 +315,7 @@ Here 2 examples for apache and nginx (because they have slightly different confi
      nextcloud_tls_cert_key: "/etc/nginx/certs/nextcloud.key"
      nextcloud_mysql_root_pwd: "42h2g2"
      nextcloud_apps:
-       files_external: "" #enable files_external which is already installed in nexcloud  
+       files_external: "" #enable files_external which is already installed in nextcloud  
        calendar: "https://github.com/nextcloud/calendar/releases/download/v1.5.0/calendar.tar.gz" # download and install calendar app
        richdocuments-1.1.25: # the app name is equal to the extracted folder name from the archive
           source: "https://github.com/nextcloud/richdocuments/archive/1.1.25.zip"
