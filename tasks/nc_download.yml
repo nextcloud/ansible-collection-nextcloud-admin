@@ -2,6 +2,16 @@
 - name: "[NC-DL] - Unzip is installed"
   package: name=unzip state=installed
 
+- name: "[NC-DL] - regenerate the download URL for *latest*."
+  set_fact:
+    nextcloud_full_url: "{{nextcloud_repository}}/{{nextcloud_version_channel}}/{{[nextcloud_dl_file_name.latest, nextcloud_archive_format]|join('.')}}"
+  when: nextcloud_get_latest and (nextcloud_version_channel != 'prereleases') and (nextcloud_archive_url is not defined)
+
+- name: "[NC-DL] - use the provided URL instead."
+  set_fact:
+    nextcloud_full_url: "{{nextcloud_archive_url}}"
+  when: nextcloud_archive_url is defined
+
 - block:
   - name: "Download & extract Nextcloud to /tmp."
     unarchive:
