@@ -1,6 +1,11 @@
 ---
 - name: "[NC-DL] - Unzip is installed"
   package: name=unzip state=installed
+  when: nextcloud_archive_format == "zip"
+
+- name: "[NC-DL] - bunzip2 is installed"
+  package: name=bzip2 state=installed
+  when: nextcloud_archive_format == "tar.bz2"
 
 - name: "[NC-DL] - regenerate the download URL for *latest*."
   set_fact:
