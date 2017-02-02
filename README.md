@@ -21,35 +21,74 @@ This role requires root access, so either configure it in your inventory files, 
 > playbook.yml:
 ```YAML
 - hosts: dnsserver
+  become: yes
   roles:
     - role: aalaesar.install_nextcloud
-      become: yes
 ```
 
 ## Role Variables
 
 Role's variables (and their default values):
 
-### Installation configuration
-> Source location will be calculated following channel, version and branch values.
+### Choose the version
+
+An URL will be generated following naming rules used in the nextcloud repository
+_Not following this rules correctly may make the role unable to download nextcloud._
+
+#### Repository naming rules:
+Some variables changes depending on the channel used and if get_latest is true.
+This table summarize the possible cases.
+
+|channel|latest|major&latest|major|full|special|
+|---|---|---|---|---|---|
+|**releases**|yes/no|_null_ \|9\|10\|...|_null_|"10.0.3"|_null_|
+|**prereleases**|_null_|_null_|_null_|"11.0.1"|"RC(n)\|beta(n)"|
+|**daily**|yes/no|master\|stable9\|...|9\|10\|...|_null_|"YYYY-MM-DD"|
+
+__major&latest__ = major value when latest is true
+_null_ = "not used"
+#### version variables:
+```YAML
+nextcloud_version_channel: "releases" # releases | prereleases | daily
+```
+Specify the main channel to use.
+```YAML
+nextcloud_get_latest: true
+```
+Specify if the "latest" archive should be downloaded.
 
 ```YAML
-nextcloud_channel: "releases"
+# nextcloud_version_major: 10
 ```
-Defines the version channel you want to use for the installation
-Available : releases | prereleases | daily | latest
+Specify what major version you desire.
+
 ```YAML
-nextcloud_version: 10.0.2
+# nextcloud_version_full: "10.0.3"
 ```
-Specify the version name for channels **releases**, **prereleases** and **daily**. (it may not be numbers at all)
+The full version of the desired nextcloud instance. type **M.F.P** _(Major.Feature.Patch)_
+
 ```YAML
-nextcloud_branch: "stable"
+# nextcloud_version_special: ""
 ```
-Specify the branch name for **daily** & **latest** channel
+Specify a special string in the archive's filename.
+For prereleases: "RCn|beta" | for daily "YYYY-MM-DD"
+
 ```YAML
 nextcloud_repository: "https://download.nextcloud.com/server"
 ```
-The Nextcloud's official repository. You may change it if you have the sources somewhere else.
+Repository's URL.
+
+```YAML
+nextcloud_archive_format: "zip" # zip | tar.bz2
+```
+Choose between the 2 archive formats available in the repository.
+
+```YAML
+# nextcloud_archive_url:
+```
+_If you don't like rules..._
+Specify directly a full URL to the archive. The role will skip the url generation and download the archive
+
 ### Main configuration
 ```YAML
 nextcloud_trusted_domain: ["{{ ansible_default_ipv4.address }}"]
