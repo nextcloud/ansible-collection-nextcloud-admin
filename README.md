@@ -84,7 +84,7 @@ nextcloud_archive_format: "zip" # zip | tar.bz2
 Choose between the 2 archive formats available in the repository.
 
 ```YAML
-# nextcloud_archive_url:
+# nextcloud_full_url:
 ```
 _If you don't like rules..._
 Specify directly a full URL to the archive. The role will skip the url generation and download the archive
