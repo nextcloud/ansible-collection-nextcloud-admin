@@ -108,7 +108,7 @@ nextcloud_version_major: 10
 ```YAML
 nextcloud_version_channel: "releases"
 nextcloud_get_latest: false
-nextcloud_full_version: 10.0.3
+nextcloud_full_version: "10.0.3"
 ```
 - Get the nextcloud 11.0.1 prerelease 1:
 ```YAML
@@ -125,13 +125,13 @@ nextcloud_get_latest: true
 ```YAML
 nextcloud_version_channel: "daily"
 nextcloud_get_latest: true
-nextcloud_version_major: stable10
+nextcloud_version_major: "stable10"
 ```
 - Get the daily for master at january 1rst 2017:
 ```YAML
 nextcloud_version_channel: "daily"
 nextcloud_get_latest: false
-nextcloud_version_full: master
+nextcloud_version_major: "master"
 nextcloud_version_special: "2017-01-01"
 ```
 ### Main configuration

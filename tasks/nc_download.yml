@@ -16,7 +16,7 @@
   - name: "[NC-DL] - Create the download link."
     set_fact:
       nextcloud_full_url: "{{nextcloud_repository}}/{{nextcloud_version_channel}}/{{[nextcloud_dl_file_name[nextcloud_version_channel], nextcloud_archive_format]|join('.')}}"
-    when: not nextcloud_get_latest
+    when: (not nextcloud_get_latest) or (nextcloud_version_channel == 'prereleases')
   when: nextcloud_full_url is not defined
 
 - block:
