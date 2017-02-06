@@ -21,35 +21,119 @@ This role requires root access, so either configure it in your inventory files, 
 > playbook.yml:
 ```YAML
 - hosts: dnsserver
+  become: yes
   roles:
     - role: aalaesar.install_nextcloud
-      become: yes
 ```
 
 ## Role Variables
 
 Role's variables (and their default values):
 
-### Installation configuration
-> Source location will be calculated following channel, version and branch values.
+### Choose the version
+
+An URL will be generated following naming rules used in the nextcloud repository
+_Not following this rules correctly may make the role unable to download nextcloud._
+
+#### Repository naming rules:
+Some variables changes depending on the channel used and if get_latest is true.
+This table summarize the possible cases.
+
+|channel|latest|major&latest|major|full|special|
+|---|---|---|---|---|---|
+|**releases**|yes/no|_null_ \|9\|10\|...|_null_|"10.0.3"|_null_|
+|**prereleases**|_null_|_null_|_null_|"11.0.1"|_null_ \|"RC(n)\|beta(n)"|
+|**daily**|yes/no|_null_ \|master\|stable9\|...|master\|9\|10\|...|_null_|_null_ \|"YYYY-MM-DD"|
+
+__major&latest__ = major value when latest is true
+_null_ = "not used"
+#### version variables:
+```YAML
+nextcloud_version_channel: "releases" # releases | prereleases | daily
+```
+Specify the main channel to use.
+```YAML
+nextcloud_get_latest: true
+```
+Specify if the "latest" archive should be downloaded.
 
 ```YAML
-nextcloud_channel: "releases"
+# nextcloud_version_major: 10
 ```
-Defines the version channel you want to use for the installation
-Available : releases | prereleases | daily | latest
+Specify what major version you desire.
+
 ```YAML
-nextcloud_version: 10.0.2
+# nextcloud_version_full: "10.0.3"
 ```
-Specify the version name for channels **releases**, **prereleases** and **daily**. (it may not be numbers at all)
+The full version of the desired nextcloud instance. type **M.F.P** _(Major.Feature.Patch)_
+
 ```YAML
-nextcloud_branch: "stable"
+# nextcloud_version_special: ""
 ```
-Specify the branch name for **daily** & **latest** channel
+Specify a special string in the archive's filename.
+For prereleases: "RCn|beta" | for daily "YYYY-MM-DD"
+
 ```YAML
 nextcloud_repository: "https://download.nextcloud.com/server"
 ```
-The Nextcloud's official repository. You may change it if you have the sources somewhere else.
+Repository's URL.
+
+```YAML
+nextcloud_archive_format: "zip" # zip | tar.bz2
+```
+Choose between the 2 archive formats available in the repository.
+
+```YAML
+# nextcloud_full_url:
+```
+_If you don't like rules..._
+Specify directly a full URL to the archive. The role will skip the url generation and download the archive
+#### Examples:
+- Download your own archive:
+```YAML
+nextcloud_full_url: https://h2g2.com/42/nexcloud.zip
+```
+- Choose the latest release (default):
+```YAML
+nextcloud_version_channel: "releases"
+nextcloud_get_latest: true
+```
+- Choose the latest v10 release:
+```YAML
+nextcloud_version_channel: "releases"
+nextcloud_get_latest: true
+nextcloud_version_major: 10
+```
+- Choose a specific release:
+```YAML
+nextcloud_version_channel: "releases"
+nextcloud_get_latest: false
+nextcloud_full_version: "10.0.3"
+```
+- Get the nextcloud 11.0.1 prerelease 1:
+```YAML
+nextcloud_version_channel: "prereleases"
+nextcloud_version_full: "11.0.1"
+nextcloud_version_special: "RC1"
+```
+- Get the latest daily:
+```YAML
+nextcloud_version_channel: "daily"
+nextcloud_get_latest: true
+```
+- Get the latest daily for stable 10:
+```YAML
+nextcloud_version_channel: "daily"
+nextcloud_get_latest: true
+nextcloud_version_major: "stable10"
+```
+- Get the daily for master at january 1rst 2017:
+```YAML
+nextcloud_version_channel: "daily"
+nextcloud_get_latest: false
+nextcloud_version_major: "master"
+nextcloud_version_special: "2017-01-01"
+```
 ### Main configuration
 ```YAML
 nextcloud_trusted_domain: ["{{ ansible_default_ipv4.address }}"]
@@ -235,7 +319,6 @@ The name may not be canon some times. (like *appName-x.y.z** instead of **appNam
 - The role will __not__ update an already enabled application.
 - The configuration is applied only when the app in enabled the first time:
 Changing a parameter, then running the role again while the app is already enabled will __not__ update its configuration.
-- for configuration, special characters must be escaped.
 - this post_install process is tagged and can be called directly using the `--tags install_apps` option.
 
 ## Dependencies
@@ -264,8 +347,8 @@ You can choose the version channel to download a specific version of nextcloud. 
 - hosts: server
   roles:
    - role: aalaesar.install_nextcloud
-     nextcloud_channel: "latest"
-     nextcloud_branch: "master"
+     nextcloud_version_channel: "daily"
+     nextcloud_version_major: "master"
 ```
 
 ### Case 2: Using letsencrypt with this role.
@@ -298,18 +381,24 @@ Here 2 examples for apache and nginx (because they have slightly different confi
       nextcloud_tls_cert_key: "/etc/letsencrypt/live/example2.com/privkey.pem"
 ```
 ### Case 3: integration to an existing system.
-- An Ansible master want to install a new Nextcloud instance at _cloud.example.tld_ on an existing server.
-- He already have a valid certificate for the trusted domain in /etc/nginx/certs/ installed
-- he wants the following apps to be installed & enabled : files_external, calendar, richdocuments (Collabora)
-- He can run the role with the following variables to install Nextcloud accordingly to its existing infrastructure .
+- An Ansible master want to install a new Nextcloud instance on an existing Ubuntu 14.04 server with nginx & mariadb installed.
+- As is server do not meet the php requirements for Nextcloud 11, he chooses to use the lastest Nextcloud 10 release.
+- He wants it to be accessible from internet at _cloud.example.tld_ and from his intranet at _dbox.intra.net_.
+- He already have a valid certificate for the intranet domain in /etc/nginx/certs/ installed
+- he wants the following apps to be installed & enabled : files_external, calendar, agenda, richdocuments (Collabora)
+- The richdocuments app has to be configured to point out to the Collabora domain.
+
+He can run the role with the following variables to install Nextcloud accordingly to its existing requirements .
 
 ```YAML
 ---
 - hosts: server
   roles:
    - role: aalaesar.install_nextcloud
+     nextcloud_version_major: 10
      nextcloud_trusted_domain:
        - "cloud.example.tld"
+       - "dbox.intra.net"
      nextcloud_websrv: "nginx"
      nextcloud_admin_pwd: "secret007"
      nextcloud_webroot: "/var/www/nextcloud/"
@@ -321,11 +410,12 @@ Here 2 examples for apache and nginx (because they have slightly different confi
      nextcloud_mysql_root_pwd: "42h2g2"
      nextcloud_apps:
        files_external: "" #enable files_external which is already installed in nextcloud  
-       calendar: "https://github.com/nextcloud/calendar/releases/download/v1.5.0/calendar.tar.gz" # download and install calendar app
+       calendar: "https://github.com/nextcloud/calendar/releases/download/v1.5.0/calendar.tar.gz"
+       contacts: "https://github.com/nextcloud/contacts/releases/download/v1.5.3/contacts.tar.gz"
        richdocuments-1.1.25: # the app name is equal to the extracted folder name from the archive
           source: "https://github.com/nextcloud/richdocuments/archive/1.1.25.zip"
           conf:
-            wopi_url: 'https:\/\/office.example.tld'
+            wopi_url: 'https://office.example.tld'
 ```
 
 License

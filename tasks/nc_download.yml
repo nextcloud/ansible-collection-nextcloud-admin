@@ -1,6 +1,23 @@
 ---
 - name: "[NC-DL] - Unzip is installed"
   package: name=unzip state=installed
+  when: nextcloud_archive_format == "zip"
+
+- name: "[NC-DL] - bunzip2 is installed"
+  package: name=bzip2 state=installed
+  when: nextcloud_archive_format == "tar.bz2"
+
+- block:
+  - name: "[NC-DL] - Create the download link for *latest*."
+    set_fact:
+      nextcloud_full_url: "{{nextcloud_repository}}/{{nextcloud_version_channel}}/{{[nextcloud_dl_file_name.latest, nextcloud_archive_format]|join('.')}}"
+    when: nextcloud_get_latest and (nextcloud_version_channel != 'prereleases')
+
+  - name: "[NC-DL] - Create the download link."
+    set_fact:
+      nextcloud_full_url: "{{nextcloud_repository}}/{{nextcloud_version_channel}}/{{[nextcloud_dl_file_name[nextcloud_version_channel], nextcloud_archive_format]|join('.')}}"
+    when: (not nextcloud_get_latest) or (nextcloud_version_channel == 'prereleases')
+  when: nextcloud_full_url is not defined
 
 - block:
   - name: "Download & extract Nextcloud to /tmp."
