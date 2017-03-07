@@ -32,6 +32,10 @@ Role's variables (and their default values):
 
 ### Choose the version
 
+_*WARNING: Since Nexcloud 11 requires php v5.6 or later, command line installation will fail on old OS without php v5.6+ support.*_
+
+_Known issue while installing Nextcloud 11 on an Ubuntu 14.04 system:_ [#27](https://github.com/aalaesar/install_nextcloud/issues/27)
+
 An URL will be generated following naming rules used in the nextcloud repository
 _Not following this rules correctly may make the role unable to download nextcloud._
 
