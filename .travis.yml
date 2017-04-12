@@ -5,7 +5,8 @@ os: linux
 dist: trusty
 env:
   - ansible_version="2.1.4.0"
-  - ansible_version="2.2.1.0"
+  - ansible_version="2.2.2.0"
+  - ansible_version="2.3.0.0"
 
 sudo: required
 

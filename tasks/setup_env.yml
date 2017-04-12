@@ -30,7 +30,7 @@
 
 - name: "[ENV] - rolling back to su."
   set_fact: ansible_become_method="su"
-  when: nc_sudo_installed_result is defined and nc_sudo_installed_result.rc != 0
+  when: (nc_sudo_installed_result.rc is defined) and (nc_sudo_installed_result.rc != 0)
 
 # fix for ubuntu 14.04 with permission issue for unprivileged user :
 - name: "[NC] - Adding ACL on trusty."
