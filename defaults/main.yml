@@ -22,9 +22,8 @@ nextcloud_archive_format: "zip" # zip | tar.bz2
 nextcloud_trusted_domain: ["{{ ansible_default_ipv4.address }}"]
 nextcloud_instance_name: "{{ nextcloud_trusted_domain | first }}"
 
-# nextcloud_websrv: "apache2" | "nginx"
 nextcloud_install_websrv: true
-nextcloud_websrv: "apache2"
+nextcloud_websrv: "apache2" # "apache2" | "nginx"
 nextcloud_websrv_template: "templates/{{nextcloud_websrv}}_nc.j2"
 nextcloud_webroot: "/opt/nextcloud"
 nextcloud_data_dir: "/var/ncdata"
@@ -32,10 +31,9 @@ nextcloud_admin_name: "admin"
 # nextcloud_admin_pwd: "secret"
 
 # [DATABASE]
-# nextcloud_db_backend: "mysql"/"mariadb" | "pgsql"
 nextcloud_install_db: true
 nextcloud_db_host: "127.0.0.1"
-nextcloud_db_backend: "mysql"
+nextcloud_db_backend: "mysql" # "mysql"/"mariadb" | "pgsql"
 nextcloud_db_name: "nextcloud"
 nextcloud_db_admin: "ncadmin"
 # nextcloud_db_pwd: "secret"
@@ -44,10 +42,9 @@ nextcloud_db_admin: "ncadmin"
 nextcloud_install_tls: true
 nextcloud_tls_enforce: true
 nextcloud_force_strong_apache_ssl: true
-nextcloud_tls_cert_method: "self-signed"
+nextcloud_tls_cert_method: "self-signed" # "self-signed" | "signed" | "installed"
 nextcloud_tls_dhparam: "/etc/ssl/dhparam.pem"
 nextcloud_hsts: false
-# nextcloud_tls_cert_method: "self-signed" | "signed" | "installed"
 # nextcloud_tls_cert: /path/to/cert
 # nextcloud_tls_cert_key: /path/to/cert/key
 # nextcloud_tls_cert_chain: /path/to/cert/chain
