@@ -44,6 +44,9 @@
   SSLCertificateChainFile {{ nextcloud_tls_cert_chain_file }}
 {% endif %}
 
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+
 {% if nextcloud_hsts is string %}
   <IfModule mod_headers.c>
     Header always set Strict-Transport-Security "{{ nextcloud_hsts }}"
