@@ -63,6 +63,25 @@
     # validate: "/usr/sbin/{{ php_bin }} -t #%s"
   notify: reload php-fpm
 
+- name: "[NGINX] -  enable PHP OPcache for php.ini"
+  lineinfile:
+    #path: "{{ php_dir }}/fpm/php.ini" #for ansible 2.3
+    dest: "{{ php_dir }}/fpm/php.ini"
+    state: present
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    backrefs: yes
+  with_items:
+    - { regexp: 'opcache.enable=0', line: 'opcache.enable=1' }
+    - { regexp: 'opcache.enable_cli', line: 'opcache.enable_cli=1' }
+    - { regexp: 'opcache.interned_strings_buffer', line: 'opcache.interned_strings_buffer=8' }
+    - { regexp: 'opcache.max_accelerated_files', line: 'opcache.max_accelerated_files=10000' }
+    - { regexp: 'opcache.memory_consumption', line: 'opcache.memory_consumption=128' }
+    - { regexp: 'opcache.save_comments', line: 'opcache.save_comments=1' }
+    - { regexp: 'opcache.revalidate_freq', line: 'opcache.revalidate_freq=1' }
+    # validate: "/usr/sbin/{{ php_bin }} -t #%s"
+  notify: reload php-fpm
+
 - name: "[NGINX] -  Public Diffie-Hellman Parameter are generated. This might take a while."
   command: "openssl dhparam -out {{ nextcloud_tls_dhparam }} 2048"
   args:
