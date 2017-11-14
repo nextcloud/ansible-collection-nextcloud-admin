@@ -65,7 +65,6 @@
 
 - name: "[NGINX] -  enable PHP OPcache for php.ini"
   lineinfile:
-    #path: "{{ php_dir }}/fpm/php.ini" #for ansible 2.3
     dest: "{{ php_dir }}/fpm/php.ini"
     state: present
     regexp: "{{ item.regexp }}"
