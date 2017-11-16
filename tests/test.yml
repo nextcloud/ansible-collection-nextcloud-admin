@@ -4,6 +4,7 @@
   become_user: root
   roles: [../../]
   vars:
+     nextcloud_websrv: nginx
      nextcloud_db_backend: "pgsql"
      nextcloud_version_major: 10
      nextcloud_apps:

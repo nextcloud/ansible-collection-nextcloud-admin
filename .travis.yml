@@ -2,11 +2,11 @@
 language: python
 python: "2.7"
 os: linux
-dist: trusty
 env:
   - ansible_version="2.1.6.0"
   - ansible_version="2.2.3.0"
-  - ansible_version="2.3.1.0"
+  - ansible_version="2.3.2.0"
+  - ansible_version="2.4.1.0"
 
 sudo: required
 
@@ -23,6 +23,8 @@ install:
   - ansible --version
   # Create ansible.cfg with correct roles_path
   - printf '[defaults]\nroles_path=../' >ansible.cfg
+  - sudo apt-get remove -y postgresql-9.2
+  - sudo apt-get purge -y postgresql-9.2
 
 before_script:
   - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
