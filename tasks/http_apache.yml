@@ -63,12 +63,18 @@
 - name: "[APACHE] -  Required Apache2 modules are enabled"
   apache2_module: state=present name={{ item }}
   with_items:
-    - ssl
     - rewrite
     - headers
     - env
     - dir
     - mime
+  notify: restart apache
+
+- name: "[APACHE] -  Ssl Apache2 module is enabled"
+  apache2_module: state=present name={{ item }}
+  with_items:
+    - ssl
+  when: nextcloud_install_tls
   notify: restart apache
 
 - name: "[APACHE] -  generate Nextcloud configuration for apache"
