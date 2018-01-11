@@ -11,4 +11,5 @@ php_pkg_spe:
   - "php7.0-xml"
   - "php7.0-zip"
   - "php7.0-mbstring"
+  - "php-redis"
 php_socket: "/run/php/php7.0-fpm.sock"

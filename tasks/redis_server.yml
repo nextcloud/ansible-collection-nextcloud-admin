@@ -3,5 +3,5 @@
   package: "name={{ item }} state=present"
   with_items:
     - redis-server
-    - "php-redis"
+    - "{{ php_pkg_spe }}"
   notify: start redis
