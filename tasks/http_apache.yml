@@ -42,15 +42,39 @@
     state: present
     # validate: "/usr/sbin/{{ php_bin }} -t #%s"
 
+- name: "[APACHE] -  enable PHP OPcache for php.ini"
+  lineinfile:
+    dest: "{{ php_dir }}/apache2/php.ini"
+    state: present
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    backrefs: yes
+  with_items:
+    - { regexp: 'opcache.enable=0', line: 'opcache.enable=1' }
+    - { regexp: 'opcache.enable_cli', line: 'opcache.enable_cli=1' }
+    - { regexp: 'opcache.interned_strings_buffer', line: 'opcache.interned_strings_buffer=8' }
+    - { regexp: 'opcache.max_accelerated_files', line: 'opcache.max_accelerated_files=10000' }
+    - { regexp: 'opcache.memory_consumption', line: 'opcache.memory_consumption=128' }
+    - { regexp: 'opcache.save_comments', line: 'opcache.save_comments=1' }
+    - { regexp: 'opcache.revalidate_freq', line: 'opcache.revalidate_freq=1' }
+    # validate: "/usr/sbin/{{ php_bin }} -t #%s"
+  notify: reload apache
+
 - name: "[APACHE] -  Required Apache2 modules are enabled"
   apache2_module: state=present name={{ item }}
   with_items:
-    - ssl
     - rewrite
     - headers
     - env
     - dir
     - mime
+  notify: restart apache
+
+- name: "[APACHE] -  Ssl Apache2 module is enabled"
+  apache2_module: state=present name={{ item }}
+  with_items:
+    - ssl
+  when: nextcloud_install_tls
   notify: restart apache
 
 - name: "[APACHE] -  generate Nextcloud configuration for apache"

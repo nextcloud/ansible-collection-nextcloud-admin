@@ -8,12 +8,13 @@ The role's main actions are:
 - [x] Database configuration (if located on the same host).
 - [x] Strengthened files permissions and ownership following Nextcloud recommendations.
 - [x] Web server configuration.
+- [x] Redis Server installation.
 - [x] Strengthened TLS configuration following _Mozilla SSL Configuration Generator_, intermediate profile.
 - [x] Post installation of Nextcloud applications
 
 ## Requirements
 ### Ansible version
-Ansible 2.1.4.0
+Ansible 2.4
 ### Setup module:
 The role uses facts gathered by Ansible on the remote host. If you disable the Setup module in your playbook, the role will not work properly.
 ### Root access
@@ -140,13 +141,20 @@ nextcloud_version_special: "2017-01-01"
 ```
 ### Main configuration
 ```YAML
-nextcloud_trusted_domain: ["{{ ansible_default_ipv4.address }}"]
+nextcloud_trusted_domain:
+  - "{{ ansible_fqdn }}"
+  - "{{ ansible_default_ipv4.address }}"
 ```
 The list of domains you will use to access the same Nextcloud instance.
+```YAML
+nextcloud_trusted_proxies: []
+```
+The list of trusted proxies IPs if Nextcloud runs through a reverse proxy you.
 ```YAML
 nextcloud_instance_name: "{{ nextcloud_trusted_domain | first }}"
 ```
 The name of the Nextcloud instance. By default, the first element in the list of trusted domains
+### WebServer configuration
 ```YAML
 nextcloud_install_websrv: true
 ```
@@ -180,6 +188,42 @@ Defines the Nextcloud admin's password.
 **Not defined by default**
 
 If not defined by the user, a random password will be generated.
+### Redis Server configuration
+```YAML
+nextcloud_install_redis_server: true
+```
+Whenever the role should install a redis server on the same host.
+```YAML
+nextcloud_redis_settings:
+  - { name: 'memcache.locking', value: '\OC\Memcache\Redis' }
+  - { name: 'redis host', value: 'localhost' }
+  - { name: 'redis port', value: '6379'}
+```
+Settings to use redis server with Nextcloud
+
+### Nextcloud Background Jobs
+```YAML
+nextcloud_background_cron: True
+```
+Set opereting system cron for executing Nextcloud regular tasks. This method enables the execution of scheduled jobs without the inherent limitations the Web server might have.
+
+### Custom nextcloud settings
+```YAML
+nextcloud_config_settings:
+  - { name: 'overwrite.cli.url', value: 'https://{{ nextcloud_trusted_domain | first }}' }
+  - { name: 'memcache.local', value: '\OC\Memcache\APCu' }
+  - { name: 'open_basedir', value: '/dev/urandom' }
+  - { name: 'mysql.utf8mb4', value: 'true' }
+  - { name: 'updater.release.channel', value: 'production' } # production | stable | daily | beta
+```
+Setting custom Nextcloud setting in config.php ( [Config.php Parameters Documentations](https://docs.nextcloud.com/server/12/admin_manual/configuration_server/config_sample_php_parameters.html) )
+
+Default custom settings:
+- **Base URL**: https://\<first element in the list of trusted domains>
+- **Memcache local**: APCu
+- **Mysql Character Set**: utf8mb4
+- **PHP read access to /dev/urandom**: Enabled
+- **Updater Relese Channel:** Production
 ### Database configuration
 ```YAML
 nextcloud_install_db: true

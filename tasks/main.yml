@@ -1,35 +1,39 @@
 ---
 # tasks file for nextcloud
-- include: tasks/setup_env.yml
+- include_tasks: tasks/setup_env.yml
   tags: always
   # load os specific variables
 
 - name: Verify permission for installed TLS certificates
-  include: tasks/tls_installed.yml
+  include_tasks: tasks/tls_installed.yml
   when: nextcloud_install_tls and nextcloud_tls_cert_method == "installed"
 
 - name: Install given signed certificates
-  include: tasks/tls_signed.yml
+  include_tasks: tasks/tls_signed.yml
   when: nextcloud_install_tls and nextcloud_tls_cert_method == "signed"
 
 - name: configure self signed TLS certificates
-  include: tasks/tls_selfsigned.yml
+  include_tasks: tasks/tls_selfsigned.yml
   when: nextcloud_install_tls and nextcloud_tls_cert_method == "self-signed"
 
 - name: Configure Nginx web server.
-  include: tasks/http_nginx.yml
+  include_tasks: tasks/http_nginx.yml
   when: nextcloud_install_websrv and nextcloud_websrv in ["nginx"]
 
 - name: Configure Apache web server
-  include: tasks/http_apache.yml
+  include_tasks: tasks/http_apache.yml
   when: nextcloud_install_websrv and nextcloud_websrv in ["apache", "apache2"]
 
+- name: Configure Redis server
+  include_tasks: tasks/redis_server.yml
+  when: nextcloud_install_redis_server
+
 - name: Configure {{ nextcloud_db_backend }} database
-  include: tasks/db_mysql.yml
+  include_tasks: tasks/db_mysql.yml
   when: nextcloud_install_db and nextcloud_db_backend in ["mysql", "mariadb"]
 
 - name: Configure PostgreSQL database
-  include: tasks/db_postgresql.yml
+  include_tasks: tasks/db_postgresql.yml
   when: nextcloud_install_db and nextcloud_db_backend in ["pgsql"]
 
 - name: Check Nextcloud installed
@@ -37,7 +41,7 @@
   register: nc_nextcloud_installed
 
 - name: Downloading Nextcloud
-  include: tasks/nc_download.yml
+  include_tasks: tasks/nc_download.yml
   when: not nc_nextcloud_installed.stat.exists
 
 - name: Check Nextcloud configuration exists.
@@ -52,12 +56,12 @@
   when: nc_nextcloud_conf.stat.exists
 
 - name: Fix su issue with occ
-  include: tasks/fix_su.yml
+  include_tasks: tasks/fix_su.yml
   when: ansible_become_method is defined and ansible_become_method == "su"
   tags: always
 
 - name: Nextcloud installation
-  include: tasks/nc_installation.yml
+  include_tasks: tasks/nc_installation.yml
   when: (not nc_nextcloud_conf.stat.exists) or (nc_nextcloud_configured.rc is defined and nc_nextcloud_configured.rc != 0)
 
 - block:
@@ -73,7 +77,7 @@
     set_fact: nc_available_apps="{{ nc_apps_list.stdout | from_json }}"
 
   - name: "[NC apps] - installation."
-    include: tasks/nc_apps.yml
+    include_tasks: tasks/nc_apps.yml
     # do if the app is not enabled and ( (archive path is not "") or (app is disabled) )
     when: (item.key not in nc_available_apps.enabled) and ((item.value != "") or (item.key in nc_available_apps.disabled))
     with_dict: "{{nextcloud_apps}}"
@@ -81,12 +85,12 @@
   tags: install_apps
   rescue:
   - name: Unfix su issue with occ
-    include: tasks/unfix_su.yml
+    include_tasks: tasks/unfix_su.yml
     when: ansible_become_method is defined and ansible_become_method == "su"
   - fail:
       msg: "An error Occured during Apps installation."
 
 - name: Unfix su issue with occ
-  include: tasks/unfix_su.yml
+  include_tasks: tasks/unfix_su.yml
   when: ansible_become_method is defined and ansible_become_method == "su"
   tags: always
