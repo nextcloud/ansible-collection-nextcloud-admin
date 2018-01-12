@@ -8,4 +8,5 @@ php_pkg_apcu: "php5-apcu"
 php_pkg_spe:
   - "php5-imap"
   - "php5-imagick"
+  - "php5-redis"
 php_socket: "/var/run/php5-fpm.sock"

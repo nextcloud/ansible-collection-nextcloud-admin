@@ -19,7 +19,12 @@ nextcloud_archive_format: "zip" # zip | tar.bz2
 
 
 # [CONFIG]
-nextcloud_trusted_domain: ["{{ ansible_default_ipv4.address }}"]
+nextcloud_trusted_domain:
+  - "{{ ansible_fqdn }}"
+  - "{{ ansible_default_ipv4.address }}"
+
+nextcloud_trusted_proxies: []
+
 nextcloud_instance_name: "{{ nextcloud_trusted_domain | first }}"
 
 nextcloud_install_websrv: true
@@ -29,6 +34,23 @@ nextcloud_webroot: "/opt/nextcloud"
 nextcloud_data_dir: "/var/ncdata"
 nextcloud_admin_name: "admin"
 # nextcloud_admin_pwd: "secret"
+
+nextcloud_install_redis_server: true
+nextcloud_redis_settings:
+  - { name: 'memcache.locking', value: '\OC\Memcache\Redis' }
+  - { name: 'redis host', value: 'localhost' }
+  - { name: 'redis port', value: '6379'}
+
+nextcloud_background_cron: True
+
+## Custom nextcloud settings
+## https://docs.nextcloud.com/server/12/admin_manual/configuration_server/config_sample_php_parameters.html
+nextcloud_config_settings:
+  - { name: 'overwrite.cli.url', value: 'https://{{ nextcloud_trusted_domain | first }}' }
+  - { name: 'memcache.local', value: '\OC\Memcache\APCu' }
+  - { name: 'open_basedir', value: '/dev/urandom' }
+  - { name: 'mysql.utf8mb4', value: 'true' }
+  - { name: 'updater.release.channel', value: 'production' } # production | stable | daily | beta
 
 # [DATABASE]
 nextcloud_install_db: true

@@ -4,9 +4,9 @@ python: "2.7"
 os: linux
 dist: trusty
 env:
-  - ansible_version="2.1.6.0"
-  - ansible_version="2.2.3.0"
-  - ansible_version="2.3.1.0"
+  - ansible_version="2.4.0.0"
+  - ansible_version="2.4.1.0"
+  - ansible_version="2.4.2.0"
 
 sudo: required
 
