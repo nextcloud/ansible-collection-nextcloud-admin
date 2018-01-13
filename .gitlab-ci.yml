@@ -1,0 +1,347 @@
+---
+
+variables:
+  LXD_DIR: "/var/snap/lxd/common/lxd/"
+  project: '$CI_PROJECT_NAME'
+  lxc: 'job$CI_JOB_ID'
+
+stages:
+  - Role Test
+
+# Ubuntu Xenial
+UbuntuXenialMariadb:
+  stage: Role Test
+  before_script:
+  # Create ansible.cfg with correct roles_path
+  - printf '[defaults]\nroles_path=../' > ansible.cfg
+
+  # Create .lxdock.yml
+  - |
+    echo """
+    name: $project
+
+    containers:
+      - name: $lxc
+        image: ubuntu/xenial
+        hostnames:
+          - $lxc
+
+    provisioning:
+      - type: ansible
+        playbook: tests/nextcloud_mariadb.yml
+    """ > .lxdock.yml
+  
+  script:
+    # Basic role syntax check
+    - ansible-playbook tests/nextcloud_mariadb.yml -i tests/inventory --syntax-check
+
+    # Deploy lxdock project and run the role/playbook
+    - lxdock up
+
+    # Run the role/playbook again, checking to make sure it's idempotent
+    - >
+      lxdock provision
+      | grep -q 'changed=0.*failed=0'
+      && (echo 'Idempotence test: pass' && exit 0)
+      || (echo 'Idempotence test: fail' && exit 1)
+
+    # Check for role is done
+    - lxdock shell $lxc -c netstat -ntulp
+    - lxdock shell $lxc -c netstat -ntulp | grep -q apache2
+    - lxdock shell $lxc -c netstat -ntulp | grep -q 3306
+    - lxdock shell $lxc -c netstat -ntulp | grep -q redis-server
+
+    # test login pages
+    - lxdock shell $lxc -c curl -i -s --insecure --data "user=ncadmin&password=" https://localhost/index.php/login | egrep -q "Location:.*/apps/files/"
+  
+  after_script:
+  - lxdock destroy -f
+
+UbuntuXenialMysql:
+  stage: Role Test
+  before_script:
+  # Create ansible.cfg with correct roles_path
+  - printf '[defaults]\nroles_path=../' > ansible.cfg
+
+  # Create .lxdock.yml
+  - |
+    echo """
+    name: $project
+
+    containers:
+      - name: $lxc
+        image: ubuntu/xenial
+        hostnames:
+          - $lxc
+
+    provisioning:
+      - type: ansible
+        playbook: tests/nextcloud_mysql.yml
+    """ > .lxdock.yml
+  
+  script:
+    # Basic role syntax check
+    - ansible-playbook tests/nextcloud_mysql.yml -i tests/inventory --syntax-check
+
+    # Deploy lxdock project and run the role/playbook
+    - lxdock up
+
+    # Run the role/playbook again, checking to make sure it's idempotent
+    - >
+      lxdock provision
+      | grep -q 'changed=0.*failed=0'
+      && (echo 'Idempotence test: pass' && exit 0)
+      || (echo 'Idempotence test: fail' && exit 1)
+
+    # Check for role is done
+    - lxdock shell $lxc -c netstat -ntulp
+    - lxdock shell $lxc -c netstat -ntulp | grep -q apache2
+    - lxdock shell $lxc -c netstat -ntulp | grep -q mysqld
+    - lxdock shell $lxc -c netstat -ntulp | grep -q redis-server
+
+    # test login pages
+    - lxdock shell $lxc -c curl -i -s --insecure --data "user=ncadmin&password=" https://localhost/index.php/login | egrep -q "Location:.*/apps/files/"
+  
+  after_script:
+  - lxdock destroy -f
+
+UbuntuXenialPsql:
+  stage: Role Test
+  before_script:
+  # Create ansible.cfg with correct roles_path
+  - printf '[defaults]\nroles_path=../' > ansible.cfg
+
+  # Create .lxdock.yml
+  - |
+    echo """
+    name: $project
+
+    containers:
+      - name: $lxc
+        image: ubuntu/xenial
+        hostnames:
+          - $lxc
+
+    provisioning:
+      - type: ansible
+        playbook: tests/nextcloud_psql.yml
+    """ > .lxdock.yml
+  
+  script:
+    # Basic role syntax check
+    - ansible-playbook tests/nextcloud_psql.yml -i tests/inventory --syntax-check
+
+    # Deploy lxdock project and run the role/playbook
+    - lxdock up
+
+    # Run the role/playbook again, checking to make sure it's idempotent
+    - >
+      lxdock provision
+      | grep -q 'changed=0.*failed=0'
+      && (echo 'Idempotence test: pass' && exit 0)
+      || (echo 'Idempotence test: fail' && exit 1)
+
+    # Check for role is done
+    - lxdock shell $lxc -c netstat -ntulp
+    - lxdock shell $lxc -c netstat -ntulp | grep -q apache2
+    - lxdock shell $lxc -c netstat -ntulp | grep -q postgres
+    - lxdock shell $lxc -c netstat -ntulp | grep -q redis-server
+
+    # test login pages
+    - lxdock shell $lxc -c curl -i -s --insecure --data "user=ncadmin&password=" https://localhost/index.php/login | egrep -q "Location:.*/apps/files/"
+  
+  after_script:
+  - lxdock destroy -f
+
+UbuntuXenialNginx:
+  stage: Role Test
+  before_script:
+  # Create ansible.cfg with correct roles_path
+  - printf '[defaults]\nroles_path=../' > ansible.cfg
+
+  # Create .lxdock.yml
+  - |
+    echo """
+    name: $project
+
+    containers:
+      - name: $lxc
+        image: ubuntu/xenial
+        hostnames:
+          - $lxc
+
+    provisioning:
+      - type: ansible
+        playbook: tests/nextcloud_nginx.yml
+    """ > .lxdock.yml
+  
+  script:
+    # Basic role syntax check
+    - ansible-playbook tests/nextcloud_nginx.yml -i tests/inventory --syntax-check
+
+    # Deploy lxdock project and run the role/playbook
+    - lxdock up
+
+    # Run the role/playbook again, checking to make sure it's idempotent
+    - >
+      lxdock provision
+      | grep -q 'changed=0.*failed=0'
+      && (echo 'Idempotence test: pass' && exit 0)
+      || (echo 'Idempotence test: fail' && exit 1)
+
+    # Check for role is done
+    - lxdock shell $lxc -c netstat -ntulp
+    - lxdock shell $lxc -c netstat -ntulp | grep -q nginx
+    - lxdock shell $lxc -c netstat -ntulp | grep -q 3306
+    - lxdock shell $lxc -c netstat -ntulp | grep -q redis-server
+
+    # test login pages
+    - lxdock shell $lxc -c curl -i -s --insecure --data "user=ncadmin&password=" https://localhost/index.php/login | egrep -q "Location:.*/apps/files/"
+  
+  after_script:
+  - lxdock destroy -f
+
+# Ubuntu Trusty
+UbuntuTrustyMariadb:
+  stage: Role Test
+  before_script:
+  # Create ansible.cfg with correct roles_path
+  - printf '[defaults]\nroles_path=../' > ansible.cfg
+
+  # Create .lxdock.yml
+  - |
+    echo """
+    name: $project
+
+    containers:
+      - name: $lxc
+        image: ubuntu/trusty
+        hostnames:
+          - $lxc
+
+    provisioning:
+      - type: ansible
+        playbook: tests/nextcloud10_mariadb.yml
+    """ > .lxdock.yml
+  
+  script:
+    # Basic role syntax check
+    - ansible-playbook tests/nextcloud10_mariadb.yml -i tests/inventory --syntax-check
+
+    # Deploy lxdock project and run the role/playbook
+    - lxdock up
+
+    # Run the role/playbook again, checking to make sure it's idempotent
+    - >
+      lxdock provision
+      | grep -q 'changed=0.*failed=0'
+      && (echo 'Idempotence test: pass' && exit 0)
+      || (echo 'Idempotence test: fail' && exit 1)
+
+    # Check for role is done
+    - lxdock shell $lxc -c netstat -ntulp
+    - lxdock shell $lxc -c netstat -ntulp | grep -q apache2
+    - lxdock shell $lxc -c netstat -ntulp | grep -q 3306
+    - lxdock shell $lxc -c netstat -ntulp | grep -q redis-server
+
+    # test login pages
+    - lxdock shell $lxc -c curl -i -s --insecure --data "user=ncadmin&password=" https://localhost/index.php/login | egrep -q "Location:.*/apps/files/"
+  
+  after_script:
+  - lxdock destroy -f
+
+UbuntuTrustyMysql:
+  stage: Role Test
+  before_script:
+  # Create ansible.cfg with correct roles_path
+  - printf '[defaults]\nroles_path=../' > ansible.cfg
+
+  # Create .lxdock.yml
+  - |
+    echo """
+    name: $project
+
+    containers:
+      - name: $lxc
+        image: ubuntu/trusty
+        hostnames:
+          - $lxc
+
+    provisioning:
+      - type: ansible
+        playbook: tests/nextcloud10_mysql.yml
+    """ > .lxdock.yml
+  
+  script:
+    # Basic role syntax check
+    - ansible-playbook tests/nextcloud10_mysql.yml -i tests/inventory --syntax-check
+
+    # Deploy lxdock project and run the role/playbook
+    - lxdock up
+
+    # Run the role/playbook again, checking to make sure it's idempotent
+    - >
+      lxdock provision
+      | grep -q 'changed=0.*failed=0'
+      && (echo 'Idempotence test: pass' && exit 0)
+      || (echo 'Idempotence test: fail' && exit 1)
+
+    # Check for role is done
+    - lxdock shell $lxc -c netstat -ntulp
+    - lxdock shell $lxc -c netstat -ntulp | grep -q apache2
+    - lxdock shell $lxc -c netstat -ntulp | grep -q 3306
+    - lxdock shell $lxc -c netstat -ntulp | grep -q redis-server
+
+    # test login pages
+    - lxdock shell $lxc -c curl -i -s --insecure --data "user=ncadmin&password=" https://localhost/index.php/login | egrep -q "Location:.*/apps/files/"
+  
+  after_script:
+  - lxdock destroy -f
+
+UbuntuTrustyPsql:
+  stage: Role Test
+  before_script:
+  # Create ansible.cfg with correct roles_path
+  - printf '[defaults]\nroles_path=../' > ansible.cfg
+
+  # Create .lxdock.yml
+  - |
+    echo """
+    name: $project
+
+    containers:
+      - name: $lxc
+        image: ubuntu/trusty
+        hostnames:
+          - $lxc
+
+    provisioning:
+      - type: ansible
+        playbook: tests/nextcloud10_psql.yml
+    """ > .lxdock.yml
+  
+  script:
+    # Basic role syntax check
+    - ansible-playbook tests/nextcloud10_psql.yml -i tests/inventory --syntax-check
+
+    # Deploy lxdock project and run the role/playbook
+    - lxdock up
+
+    # Run the role/playbook again, checking to make sure it's idempotent
+    - >
+      lxdock provision
+      | grep -q 'changed=0.*failed=0'
+      && (echo 'Idempotence test: pass' && exit 0)
+      || (echo 'Idempotence test: fail' && exit 1)
+
+    # Check for role is done
+    - lxdock shell $lxc -c netstat -ntulp
+    - lxdock shell $lxc -c netstat -ntulp | grep -q apache2
+    - lxdock shell $lxc -c netstat -ntulp | grep -q postgres
+    - lxdock shell $lxc -c netstat -ntulp | grep -q redis-server
+
+    # test login pages
+    - lxdock shell $lxc -c curl -i -s --insecure --data "user=ncadmin&password=" https://localhost/index.php/login | egrep -q "Location:.*/apps/files/"
+  
+  after_script:
+  - lxdock destroy -f
