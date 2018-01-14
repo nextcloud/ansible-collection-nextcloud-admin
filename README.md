@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/aalaesar/install_nextcloud.svg?branch=master)](https://travis-ci.org/aalaesar/install_nextcloud)
-[![pipeline status](https://gitlab.ninux.org/hispanico/ansible-nextcloud/badges/master/pipeline.svg)](https://gitlab.ninux.org/hispanico/ansible-nextcloud/pipelines)
+[![pipeline status](https://gitlab.ninux.org/hispanico/ansible-nextcloud/badges/master/pipeline.svg)](https://gitlab.ninux.org/hispanico/ansible-nextcloud/pipelines?scope=branches)
 
 # install_nextcloud
 
