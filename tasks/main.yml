@@ -28,7 +28,7 @@
   include_tasks: tasks/redis_server.yml
   when: nextcloud_install_redis_server
 
-- name: Configure {{ nextcloud_db_backend }} database
+- name: Configure mysql/mariadb database
   include_tasks: tasks/db_mysql.yml
   when: nextcloud_install_db and nextcloud_db_backend in ["mysql", "mariadb"]
 
