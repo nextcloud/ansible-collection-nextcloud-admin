@@ -28,10 +28,10 @@ script:
   # Basic role syntax check
   - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
 
-  # # Test Demo case 1
-  # - ansible-playbook tests/test.yml -i tests/inventory -v
-  # # test login pages
-  # - curl -i -s --insecure --data "user=ncadmin&password=" https://localhost/index.php/login | egrep -q "Location:.*/apps/files/"
+  # Test Demo case 1
+  - ansible-playbook tests/test.yml -i tests/inventory -v
+  # test login pages
+  - curl -i -s --insecure --data "user=ncadmin&password=" https://localhost/index.php/login | egrep -q "Location:.*/apps/files/"
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
