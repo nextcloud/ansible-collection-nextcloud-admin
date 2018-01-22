@@ -64,10 +64,10 @@
         password="{{ nextcloud_mysql_root_pwd }}"
   when: nc_mysql_mycred.stat.exists is defined and not nc_mysql_mycred.stat.exists
 
-- name: "[mySQL] - Fix mysql binary logging for nextcloud"
+- name: "[mySQL] - Set mysql confing option for nextcloud"
   copy:
-    dest: /etc/mysql/conf.d/binlog_format_mixed.cnf
-    src: files/binlog_format_mixed.cnf
+    dest: /etc/mysql/conf.d/nextcloud.cnf
+    src: files/mysql_nextcloud.cnf
   notify: restart mysql
 
 - name: "[mySQL] - Generate database user Password."
@@ -75,7 +75,9 @@
   when: nextcloud_db_pwd is not defined
 
 - name: "[mySQL] - Add Database {{ nextcloud_db_name }}."
-  mysql_db: name={{ nextcloud_db_name }} state=present
+  mysql_db:
+    name: "{{ nextcloud_db_name }}"
+    state: present
 
 - name: "[mySQL] - Configure the database user."
   mysql_user:

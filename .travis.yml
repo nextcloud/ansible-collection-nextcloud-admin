@@ -4,9 +4,9 @@ python: "2.7"
 os: linux
 dist: trusty
 env:
-  - ansible_version="2.1.6.0"
-  - ansible_version="2.2.3.0"
-  - ansible_version="2.3.1.0"
+  - ansible_version="2.4.0.0"
+  - ansible_version="2.4.1.0"
+  - ansible_version="2.4.2.0"
 
 sudo: required
 
@@ -17,6 +17,7 @@ before_install:
   - sudo easy_install pip
   # Install ansible
   - sudo pip install -I "ansible==$ansible_version"
+  
 
 install:
   # Check ansible version
@@ -24,13 +25,12 @@ install:
   # Create ansible.cfg with correct roles_path
   - printf '[defaults]\nroles_path=../' >ansible.cfg
 
-before_script:
-  - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
-
 script:
   # Basic role syntax check
+  - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
+
   # Test Demo case 1
-  - ansible-playbook tests/test.yml -i tests/inventory -v
+  - ansible-playbook tests/test.yml -i tests/inventory
   # test login pages
   - curl -i -s --insecure --data "user=ncadmin&password=" https://localhost/index.php/login | egrep -q "Location:.*/apps/files/"
 

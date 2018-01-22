@@ -39,3 +39,8 @@
   service:
     name: apache2
     state: reloaded
+
+- name: start redis
+  service:
+    name: redis-server
+    state: started

@@ -1,26 +1,25 @@
 ---
-- hosts: localhost
+- hosts: all
   become: true
-  become_user: root
-  roles: [../../]
 
   pre_tasks:
     - name: Update apt cache.
       apt: update_cache=yes cache_valid_time=600
       when: ansible_os_family == 'Debian'
       changed_when: false
-
-    - name: Remove default travis databases
+    
+    - name: Install required testing packages
       package:
         name: "{{ item }}"
-        state: absent
+        state: installed
       with_items:
-        - postgresql*
-        - mysql*
-        
+        - curl
+
+  roles:
+    - ansible-nextcloud
+
   vars:
      nextcloud_db_backend: "pgsql"
-     nextcloud_version_major: 10
      nextcloud_apps:
        files_external: "" #enable files_external which is already installed in nexcloud
        calendar: "https://github.com/nextcloud/calendar/releases/download/v1.5.0/calendar.tar.gz" # download and install calendar app

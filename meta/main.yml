@@ -175,7 +175,7 @@ galaxy_info:
   #  - lenny
   #  - sid
   #  - squeeze
-  #  - stretch
+    - stretch
   #  - wheezy
 
   galaxy_tags:

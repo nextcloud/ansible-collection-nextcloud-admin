@@ -16,6 +16,7 @@
   postgresql_user:
     name: "{{ nextcloud_db_admin }}"
     password: "{{ nextcloud_db_pwd }}"
+    encrypted: yes
     state: present
     role_attr_flags: CREATEDB
   become_user: postgres
