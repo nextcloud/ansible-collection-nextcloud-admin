@@ -9,6 +9,14 @@
       apt: update_cache=yes cache_valid_time=600
       when: ansible_os_family == 'Debian'
       changed_when: false
+
+    - name: Remove default travis databases
+      package:
+        name: "{{ item }}"
+        state: absent
+      with_items:
+        - postgresql*
+        - mysql*
         
   vars:
      nextcloud_db_backend: "pgsql"

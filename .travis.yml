@@ -18,8 +18,6 @@ before_install:
   # Install ansible
   - sudo pip install -I "ansible==$ansible_version"
   
-  # Remove postgresql pre-installed version
-  - sudo apt-get purge postgresql
 
 install:
   # Check ansible version
@@ -32,7 +30,7 @@ script:
   - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
 
   # Test Demo case 1
-  - ansible-playbook tests/test.yml -i tests/inventory -v
+  - ansible-playbook tests/test.yml -i tests/inventory
   # test login pages
   - curl -i -s --insecure --data "user=ncadmin&password=" https://localhost/index.php/login | egrep -q "Location:.*/apps/files/"
 
