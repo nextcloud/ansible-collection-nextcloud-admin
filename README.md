@@ -356,7 +356,7 @@ Alternatively, if you need to configure an application after enabling it, you ca
 nextcloud_apps:
   app_name_1:
     source: "http://download_link.com/some_archive.zip"
-    config:
+    conf:
       parameter1: ldap:\/\/ldapsrv
       parameter2: another_value
 ```
