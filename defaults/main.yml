@@ -63,7 +63,7 @@ nextcloud_db_admin: "ncadmin"
 # [TLS] parameters used in the apache2 & nginx templates
 nextcloud_install_tls: true
 nextcloud_tls_enforce: true
-nextcloud_force_strong_apache_ssl: true
+nextcloud_mozilla_modern_ssl_profile: false # when false, intermediate profile is used
 nextcloud_tls_cert_method: "self-signed" # "self-signed" | "signed" | "installed"
 nextcloud_tls_dhparam: "/etc/ssl/dhparam.pem"
 nextcloud_hsts: false

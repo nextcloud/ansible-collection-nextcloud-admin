@@ -11,7 +11,7 @@ The role's main actions are:
 - [x] Strengthened files permissions and ownership following Nextcloud recommendations.
 - [x] Web server configuration.
 - [x] Redis Server installation.
-- [x] Strengthened TLS configuration following _Mozilla SSL Configuration Generator_, intermediate profile.
+- [x] Strengthened TLS configuration following _Mozilla SSL Configuration Generator_, intermediate profile by default, modern profile available.
 - [x] Post installation of Nextcloud applications
 
 ## Requirements
@@ -272,9 +272,9 @@ nextcloud_tls_enforce: true
 ```
 Force http to https.
 ```YAML
-nextcloud_force_strong_apache_ssl: true
+nextcloud_mozilla_modern_ssl_profile: true
 ```
-Force strong ssl configuration in the virtualhost file.
+Force Mozilla modern SSL profile in webserver configuration (intermediate profile is used when false).
 ```YAML
 nextcloud_hsts: false
 ```
