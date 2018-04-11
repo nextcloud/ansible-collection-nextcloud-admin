@@ -36,5 +36,5 @@
 - name: "[NC] - Adding ACL on trusty."
   apt:
     name: acl
-    state: installed
+    state: present
   when: ansible_distribution_release == "trusty"

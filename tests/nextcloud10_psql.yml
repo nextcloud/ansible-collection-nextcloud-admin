@@ -11,7 +11,7 @@
     - name: Install required testing packages
       package:
         name: "{{ item }}"
-        state: installed
+        state: present
       with_items:
         - curl
 
