@@ -13,11 +13,11 @@
 
 - name: "[ENV] - Load environment for OS using php 5"
   include_vars: "{{ role_path }}/defaults/php5_env.yml"
-  when: ansible_distribution_release in [ "trusty", "jessie" ]
+  when: ansible_distribution_release in [ "trusty", "jessie" ] and not php_custom
 
 - name: "[ENV] - Load environment for OS using php 7.0"
   include_vars: "{{ role_path }}/defaults/php7.0_env.yml"
-  when: ansible_distribution_release in [ "xenial", "stretch" ]
+  when: ansible_distribution_release in [ "xenial", "stretch" ] and not php_custom
 
   # fix for debian not using sudo :
   # defining if sudo is installed or not
