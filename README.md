@@ -313,6 +313,24 @@ Defines various method for retrieving a TLS certificate.
 ```
 
 ### System configuration
+
+install and use a custom version for PHP instead of the default one: 
+```YAML
+php_version: '7.1'
+php_custom: yes
+php_ver: "{{ php_version }}"
+php_dir: "/etc/php/{{ php_version }}"
+php_bin: "php-fpm{{ php_version }}"
+php_pkg_apcu: "php-apcu"
+php_pkg_spe:
+  - "php{{ php_version }}-imap"
+  - "php{{ php_version }}-imagick"
+  - "php{{ php_version }}-xml"
+  - "php{{ php_version }}-zip"
+  - "php{{ php_version }}-mbstring"
+  - "php-redis"
+```
+
 ```YAML
 nextcloud_websrv_user: "www-data"
 ```
