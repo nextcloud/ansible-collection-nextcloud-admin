@@ -80,3 +80,5 @@ nextcloud_apps: {}
 nextcloud_websrv_user: "www-data"
 nextcloud_websrv_group: "www-data"
 #nextcloud_mysql_root_pwd: "secret"
+
+php_custom: false
