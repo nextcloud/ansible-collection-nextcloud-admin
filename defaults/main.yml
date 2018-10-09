@@ -30,6 +30,7 @@ nextcloud_instance_name: "{{ nextcloud_trusted_domain | first }}"
 nextcloud_install_websrv: true
 nextcloud_websrv: "apache2" # "apache2" | "nginx"
 nextcloud_websrv_template: "templates/{{nextcloud_websrv}}_nc.j2"
+nextcloud_websrv_nginx_ipv6: false
 nextcloud_webroot: "/opt/nextcloud"
 nextcloud_data_dir: "/var/ncdata"
 nextcloud_admin_name: "admin"
