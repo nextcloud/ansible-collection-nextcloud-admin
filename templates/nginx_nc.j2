@@ -27,7 +27,7 @@ server {
 {% if nextcloud_install_tls %}
     listen 443 ssl;
 {% if nextcloud_websrv_nginx_ipv6 %}
-    listen [::]:443;
+    listen [::]:443 ssl;
 {% endif %}
     ssl_certificate {{ nextcloud_tls_cert_file }};
     ssl_certificate_key {{ nextcloud_tls_cert_key_file }};
