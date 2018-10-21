@@ -6,7 +6,7 @@
 {% if nextcloud_install_tls and nextcloud_tls_enforce %}
 server {
     listen 80;
-{% if nextcloud_websrv_nginx_ipv6 %}
+{% if nextcloud_ipv6 %}
     listen [::]:80;
 {% endif %}
     server_name {{ nextcloud_trusted_domain | join(' ') }};
@@ -20,13 +20,13 @@ server {
 
 {% if not nextcloud_install_tls or not nextcloud_tls_enforce %}
     listen 80;
-{% if nextcloud_websrv_nginx_ipv6 %}
+{% if nextcloud_ipv6 %}
     listen [::]:80;
 {% endif %}
 {% endif %}
 {% if nextcloud_install_tls %}
     listen 443 ssl;
-{% if nextcloud_websrv_nginx_ipv6 %}
+{% if nextcloud_ipv6 %}
     listen [::]:443 ssl;
 {% endif %}
     ssl_certificate {{ nextcloud_tls_cert_file }};
