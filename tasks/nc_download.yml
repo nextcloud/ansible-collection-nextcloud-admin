@@ -7,6 +7,11 @@
   package: name=bzip2 state=present
   when: nextcloud_archive_format == "tar.bz2"
 
+- name: you must specify the major version
+  assert:
+    that: nextcloud_version_major is defined
+  when: nextcloud_full_url is defined
+
 - block:
   - name: "[NC-DL] - Create the download link for *latest*."
     set_fact:
