@@ -23,6 +23,8 @@ nextcloud_trusted_domain:
   - "{{ ansible_fqdn }}"
   - "{{ ansible_default_ipv4.address }}"
 
+nextcloud_ipv6: false
+
 nextcloud_trusted_proxies: []
 
 nextcloud_instance_name: "{{ nextcloud_trusted_domain | first }}"
