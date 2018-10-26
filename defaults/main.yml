@@ -13,7 +13,6 @@ nextcloud_get_latest: true # mandatory # specify if the latest archive should be
 # nextcloud_version_major: 10 # (9 | 10 | 11| ..) for releases |  for daily : (master | stable9 | stable10 | ...)
 # nextcloud_version_full: "10.0.3" # full version string
 # nextcloud_version_special: "" #  For prereleases: "RCn|beta" | for daily "YYYY-MM-DD"
-nextcloud_version_14_or_higher: true
 nextcloud_repository: "https://download.nextcloud.com/server" # Domain URL where to download Nextcloud.
 nextcloud_archive_format: "zip" # zip | tar.bz2
 # nextcloud_full_url: "https://h2g2.com/downloads/42/my_nexcloud.zip" # specify directly a full URL to the archive if you don't like rules.

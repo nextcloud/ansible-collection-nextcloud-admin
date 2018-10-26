@@ -16,10 +16,10 @@ server {
     server_name {{ nextcloud_trusted_domain | join(' ') }};
 
 {% if not nextcloud_install_tls or not nextcloud_tls_enforce %}
-    listen 80{% if nextcloud_version_14_or_higher %} http2{% endif %};
+    listen 80{% if (nextcloud_computed_major_version|int) > 13 %} http2{% endif %};
 {% endif %}
 {% if nextcloud_install_tls %}
-    listen 443 ssl{% if nextcloud_version_14_or_higher %} http2{% endif %};
+    listen 443 ssl{% if (nextcloud_computed_major_version|int) > 13 %} http2{% endif %};
     ssl_certificate {{ nextcloud_tls_cert_file }};
     ssl_certificate_key {{ nextcloud_tls_cert_key_file }};
     ssl_session_timeout 1d;
@@ -84,7 +84,7 @@ server {
     client_max_body_size 512M;
     fastcgi_buffers 64 4K;
 
-{% if nextcloud_version_14_or_higher %}
+{% if (nextcloud_computed_major_version|int) > 13 %}
     # Enable gzip but do not remove ETag headers
     gzip on;
     gzip_vary on;
@@ -145,7 +145,7 @@ server {
 {% if nextcloud_install_tls and nextcloud_hsts is string %}
         add_header Strict-Transport-Security "{{ nextcloud_hsts }}";
 {% endif %}
-{% if not nextcloud_version_14_or_higher %}
+{% if (nextcloud_computed_major_version|int) < 13 %}
         add_header X-Frame-Options "SAMEORIGIN";
 {% endif %}
         add_header X-Content-Type-Options nosniff;
