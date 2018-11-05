@@ -94,11 +94,13 @@ Choose between the 2 archive formats available in the repository.
 # nextcloud_full_url:
 ```
 _If you don't like rules..._
-Specify directly a full URL to the archive. The role will skip the url generation and download the archive
+Specify directly a full URL to the archive. The role will skip the url generation and download the archive. **Requires nextcloud_version_major to be set along**.
 #### Examples:
 - Download your own archive:
+  (_you **must** specify the nextcloud major version along_)
 ```YAML
 nextcloud_full_url: https://h2g2.com/42/nexcloud.zip
+nextcloud_version_major: 42
 ```
 - Choose the latest release (default):
 ```YAML

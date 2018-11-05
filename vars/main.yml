@@ -5,3 +5,27 @@ nextcloud_dl_file_name:
   releases: "{{['nextcloud', nextcloud_version_full]|reject('undefined')|join('-')}}"
   prereleases: "nextcloud-{{[nextcloud_version_full, nextcloud_version_special]|reject('undefined')|join()}}"
   daily: "nextcloud-{{nextcloud_version_major|d('')}}-daily-{{nextcloud_version_special|d('')}}"
+
+## finding the major version selected by the user :
+## type : string
+# the user will set either nextcloud_version_major or nextcloud_version_full
+# to pin point a major/specific version.
+# if nextcloud_version_major is set it can have 3 values:
+#   - 'master' : we just set an arbitrary high version (99)   -- used for daily
+#   - a version number [M] : here's what we need. neat !
+#   - stable[M] : just remove the 'stable' and here we go !
+#     note: There is still a case when the user could use the master branch AND specify a very old date
+#           and that whould make the computed major version inconsistent.
+#           But I'm sure at 99.99% nobody wants to do that when using the daily channel.
+# if nextcloud_version_full is set, it always have the form [Major.minor.patch] version number. (M.m.p)
+#   so the major version is the first element.
+# if both variables are set we exclude the prerelease channel that do not use the major version on the first condition.
+# if none are defined, either the user misconfigured the playbook that's calling the role
+#   and the play should fail - so we won't manage this case here -
+#   or nextcloud_get_latest is true which is the equivalent for us of using "master"
+nexcloud_computed_major_version: > # type string
+  {%- if nextcloud_version_major is defined and nextcloud_version_channel not in ['prereleases'] -%}
+  {{99 if nextcloud_version_major == 'master' else (nextcloud_version_major|regex_replace('stable')) }}
+  {%- elif nextcloud_version_full is defined -%}
+  {{ (nextcloud_version_full.split('.'))[0] }}
+  {%- else -%}99{%- endif -%}
