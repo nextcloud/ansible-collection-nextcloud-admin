@@ -41,6 +41,7 @@
 
   - name: "[NC] - Run occ installation command"
     become_user: "{{ nextcloud_websrv_user }}"
+    become: yes
     command: >
         php occ maintenance:install
         --database={{ nextcloud_tmp_backend }}
