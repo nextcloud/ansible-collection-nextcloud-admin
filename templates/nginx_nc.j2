@@ -19,9 +19,9 @@ server {
     server_name {{ nextcloud_trusted_domain | join(' ') }};
 
 {% if not nextcloud_install_tls or not nextcloud_tls_enforce %}
-    listen 80{% if (nextcloud_computed_major_version|int) > 13 %} http2{% endif %};
+    listen 80;
 {% if nextcloud_ipv6 %}
-    listen [::]:80{% if (nextcloud_computed_major_version|int) > 13 %} http2{% endif %};
+    listen [::]:80;
 {% endif %}
 {% endif %}
 {% if nextcloud_install_tls %}
