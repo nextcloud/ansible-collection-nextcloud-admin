@@ -23,7 +23,7 @@ nextcloud_dl_file_name:
 # if none are defined, either the user misconfigured the playbook that's calling the role
 #   and the play should fail - so we won't manage this case here -
 #   or nextcloud_get_latest is true which is the equivalent for us of using "master"
-nexcloud_computed_major_version: > # type string
+nextcloud_computed_major_version: > # type string
   {%- if nextcloud_version_major is defined and nextcloud_version_channel not in ['prereleases'] -%}
   {{99 if nextcloud_version_major == 'master' else (nextcloud_version_major|regex_replace('stable')) }}
   {%- elif nextcloud_version_full is defined -%}
