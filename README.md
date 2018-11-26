@@ -35,7 +35,7 @@ Role's variables (and their default values):
 
 ### Choose the version
 
-_*WARNING: Since Nexcloud 11 requires php v5.6 or later, command line installation will fail on old OS without php v5.6+ support.*_
+_*WARNING: Since nextcloud 11 requires php v5.6 or later, command line installation will fail on old OS without php v5.6+ support.*_
 
 _Known issue while installing Nextcloud 11 on an Ubuntu 14.04 system:_ [#27](https://github.com/aalaesar/install_nextcloud/issues/27)
 
@@ -99,7 +99,7 @@ Specify directly a full URL to the archive. The role will skip the url generatio
 - Download your own archive:
   (_you **must** specify the nextcloud major version along_)
 ```YAML
-nextcloud_full_url: https://h2g2.com/42/nexcloud.zip
+nextcloud_full_url: https://h2g2.com/42/nextcloud.zip
 nextcloud_version_major: 42
 ```
 - Choose the latest release (default):
