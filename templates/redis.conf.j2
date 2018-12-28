@@ -52,7 +52,7 @@ pidfile /var/run/redis/redis-server.pid
 
 # Accept connections on the specified port, default is 6379.
 # If port 0 is specified Redis will not listen on a TCP socket.
-{% if nextcloud_redis_port %}
+{% if nextcloud_redis_port is defined %}
 port {{ nextcloud_redis_port|int}} 
 {% endif %}
 
@@ -73,7 +73,7 @@ tcp-backlog 511
 # Examples:
 #
 # bind 192.168.1.100 10.0.0.1
-{% if nextcloud_redis_host and (nextcloud_redis_port|int) > 0 %}
+{% if nextcloud_redis_host is defined and (nextcloud_redis_port|int) > 0 %}
 bind {{ nextcloud_redis_host }}
 {% endif %}
 
@@ -83,7 +83,7 @@ bind {{ nextcloud_redis_host }}
 #
 # unixsocket /var/run/redis/redis.sock
 # unixsocketperm 700
-{% if (nextcloud_redis_port|int) == 0 %}
+{% if nextcloud_redis_port is defined and (nextcloud_redis_port|int) == 0 %}
 unixsocket {{ nextcloud_redis_host }}
 unixsocketperm 777
 {% endif %}
