@@ -91,6 +91,14 @@
     chdir: "{{ nextcloud_webroot }}"
   with_indexed_items: "{{ nextcloud_trusted_proxies }}"
 
+- name: "[NC] - Set Nextcloud settings in config.php"
+  become_user: "{{ nextcloud_websrv_user }}"
+  shell: php occ config:system:set {{ item.name }} --value="{{ item.value }}"
+  args:
+    chdir: "{{ nextcloud_webroot }}"
+  with_items:
+    - "{{ nextcloud_config_settings }}"
+
 - name: "[NC] - Set Redis Server"
   become_user: "{{ nextcloud_websrv_user }}"
   command: php occ config:system:set {{ item.name }} --value="{{ item.value }}"
@@ -100,13 +108,6 @@
     - "{{ nextcloud_redis_settings }}"
   when: nextcloud_install_redis_server == True
 
-- name: "[NC] - Set Nextcloud settings in config.php"
-  become_user: "{{ nextcloud_websrv_user }}"
-  shell: php occ config:system:set {{ item.name }} --value="{{ item.value }}"
-  args:
-    chdir: "{{ nextcloud_webroot }}"
-  with_items:
-    - "{{ nextcloud_config_settings }}"
 
 - name: "[NC] - Install Cronjob"
   cron:
