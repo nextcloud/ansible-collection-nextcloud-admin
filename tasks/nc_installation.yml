@@ -108,7 +108,6 @@
     - "{{ nextcloud_redis_settings }}"
   when: nextcloud_install_redis_server == True
 
-
 - name: "[NC] - Install Cronjob"
   cron:
     name: "Nextcloud Cronjob"
