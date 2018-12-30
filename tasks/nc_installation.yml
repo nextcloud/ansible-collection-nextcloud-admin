@@ -93,7 +93,7 @@
 
 - name: "[NC] - Set Nextcloud settings in config.php"
   become_user: "{{ nextcloud_websrv_user }}"
-  shell: php occ config:system:set {{ item.name }} --value="{{ item.value }}"
+  command: php occ config:system:set {{ item.name }} --value="{{ item.value }}"
   args:
     chdir: "{{ nextcloud_webroot }}"
   with_items:
