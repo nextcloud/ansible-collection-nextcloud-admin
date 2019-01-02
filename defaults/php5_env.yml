@@ -1,7 +1,6 @@
 ---
 # [system]
 # system_configuration for php5:
-php_ver: 5
 php_dir: "/etc/php5"
 php_bin: "php5-fpm"
 php_pkg_apcu: "php5-apcu"

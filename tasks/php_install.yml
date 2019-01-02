@@ -1,0 +1,66 @@
+---
+- name: "[INSTALL] -  Required and recommended packages are installed."
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ nextcloud_websrv }}"
+    - smbclient
+    - "php{{ php_ver }}-gd"
+    - "php{{ php_ver }}-ldap"
+    - "php{{ php_ver }}-imap"
+    - "php{{ php_ver }}-json"
+    - "php{{ php_ver }}-curl"
+    - "php{{ php_ver }}-intl"
+    - "php{{ php_ver }}-mcrypt"
+  notify:
+    - start http
+    - start php-fpm
+
+- name: "[INSTALL] -  Apache Required package is installed."
+  package:
+    name: "libapache2-mod-php{{ php_ver }}"
+    state: present
+  when: nextcloud_websrv == "apache2"
+  notify:
+    - start http
+
+- name: "[INSTALL] -  NGINX Required package is installed."
+  package:
+    name: "php{{ php_ver }}-fpm"
+    state: present
+  when: nextcloud_websrv == "nginx"
+  notify:
+    - start http
+
+
+- name: "[INSTALL] -  PHP extra Packages are installed."
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ php_pkg_spe }}"
+
+- name: "[INSTALL] -  APCu is installed."
+  package:
+    name: "{{ php_pkg_apcu }}"
+    state: present
+  when : ansible_distribution_release not in [ "trusty" ]
+
+- block:
+  # load APCu from backports as the default version for trusty is obsolete.
+  - name: "[INSTALL] -  Configure trusty backports."
+    apt_repository:
+      repo: "deb http://fr.archive.ubuntu.com/ubuntu/ trusty-backports main restricted universe multiverse"
+      state: present
+      update_cache: yes
+
+  - name: "[INSTALL] -  Install APCu from backports."
+    package:
+      name: "{{ php_pkg_apcu }}"
+      state: latest
+      default_release: trusty-backports
+  when: ansible_distribution_release == "trusty"
+
+
+
