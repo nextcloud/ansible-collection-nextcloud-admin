@@ -1,68 +1,71 @@
 ---
 - name: "[mySQL] - Service is installed."
-  package: "name={{ nextcloud_db_backend }}-server state=present"
+  package:
+    name: "{{ nextcloud_db_backend }}-server"
+    state: present
   register: nc_mysql_db_install
 
-- name: "[mySQL] - PHP module is installed."
-  package: "name=php{{ php_ver }}-mysql state=present"
+- name: "[mySQL] - Packages are installed.i"
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - "php{{ php_ver }}-mysql"
+    - python-mysqldb
 
-- name: "[mySQL] - the python module mysqldb is present"
-  # needed by mysql_* ansible modules
-  package: name=python-mysqldb state=present
+- name: "[mySQL] - generate {{ nextcloud_db_backend }} root Password:"
+  set_fact: 
+    nextcloud_mysql_root_pwd: "{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/mysql_root.pwd' ) }}"
+  when: nextcloud_mysql_root_pwd is not defined
 
-- block:
-  - name: "[mySQL] - generate {{ nextcloud_db_backend }} root Password:"
-    set_fact: nextcloud_mysql_root_pwd="{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/mysql_root.pwd' ) }}"
-    when: nextcloud_mysql_root_pwd is not defined
+# use debian default credentials to work on user root password
+- name: "[mySQL] - Update {{ nextcloud_db_backend }} root password"
+  mysql_user:
+    name: root
+    host: "{{ item }}"
+    password: "{{ nextcloud_mysql_root_pwd }}"
+    config_file: "/etc/mysql/debian.cnf"
+    check_implicit_admin: yes
+    priv: "*.*:ALL,GRANT"
+  with_items:
+    - 127.0.0.1
+    - ::1
+    - localhost
+  ignore_errors: yes
 
-  - name: "[mySQL] - Update {{ nextcloud_db_backend }} root password"
-    mysql_user:
-      name: root
-      host: "{{ item }}"
-      password: "{{ nextcloud_mysql_root_pwd }}"
-      login_user: root
-      login_password: ""
-      check_implicit_admin: yes
-      priv: "*.*:ALL,GRANT"
-    with_items:
-      - 127.0.0.1
-      - ::1
-      - localhost
-    ignore_errors: yes
+- name: "[mySQL] - Delete the anonymous user."
+  mysql_user:
+    user: ""
+    state: "absent"
+    login_user: root
+    login_password: "{{ nextcloud_mysql_root_pwd }}"
+  ignore_errors: yes
 
-  - name: "[mySQL] - Delete the anonymous user."
-    mysql_user:
-      user: ""
-      state: "absent"
-      login_password: "{{ nextcloud_mysql_root_pwd }}"
-      login_user: root
-    ignore_errors: yes
-
-  - name: "[mySQL] - Removes the MySQL test database"
-    mysql_db:
-      name: test
-      state: absent
-      login_password: "{{ nextcloud_mysql_root_pwd }}"
-      login_user: root
-    ignore_errors: yes
+- name: "[mySQL] - Removes the MySQL test database"
+  mysql_db:
+    name: test
+    state: absent
+    login_user: root
+    login_password: "{{ nextcloud_mysql_root_pwd }}"
+  ignore_errors: yes
   when: nc_mysql_db_install.changed
 
-- name: "[mySQL] - Check credentials"
-  stat: "path=/root/.my.cnf"
-  register: nc_mysql_mycred
-
-- block:
-  - name: "[mySQL] - Make the file .my.cnf"
-    file: path=/root/.my.cnf state=touch mode="0640"
-
-  - name: "[mySQL] - Add content to .my.cnf"
-    blockinfile:
-      dest: /root/.my.cnf
-      block: |
-        [client]
-        user=root
-        password="{{ nextcloud_mysql_root_pwd }}"
-  when: nc_mysql_mycred.stat.exists is defined and not nc_mysql_mycred.stat.exists
+#- name: "[mySQL] - Check credentials"
+#  stat: "path=/root/.my.cnf"
+#  register: nc_mysql_mycred
+#
+#- block:
+#  - name: "[mySQL] - Make the file .my.cnf"
+#    file: path=/root/.my.cnf state=touch mode="0640"
+#
+#  - name: "[mySQL] - Add content to .my.cnf"
+#    blockinfile:
+#      dest: /root/.my.cnf
+#      block: |
+#        [client]
+#        user=root
+#        password="{{ nextcloud_mysql_root_pwd }}"
+#  when: nc_mysql_mycred.stat.exists is defined and not nc_mysql_mycred.stat.exists
 
 - name: "[mySQL] - Set mysql confing option for nextcloud"
   copy:
@@ -71,12 +74,15 @@
   notify: restart mysql
 
 - name: "[mySQL] - Generate database user Password."
-  set_fact: nextcloud_db_pwd="{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/db_admin.pwd' ) }}"
+  set_fact: 
+    nextcloud_db_pwd: "{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/db_admin.pwd' ) }}"
   when: nextcloud_db_pwd is not defined
 
 - name: "[mySQL] - Add Database {{ nextcloud_db_name }}."
   mysql_db:
     name: "{{ nextcloud_db_name }}"
+    login_user: root
+    login_password: "{{ nextcloud_mysql_root_pwd }}"
     state: present
 
 - name: "[mySQL] - Configure the database user."
@@ -84,4 +90,6 @@
     name: "{{ nextcloud_db_admin }}"
     password: "{{ nextcloud_db_pwd }}"
     priv: "{{ nextcloud_db_name }}.*:ALL"
+    login_user: root
+    login_password: "{{ nextcloud_mysql_root_pwd }}"
     state: present
