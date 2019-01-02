@@ -9,4 +9,5 @@ php_pkg_spe:
   - "php5-imap"
   - "php5-imagick"
   - "php5-redis"
+  - "php5-mcrypt"
 php_socket: "/var/run/php5-fpm.sock"
