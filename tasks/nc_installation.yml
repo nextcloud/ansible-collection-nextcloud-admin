@@ -8,7 +8,7 @@
 - name: "[NC] - Setting directory ownership & permissions for the data folder"
   file:
     path: "{{ nextcloud_data_dir }}"
-    mode: u=rwX,g=rX,o-rwx
+    mode: "u=rwX,g=rX,o-rwx"
     recurse: yes
     state: directory
     owner: "{{ nextcloud_websrv_user }}"
