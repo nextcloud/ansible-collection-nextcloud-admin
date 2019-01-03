@@ -1,0 +1,15 @@
+---
+# [system]
+# system_configuration for php 7.0:
+php_ver: "7.2"
+php_dir: "/etc/php/7.2"
+php_bin: "php-fpm7.2"
+php_pkg_apcu: "php-apcu"
+php_pkg_spe:
+  - "php-imap"
+  - "php-imagick"
+  - "php-redis"
+  - "php7.2-xml"
+  - "php7.2-zip"
+  - "php7.2-mbstring"
+php_socket: "/run/php/php7.2-fpm.sock"
