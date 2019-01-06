@@ -8,7 +8,7 @@
 - name: "[NC] - Setting directory ownership & permissions for the data folder"
   file:
     path: "{{ nextcloud_data_dir }}"
-    mode: u=rwX,g=rX,o-rwx
+    mode: "u=rwX,g=rX,o-rwx"
     recurse: yes
     state: directory
     owner: "{{ nextcloud_websrv_user }}"
@@ -41,6 +41,7 @@
 
   - name: "[NC] - Run occ installation command"
     become_user: "{{ nextcloud_websrv_user }}"
+    become: yes
     command: >
         php occ maintenance:install
         --database={{ nextcloud_tmp_backend }}
@@ -79,6 +80,7 @@
 
 - name: "[NC] - Set Trusted Domains"
   become_user: "{{ nextcloud_websrv_user }}"
+  become: yes
   command: php occ config:system:set trusted_domains {{ item.0 }} --value="{{ item.1 }}"
   args:
     chdir: "{{ nextcloud_webroot }}"
@@ -86,6 +88,7 @@
 
 - name: "[NC] - Set Trusted Proxies"
   become_user: "{{ nextcloud_websrv_user }}"
+  become: yes
   command: php occ config:system:set trusted_proxies {{ item.0 }} --value="{{ item.1 }}"
   args:
     chdir: "{{ nextcloud_webroot }}"
@@ -93,6 +96,7 @@
 
 - name: "[NC] - Set Nextcloud settings in config.php"
   become_user: "{{ nextcloud_websrv_user }}"
+  become: yes
   command: php occ config:system:set {{ item.name }} --value="{{ item.value }}"
   args:
     chdir: "{{ nextcloud_webroot }}"
@@ -101,6 +105,7 @@
 
 - name: "[NC] - Set Redis Server"
   become_user: "{{ nextcloud_websrv_user }}"
+  become: yes
   command: php occ config:system:set {{ item.name }} --value="{{ item.value }}"
   args:
     chdir: "{{ nextcloud_webroot }}"
@@ -119,6 +124,7 @@
 
 - name: "[NC] - Set Cron method to Crontab"
   become_user: "{{ nextcloud_websrv_user }}"
+  become: yes
   command: php occ background:cron
   args:
     chdir: "{{ nextcloud_webroot }}"

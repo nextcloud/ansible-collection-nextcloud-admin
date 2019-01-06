@@ -70,6 +70,7 @@
     args:
       chdir: "{{ nextcloud_webroot }}"
     become_user: "{{ nextcloud_websrv_user }}"
+    become: yes
     changed_when: false
     register: nc_apps_list
 
