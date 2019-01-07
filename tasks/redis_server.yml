@@ -5,3 +5,10 @@
     - redis-server
     - "{{ php_pkg_spe }}"
   notify: start redis
+
+- name: "[REDIS] -  Redis configuration is present."
+  template:
+    dest: /etc/redis/redis.conf
+    src: templates/redis.conf.j2
+  notify: restart redis
+

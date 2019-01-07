@@ -198,10 +198,18 @@ nextcloud_install_redis_server: true
 ```
 Whenever the role should install a redis server on the same host.
 ```YAML
+nextcloud_redis_host: '/var/run/redis/redis.sock'
+```
+The Hostname of redis server. It is set to use UNIX socket as redis is on same host. Set to hostname if it is not the case.
+```YAML
+nextcloud_redis_port: 0
+```
+The port of redis server. Port 0 is for socket use. Default redis port is 6379.
+```YAML
 nextcloud_redis_settings:
+  - { name: 'redis host', value: '"{{ nextcloud_redis_host }}"' }
+  - { name: 'redis port', value: "{{ nextcloud_redis_port }}" }
   - { name: 'memcache.locking', value: '\OC\Memcache\Redis' }
-  - { name: 'redis host', value: 'localhost' }
-  - { name: 'redis port', value: '6379'}
 ```
 Settings to use redis server with Nextcloud
 
