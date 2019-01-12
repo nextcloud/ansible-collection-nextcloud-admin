@@ -1,5 +1,4 @@
 ---
-
 - name: "[APACHE] -  enable APC for php CLI"
   lineinfile:
     dest: "{{ php_dir }}/cli/php.ini"

@@ -34,3 +34,8 @@
   service:
     name: redis-server
     state: started
+
+- name: restart redis
+  service:
+    name: redis-server
+    state: restarted

@@ -38,10 +38,13 @@ nextcloud_admin_name: "admin"
 # nextcloud_admin_pwd: "secret"
 
 nextcloud_install_redis_server: true
+nextcloud_redis_host: '/var/run/redis/redis.sock'
+nextcloud_redis_port: 0
+
 nextcloud_redis_settings:
+  - { name: 'redis host', value: '"{{ nextcloud_redis_host }}"' }
+  - { name: 'redis port', value: "{{ nextcloud_redis_port }}" }
   - { name: 'memcache.locking', value: '\OC\Memcache\Redis' }
-  - { name: 'redis host', value: 'localhost' }
-  - { name: 'redis port', value: '6379'}
 
 nextcloud_background_cron: True
 
