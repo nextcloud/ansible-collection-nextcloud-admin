@@ -339,6 +339,7 @@ php_pkg_spe:
   - "php{{ php_version }}-zip"
   - "php{{ php_version }}-mbstring"
   - "php-redis"
+php_socket: "/run/php/{{ php_version }}-fpm.sock"
 ```
 
 ```YAML
