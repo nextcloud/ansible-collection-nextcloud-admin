@@ -9,7 +9,8 @@
       apt: update_cache=yes cache_valid_time=600
       when: ansible_os_family == 'Debian'
       changed_when: false
-
+    - name: update ca-certs
+      apt: name=ca-certificates state=latest
     - name: Remove default travis databases
       package:
         name: "{{ item }}"
