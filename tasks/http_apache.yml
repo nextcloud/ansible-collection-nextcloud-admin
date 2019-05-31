@@ -11,7 +11,7 @@
     - "php{{ php_ver }}-json"
     - "php{{ php_ver }}-curl"
     - "php{{ php_ver }}-intl"
-  notify: start apache
+  notify: start apache2
 
 - name: "[APACHE] -  Some other packages are installed."
   package: "name={{ item }} state=present"
@@ -57,7 +57,7 @@
     - { regexp: 'opcache.save_comments', line: 'opcache.save_comments=1' }
     - { regexp: 'opcache.revalidate_freq', line: 'opcache.revalidate_freq=1' }
     # validate: "/usr/sbin/{{ php_bin }} -t #%s"
-  notify: reload apache
+  notify: reload apache2
 
 - name: "[APACHE] -  Required Apache2 modules are enabled"
   apache2_module: state=present name={{ item }}
@@ -67,24 +67,24 @@
     - env
     - dir
     - mime
-  notify: restart apache
+  notify: restart apache2
 
 - name: "[APACHE] -  Ssl Apache2 module is enabled"
   apache2_module: state=present name={{ item }}
   with_items:
     - ssl
   when: nextcloud_install_tls
-  notify: restart apache
+  notify: restart apache2
 
 - name: "[APACHE] -  generate Nextcloud configuration for apache"
   template:
     dest: /etc/apache2/sites-available/nc_{{ nextcloud_instance_name }}.conf
     src: "{{nextcloud_websrv_template}}"
-  notify: reload apache
+  notify: reload apache2
 
 - name: "[APACHE] -  Enable Nextcloud site in apache conf"
   file:
     path: /etc/apache2/sites-enabled/nc_{{ nextcloud_instance_name }}.conf
     src: /etc/apache2/sites-available/nc_{{ nextcloud_instance_name }}.conf
     state: link
-  notify: reload apache
+  notify: reload apache2

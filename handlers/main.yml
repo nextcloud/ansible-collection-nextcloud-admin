@@ -25,17 +25,17 @@
     name: php{{ php_ver }}-fpm
     state: reloaded
 
-- name: start apache
+- name: start apache2
   service:
     name: apache2
     state: started
 
-- name: restart apache
+- name: restart apache2
   service:
     name: apache2
     state: restarted
 
-- name: reload apache
+- name: reload apache2
   service:
     name: apache2
     state: reloaded
