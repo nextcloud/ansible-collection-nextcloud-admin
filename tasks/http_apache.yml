@@ -1,21 +1,18 @@
 ---
 - name: "[APACHE] -  Required and recommended packages are installed."
-  package: "name={{ item }} state=present"
-  with_items:
-    - apache2
-    - smbclient
-    - "libapache2-mod-php{{ php_ver }}"
-    - "php{{ php_ver }}-ldap"
-    - "php{{ php_ver }}-imap"
-    - "php{{ php_ver }}-gd"
-    - "php{{ php_ver }}-json"
-    - "php{{ php_ver }}-curl"
-    - "php{{ php_ver }}-intl"
+  package: "name={{ apache2_deps + php_pkg_spe }} state=present"
+  vars:
+    apache2_deps:
+      - apache2
+      - smbclient
+      - "libapache2-mod-php{{ php_ver }}"
+      - "php{{ php_ver }}-ldap"
+      - "php{{ php_ver }}-imap"
+      - "php{{ php_ver }}-gd"
+      - "php{{ php_ver }}-json"
+      - "php{{ php_ver }}-curl"
+      - "php{{ php_ver }}-intl"
   notify: start apache2
-
-- name: "[APACHE] -  Some other packages are installed."
-  package: "name={{ item }} state=present"
-  with_items: "{{ php_pkg_spe }}"
 
 - name: "[APACHE] -  APCu is installed."
   package: "name={{ php_pkg_apcu }} state=present"

@@ -1,21 +1,18 @@
 ---
 - name: "[NGINX] -  Required and recommended packages are installed."
-  package: "name={{ item }} state=present"
-  with_items:
-    - nginx
-    - smbclient
-    - "php{{ php_ver }}-fpm"
-    - "php{{ php_ver }}-gd"
-    - "php{{ php_ver }}-ldap"
-    - "php{{ php_ver }}-imap"
-    - "php{{ php_ver }}-json"
-    - "php{{ php_ver }}-curl"
-    - "php{{ php_ver }}-intl"
+  package: "name={{ nginx_deps + php_pkg_spe }} state=present"
+  vars:
+    nginx_deps:
+      - nginx
+      - smbclient
+      - "php{{ php_ver }}-fpm"
+      - "php{{ php_ver }}-gd"
+      - "php{{ php_ver }}-ldap"
+      - "php{{ php_ver }}-imap"
+      - "php{{ php_ver }}-json"
+      - "php{{ php_ver }}-curl"
+      - "php{{ php_ver }}-intl"
   notify: [ "start nginx", "start php-fpm" ]
-
-- name: "[NGINX] -  Some other packages are installed."
-  package: "name={{ item }} state=present"
-  with_items: "{{ php_pkg_spe }}"
 
 - name: "[NGINX] -  APCu is installed."
   package: "name={{ php_pkg_apcu }} state=present"

@@ -1,12 +1,13 @@
 ---
 - name: "[PostgreSQL] - PostgreSQL packages are installed"
   package:
-    name: "{{ item }}"
+    name: "{{ pg_deps }}"
     state: "present"
-  with_items:
-    - "postgresql"
-    - "php{{ php_ver }}-pgsql"
-    - "python-psycopg2"
+  vars:
+    pg_deps:
+      - "postgresql"
+      - "php{{ php_ver }}-pgsql"
+      - "python-psycopg2"
 
 - name: "[PostgreSQL] - generate nextcloud role password."
   set_fact: nextcloud_db_pwd="{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/pgsql_nc.pwd' ) }}"

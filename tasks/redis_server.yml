@@ -1,9 +1,9 @@
 ---
 - name: "[REDIS] -  Required packages are installed."
-  package: "name={{ item }} state=present"
-  with_items:
-    - redis-server
-    - "{{ php_pkg_spe }}"
+  package: "name={{ redix_deps + php_pkg_spe }} state=present"
+  vars:
+    redix_deps:
+      - redis-server
   notify: start redis
 
 - name: "[REDIS] -  Redis configuration is present."
