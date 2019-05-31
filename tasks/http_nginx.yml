@@ -26,7 +26,7 @@
       state: present
       update_cache: yes
   - name: "[NGINX] -  Install APCu from backports."
-    apt: "name={{ php_pkg_apcu }} state=latest default_release=trusty-backports"
+    apt: "name={{ php_pkg_apcu }} state=present default_release=trusty-backports"
   when: ansible_distribution_release == "trusty"
 
 - name: "[NGINX] -  remove some commented line in php-fpm conf"
@@ -99,7 +99,7 @@
 - name: "[NGINX] -  generate Nextcloud configuration for nginx"
   template:
     dest: /etc/nginx/sites-available/nc_{{ nextcloud_instance_name }}.cnf
-    src: "{{nextcloud_websrv_template}}"
+    src: "{{ nextcloud_websrv_template }}"
   notify: reload nginx
 
 - name: "[NGINX] -  Enable Nextcloud in nginx conf"

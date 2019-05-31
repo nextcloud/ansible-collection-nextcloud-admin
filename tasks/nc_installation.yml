@@ -84,6 +84,7 @@
   args:
     chdir: "{{ nextcloud_webroot }}"
   with_indexed_items: "{{ nextcloud_trusted_domain }}"
+  changed_when: true
 
 - name: "[NC] - Set Trusted Proxies"
   become_user: "{{ nextcloud_websrv_user }}"
@@ -93,6 +94,7 @@
   args:
     chdir: "{{ nextcloud_webroot }}"
   with_indexed_items: "{{ nextcloud_trusted_proxies }}"
+  changed_when: true
 
 - name: "[NC] - Set Nextcloud settings in config.php"
   become_user: "{{ nextcloud_websrv_user }}"
@@ -103,6 +105,7 @@
     chdir: "{{ nextcloud_webroot }}"
   with_items:
     - "{{ nextcloud_config_settings }}"
+  changed_when: true
 
 - name: "[NC] - Set Redis Server"
   become_user: "{{ nextcloud_websrv_user }}"
@@ -113,7 +116,7 @@
     chdir: "{{ nextcloud_webroot }}"
   with_items:
     - "{{ nextcloud_redis_settings }}"
-  when: nextcloud_install_redis_server == True
+  when: (nextcloud_install_redis_server | bool)
 
 - name: "[NC] - Install Cronjob"
   cron:
@@ -122,7 +125,7 @@
     user: "{{ nextcloud_websrv_user }}"
     job: "php {{ nextcloud_webroot }}/cron.php"
     cron_file: "nextcloud"
-  when: nextcloud_background_cron == True
+  when: (nextcloud_background_cron | bool)
 
 - name: "[NC] - Set Cron method to Crontab"
   become_user: "{{ nextcloud_websrv_user }}"
@@ -131,7 +134,7 @@
   command: php occ background:cron
   args:
     chdir: "{{ nextcloud_webroot }}"
-  when: nextcloud_background_cron == True
+  when: (nextcloud_background_cron | bool)
 
 - name: "[NC] - Set Custom Mimetype"
   copy:

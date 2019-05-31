@@ -34,7 +34,8 @@
       src: "{{ nextcloud_full_url | default(nextcloud_calculated_url) }}"
       dest: "/tmp/"
     vars:
-      nextcloud_calculated_url: "{{ nextcloud_repository }}/{{ nextcloud_version_channel }}/{{ [nextcloud_dl_file_name[just_a_dict_key], nextcloud_archive_format]|join('.') }}"
+      nextcloud_calculated_url: "{{ nextcloud_repository }}/{{ nextcloud_version_channel }}/{{ nextcloud_calculated_file }}"
+      nextcloud_calculated_file: "{{ [nextcloud_dl_file_name[just_a_dict_key], nextcloud_archive_format]|join('.') }}"
       just_a_dict_key: "{{ 'latest' if ((nextcloud_get_latest|bool) and (nextcloud_version_channel != 'prereleases')) else nextcloud_version_channel }}"
 
 

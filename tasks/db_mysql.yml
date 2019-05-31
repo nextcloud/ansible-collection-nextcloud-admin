@@ -15,7 +15,7 @@
       - "python{{ '3' if ansible_python.version.major == 3 else '' }}-pymysql"
 
 - name: "[mySQL] - generate {{ nextcloud_db_backend }} root Password:"
-  set_fact: 
+  set_fact:
     nextcloud_mysql_root_pwd: "{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/mysql_root.pwd' ) }}"
   when: nextcloud_mysql_root_pwd is not defined
 
@@ -23,10 +23,9 @@
 - name: "[mySQL] - Update {{ nextcloud_db_backend }} root password"
   mysql_user:
     name: root
-    # host: "{{ item }}"
+
     password: "{{ nextcloud_mysql_root_pwd }}"
     config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
-    # config_file: "/etc/mysql/debian.cnf"
     check_implicit_admin: yes
     priv: "*.*:ALL,GRANT"
     # Assuming the root user has only localhost access
@@ -50,7 +49,6 @@
     login_password: "{{ nextcloud_mysql_root_pwd }}"
     config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
   ignore_errors: yes
-  when: nc_mysql_db_install.changed
 
 - name: "[mySQL] - Set mysql config option for nextcloud"
   copy:
@@ -59,7 +57,7 @@
   notify: restart mysql
 
 - name: "[mySQL] - Generate database user Password."
-  set_fact: 
+  set_fact:
     nextcloud_db_pwd: "{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/db_admin.pwd' ) }}"
   when: nextcloud_db_pwd is not defined
 

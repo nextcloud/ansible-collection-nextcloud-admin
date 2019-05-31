@@ -26,7 +26,7 @@
 
 - name: Configure Redis server
   include_tasks: ./redis_server.yml
-  when: nextcloud_install_redis_server
+  when: (nextcloud_install_redis_server | bool)
 
 - name: Configure mysql/mariadb database
   include_tasks: ./db_mysql.yml
@@ -76,7 +76,7 @@
   - name: "[NC apps] - installation."
     include_tasks: ./nc_apps.yml
     # do if the app is not enabled and ( (archive path is not "") or (app is disabled) )
-    when: (item.key not in nc_available_apps.enabled) and ((item.value != "") or (item.key in nc_available_apps.disabled))
-    with_dict: "{{nextcloud_apps}}"
+    when: (item.key not in nc_available_apps.enabled) and ((item.value is not empty) or (item.key in nc_available_apps.disabled))
+    with_dict: "{{ nextcloud_apps }}"
   when: (nextcloud_apps is defined) and nextcloud_apps is mapping
   tags: install_apps
