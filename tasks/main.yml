@@ -55,10 +55,10 @@
   register: nc_nextcloud_configured
   when: nc_nextcloud_conf.stat.exists
 
-- name: Fix su issue with occ
-  include_tasks: tasks/fix_su.yml
-  when: ansible_become_method is defined and ansible_become_method == "su"
-  tags: always
+# - name: Fix su issue with occ
+#   include_tasks: ./fix_su.yml
+#   when: ansible_become_method is defined and ansible_become_method == "su"
+#   tags: always
 
 - name: Nextcloud installation
   include_tasks: ./nc_installation.yml
@@ -71,6 +71,7 @@
       chdir: "{{ nextcloud_webroot }}"
     become_user: "{{ nextcloud_websrv_user }}"
     become: yes
+    become_flags: "{{ ansible_become_flags | default(omit) }}"
     changed_when: false
     register: nc_apps_list
 
@@ -84,14 +85,14 @@
     with_dict: "{{nextcloud_apps}}"
   when: (nextcloud_apps is defined) and nextcloud_apps is mapping
   tags: install_apps
-  rescue:
-  - name: Unfix su issue with occ
-    include_tasks: tasks/unfix_su.yml
-    when: ansible_become_method is defined and ansible_become_method == "su"
-  - fail:
-      msg: "An error Occured during Apps installation."
+  # rescue:
+#   - name: Unfix su issue with occ
+#     include_tasks: ./unfix_su.yml
+#     when: ansible_become_method is defined and ansible_become_method == "su"
+#   - fail:
+#       msg: "An error Occured during Apps installation."
 
-- name: Unfix su issue with occ
-  include_tasks: tasks/unfix_su.yml
-  when: ansible_become_method is defined and ansible_become_method == "su"
-  tags: always
+# - name: Unfix su issue with occ
+#   include_tasks: ./unfix_su.yml
+#   when: ansible_become_method is defined and ansible_become_method == "su"
+#   tags: always

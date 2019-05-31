@@ -16,6 +16,7 @@
 
   - name: "[ App {{nc_app_name}} ] - enable the application."
     become_user: "{{ nextcloud_websrv_user }}"
+    become_flags: "{{ ansible_become_flags | default(omit) }}"
     become: yes
     command: php occ app:enable "{{nc_app_name}}"
     args:
@@ -40,6 +41,7 @@
 
   - name: "[ App {{nc_app_name}} ] - enable the application."
     become_user: "{{ nextcloud_websrv_user }}"
+    become_flags: "{{ ansible_become_flags | default(omit) }}"
     become: yes
     command: php occ app:enable "{{nc_app_name}}"
     args:
@@ -47,6 +49,7 @@
   - block:
     - name: "[ App {{nc_app_name}} ] - Configure the application "
       become_user: "{{ nextcloud_websrv_user }}"
+      become_flags: "{{ ansible_become_flags | default(omit) }}"
       become: yes
       command: php occ config:app:set {{nc_app_name}} {{item_cfg.key}} --value="{{item_cfg.value}}"
       args:

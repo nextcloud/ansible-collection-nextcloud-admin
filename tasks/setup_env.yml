@@ -32,8 +32,11 @@
   failed_when: False
   when: ansible_distribution == "Debian"
 
-- name: "[ENV] - rolling back to su."
-  set_fact: ansible_become_method="su"
+- block: 
+  - name: "[ENV] - rolling back to su."
+    set_fact: ansible_become_method="su"
+  - name: "[ENV] - force su to use /bin/sh as shell"
+    set_fact: ansible_become_flags='-s /bin/sh'
   when: (nc_sudo_installed_result.rc is defined) and (nc_sudo_installed_result.rc != 0)
 
 # fix for ubuntu 14.04 with permission issue for unprivileged user :

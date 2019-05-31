@@ -41,6 +41,9 @@
 
   - name: "[NC] - Run occ installation command"
     become_user: "{{ nextcloud_websrv_user }}"
+    become_flags: "{{ ansible_become_flags | default(omit) }}"
+    # become_flags: "-s /bin/sh"
+    # become_method: su
     become: yes
     command: >
         php occ maintenance:install
@@ -68,9 +71,9 @@
     failed_when: nc_installation_confphp.rc is defined and nc_installation_confphp.rc != 0
 
   rescue:
-    - name: Unfix su issue with occ
-      include_tasks: tasks/unfix_su.yml
-      when: ansible_become_method == "su"
+    # - name: Unfix su issue with occ
+    #   include_tasks: tasks/unfix_su.yml
+    #   when: ansible_become_method == "su"
 
     - name: "[NC] - removing config.php when occ fail"
       file:
@@ -80,6 +83,7 @@
 
 - name: "[NC] - Set Trusted Domains"
   become_user: "{{ nextcloud_websrv_user }}"
+  become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: yes
   command: php occ config:system:set trusted_domains {{ item.0 }} --value="{{ item.1 }}"
   args:
@@ -88,6 +92,7 @@
 
 - name: "[NC] - Set Trusted Proxies"
   become_user: "{{ nextcloud_websrv_user }}"
+  become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: yes
   command: php occ config:system:set trusted_proxies {{ item.0 }} --value="{{ item.1 }}"
   args:
@@ -96,6 +101,7 @@
 
 - name: "[NC] - Set Nextcloud settings in config.php"
   become_user: "{{ nextcloud_websrv_user }}"
+  become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: yes
   command: php occ config:system:set {{ item.name }} --value="{{ item.value }}"
   args:
@@ -105,6 +111,7 @@
 
 - name: "[NC] - Set Redis Server"
   become_user: "{{ nextcloud_websrv_user }}"
+  become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: yes
   command: php occ config:system:set {{ item.name }} --value="{{ item.value }}"
   args:
@@ -124,6 +131,7 @@
 
 - name: "[NC] - Set Cron method to Crontab"
   become_user: "{{ nextcloud_websrv_user }}"
+  become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: yes
   command: php occ background:cron
   args:
@@ -159,7 +167,7 @@
     - themes
     - updater
 
-- name: "[NC] - Give back execution permission to occ"
-  file:
-    path: "{{ nextcloud_webroot }}/occ"
-    mode: 0750
+# - name: "[NC] - Give back execution permission to occ"
+#   file:
+#     path: "{{ nextcloud_webroot }}/occ"
+#     mode: 0750
