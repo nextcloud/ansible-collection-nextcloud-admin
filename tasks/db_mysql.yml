@@ -29,13 +29,8 @@
     # config_file: "/etc/mysql/debian.cnf"
     check_implicit_admin: yes
     priv: "*.*:ALL,GRANT"
-    # Assuming le root user has only localhost access
+    # Assuming the root user has only localhost access
     host_all: yes
-  # with_items:
-  #   - 127.0.0.1
-  #   - ::1
-  #   - localhost
-  # ignore_errors: yes
 
 
 - name: "[mySQL] - Delete the anonymous user."
@@ -56,23 +51,6 @@
     config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
   ignore_errors: yes
   when: nc_mysql_db_install.changed
-
-#- name: "[mySQL] - Check credentials"
-#  stat: "path=/root/.my.cnf"
-#  register: nc_mysql_mycred
-#
-#- block:
-#  - name: "[mySQL] - Make the file .my.cnf"
-#    file: path=/root/.my.cnf state=touch mode="0640"
-#
-#  - name: "[mySQL] - Add content to .my.cnf"
-#    blockinfile:
-#      dest: /root/.my.cnf
-#      block: |
-#        [client]
-#        user=root
-#        password="{{ nextcloud_mysql_root_pwd }}"
-#  when: nc_mysql_mycred.stat.exists is defined and not nc_mysql_mycred.stat.exists
 
 - name: "[mySQL] - Set mysql config option for nextcloud"
   copy:

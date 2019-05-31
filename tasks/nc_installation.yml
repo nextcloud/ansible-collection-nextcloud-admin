@@ -161,8 +161,3 @@
     - config
     - themes
     - updater
-
-# - name: "[NC] - Give back execution permission to occ"
-#   file:
-#     path: "{{ nextcloud_webroot }}/occ"
-#     mode: 0750

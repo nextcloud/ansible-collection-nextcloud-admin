@@ -55,11 +55,6 @@
   register: nc_nextcloud_configured
   when: nc_nextcloud_conf.stat.exists
 
-# - name: Fix su issue with occ
-#   include_tasks: ./fix_su.yml
-#   when: ansible_become_method is defined and ansible_become_method == "su"
-#   tags: always
-
 - name: Nextcloud installation
   include_tasks: ./nc_installation.yml
   when: (not nc_nextcloud_conf.stat.exists) or (nc_nextcloud_configured.rc is defined and nc_nextcloud_configured.rc != 0)
@@ -85,14 +80,3 @@
     with_dict: "{{nextcloud_apps}}"
   when: (nextcloud_apps is defined) and nextcloud_apps is mapping
   tags: install_apps
-  # rescue:
-#   - name: Unfix su issue with occ
-#     include_tasks: ./unfix_su.yml
-#     when: ansible_become_method is defined and ansible_become_method == "su"
-#   - fail:
-#       msg: "An error Occured during Apps installation."
-
-# - name: Unfix su issue with occ
-#   include_tasks: ./unfix_su.yml
-#   when: ansible_become_method is defined and ansible_become_method == "su"
-#   tags: always
