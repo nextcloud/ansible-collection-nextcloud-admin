@@ -5,13 +5,14 @@
     state: present
   register: nc_mysql_db_install
 
-- name: "[mySQL] - Packages are installed.i"
+- name: "[mySQL] - Packages are installed."
   package:
-    name: "{{ item }}"
+    name: "{{ nc_mysql_deps }}"
     state: present
-  loop:
-    - "php{{ php_ver }}-mysql"
-    - python-mysqldb
+  vars:
+    nc_mysql_deps:
+      - "php{{ php_ver }}-mysql"
+      - "python{{ '3' if ansible_python.version.major == 3 else '' }}-pymysql"
 
 - name: "[mySQL] - generate {{ nextcloud_db_backend }} root Password:"
   set_fact: 
