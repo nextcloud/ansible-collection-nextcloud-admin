@@ -26,13 +26,6 @@
     owner: "{{ nextcloud_websrv_user }}"
     group: "{{ nextcloud_websrv_group }}"
 
-# fix for mariadb with occ
-- set_fact: nextcloud_tmp_backend="{{ nextcloud_db_backend }}"
-  when: nextcloud_db_backend != "mariadb"
-
-- set_fact: nextcloud_tmp_backend="mysql"
-  when: nextcloud_db_backend == "mariadb"
-
 - block:
   - name: "[NC] - removing possibly old or incomplete config.php"
     file:
@@ -42,8 +35,6 @@
   - name: "[NC] - Run occ installation command"
     become_user: "{{ nextcloud_websrv_user }}"
     become_flags: "{{ ansible_become_flags | default(omit) }}"
-    # become_flags: "-s /bin/sh"
-    # become_method: su
     become: yes
     command: >
         php occ maintenance:install
@@ -58,6 +49,9 @@
     args:
       chdir: "{{ nextcloud_webroot }}"
       creates: "{{ nextcloud_webroot }}/config/config.php"
+    vars:
+      # mariadb is equal to mysql for occ
+      nextcloud_tmp_backend: "{{ 'mysql' when nextcloud_db_backend == 'mariadb' else nextcloud_db_backend }}"
 
   - name: "[NC] - Verify config.php - check filesize"
     stat: path="{{ nextcloud_webroot }}/config/config.php"

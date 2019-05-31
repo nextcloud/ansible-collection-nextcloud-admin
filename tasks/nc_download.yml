@@ -28,23 +28,15 @@
     group: "{{ nextcloud_websrv_group }}"
 
 - block:
-  - name: "[NC-DL] - Create the download link for *latest*."
-    set_fact:
-      nextcloud_full_url: "{{nextcloud_repository}}/{{nextcloud_version_channel}}/{{[nextcloud_dl_file_name.latest, nextcloud_archive_format]|join('.')}}"
-    when: nextcloud_get_latest and (nextcloud_version_channel != 'prereleases')
-
-  - name: "[NC-DL] - Create the download link."
-    set_fact:
-      nextcloud_full_url: "{{nextcloud_repository}}/{{nextcloud_version_channel}}/{{[nextcloud_dl_file_name[nextcloud_version_channel], nextcloud_archive_format]|join('.')}}"
-    when: (not nextcloud_get_latest) or (nextcloud_version_channel == 'prereleases')
-  when: nextcloud_full_url is not defined
-
-- block:
   - name: "Download & extract Nextcloud to /tmp."
     unarchive:
       copy: no
-      src: "{{ nextcloud_full_url }}"
+      src: "{{ nextcloud_full_url | default(nextcloud_calculated_url) }}"
       dest: "/tmp/"
+    vars:
+      nextcloud_calculated_url: "{{ nextcloud_repository }}/{{ nextcloud_version_channel }}/{{ [nextcloud_dl_file_name[just_a_dict_key], nextcloud_archive_format]|join('.') }}"
+      just_a_dict_key: "{{ 'latest' if ((nextcloud_get_latest|bool) and (nextcloud_version_channel != 'prereleases')) else nextcloud_version_channel }}"
+
 
   - name: "[NC-DL] - Move extracted files to {{ nextcloud_webroot }}."
     command: "cp -r /tmp/nextcloud/. {{ nextcloud_webroot }}/"
