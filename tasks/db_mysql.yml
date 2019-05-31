@@ -23,16 +23,20 @@
 - name: "[mySQL] - Update {{ nextcloud_db_backend }} root password"
   mysql_user:
     name: root
-    host: "{{ item }}"
+    # host: "{{ item }}"
     password: "{{ nextcloud_mysql_root_pwd }}"
-    config_file: "/etc/mysql/debian.cnf"
+    config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
+    # config_file: "/etc/mysql/debian.cnf"
     check_implicit_admin: yes
     priv: "*.*:ALL,GRANT"
-  with_items:
-    - 127.0.0.1
-    - ::1
-    - localhost
-  ignore_errors: yes
+    # Assuming le root user has only localhost access
+    host_all: yes
+  # with_items:
+  #   - 127.0.0.1
+  #   - ::1
+  #   - localhost
+  # ignore_errors: yes
+
 
 - name: "[mySQL] - Delete the anonymous user."
   mysql_user:
@@ -40,6 +44,7 @@
     state: "absent"
     login_user: root
     login_password: "{{ nextcloud_mysql_root_pwd }}"
+    config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
   ignore_errors: yes
 
 - name: "[mySQL] - Removes the MySQL test database"
@@ -48,6 +53,7 @@
     state: absent
     login_user: root
     login_password: "{{ nextcloud_mysql_root_pwd }}"
+    config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
   ignore_errors: yes
   when: nc_mysql_db_install.changed
 
@@ -68,7 +74,7 @@
 #        password="{{ nextcloud_mysql_root_pwd }}"
 #  when: nc_mysql_mycred.stat.exists is defined and not nc_mysql_mycred.stat.exists
 
-- name: "[mySQL] - Set mysql confing option for nextcloud"
+- name: "[mySQL] - Set mysql config option for nextcloud"
   copy:
     dest: /etc/mysql/conf.d/nextcloud.cnf
     src: files/mysql_nextcloud.cnf
@@ -84,6 +90,7 @@
     name: "{{ nextcloud_db_name }}"
     login_user: root
     login_password: "{{ nextcloud_mysql_root_pwd }}"
+    config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
     state: present
 
 - name: "[mySQL] - Configure the database user."
@@ -93,4 +100,5 @@
     priv: "{{ nextcloud_db_name }}.*:ALL"
     login_user: root
     login_password: "{{ nextcloud_mysql_root_pwd }}"
+    config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
     state: present
