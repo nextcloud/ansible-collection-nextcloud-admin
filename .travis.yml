@@ -3,6 +3,10 @@ language: python
 python: "2.7"
 os: linux
 dist: xenial
+services:
+  - redis
+  - postgresql
+  - apache2
 env:
   - ansible_version="" # latest 
   - ansible_version="<2.8" # 2.7.x
