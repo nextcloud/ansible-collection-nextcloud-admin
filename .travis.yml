@@ -35,8 +35,6 @@ sudo: required
 # Install ansible
 
 before_install:
-  - pwd
-  - ls /usr/sbin/
   - sudo cat /usr/sbin/policy-rc.d
   - sudo rm -f /usr/sbin/policy-rc.d
   - sudo apt-get install python-setuptools
