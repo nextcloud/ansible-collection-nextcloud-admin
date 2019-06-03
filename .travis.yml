@@ -4,20 +4,24 @@ python: "2.7"
 os: linux
 dist: xenial
 services:
+  - mysql
   - redis
 matrix:
   include:
     # latest ansible + code coverage
-    - env: ansible_version="" NC_DB=mysql NC_WEB=apache
-    - env: ansible_version="" NC_DB=pgsql NC_WEB=apache
-    - env: ansible_version="" NC_DB=pgsql NC_WEB=nginx
+    - env: ansible_version="" NC_DB=mysql NC_WEB=apache2
     - env: ansible_version="" NC_DB=mysql NC_WEB=nginx
+    - env: ansible_version="" NC_DB=pgsql NC_WEB=apache2
+    - env: ansible_version="" NC_DB=pgsql NC_WEB=nginx
+    # backward compatibility:
     # ansible 2.7.x
-    - env: ansible_version="<2.8" NC_DB=mysql NC_WEB=apache
+    - env: ansible_version="<2.8" NC_DB=pgsql NC_WEB=apache2
     # ansible 2.6.x
-    - env: ansible_version="<2.7" NC_DB=mysql NC_WEB=apache
+    - env: ansible_version="<2.7" NC_DB=pgsql NC_WEB=apache2
     # ansible 2.5.x
-    - env: ansible_version="<2.6" NC_DB=mysql NC_WEB=apache
+    - env: ansible_version="<2.6" NC_DB=pgsql NC_WEB=apache2
+    # ansible 2.4.x
+    - env: ansible_version="<2.5" NC_DB=pgsql NC_WEB=apache2
 
     
 # env:
@@ -31,6 +35,7 @@ sudo: required
 # Install ansible
 
 before_install:
+  - pwd
   - sudo apt-get install python-setuptools
   - sudo easy_install pip
   # Install ansible
