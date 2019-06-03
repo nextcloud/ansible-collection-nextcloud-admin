@@ -21,16 +21,22 @@
 
     - name: pre-install the db backend
       package:
-        name: postgresql
+        name: "{{ db_packages_name[nextcloud_db_backend] }}"
         state: present
     - name: pre-activate the db backend
       service:
-        name: postgresql
+        name: "{{ db_packages_name[nextcloud_db_backend] }}"
         state: started
         
   vars:
-     nextcloud_db_backend: "pgsql"
-     nextcloud_version_major: 15
+    db_packages_name:
+      pgsql: postgresql
+      mariadb: mariadb-server
+      mysql: mysql-server
+    nextcloud_db_backend: "{{ lookup( 'env', 'NC_DB' ) }}"
+    nextcloud_websrv: "{{ lookup( 'env', 'NC_WEB' ) }}"
+    nextcloud_version_major: 15
+     
     #  nextcloud_apps:
     #    files_external: "" #enable files_external which is already installed in nextcloud
     #    calendar: "https://github.com/nextcloud/calendar/releases/download/v1.5.0/calendar.tar.gz" # download and install calendar app

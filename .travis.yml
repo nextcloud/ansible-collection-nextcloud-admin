@@ -5,11 +5,26 @@ os: linux
 dist: xenial
 services:
   - redis
-env:
-  - ansible_version="" # latest 
-  - ansible_version="<2.8" # 2.7.x
-  - ansible_version="<2.7" # 2.6.x
-  - ansible_version="<2.6" # 2.5.x
+matrix:
+  include:
+    # latest ansible + code coverage
+    - env: ansible_version="" NC_DB=mysql NC_WEB=apache
+    - env: ansible_version="" NC_DB=pgsql NC_WEB=apache
+    - env: ansible_version="" NC_DB=pgsql NC_WEB=nginx
+    - env: ansible_version="" NC_DB=mysql NC_WEB=nginx
+    # ansible 2.7.x
+    - env: ansible_version="<2.8" NC_DB=mysql NC_WEB=apache
+    # ansible 2.6.x
+    - env: ansible_version="<2.7" NC_DB=mysql NC_WEB=apache
+    # ansible 2.5.x
+    - env: ansible_version="<2.6" NC_DB=mysql NC_WEB=apache
+
+    
+# env:
+#   - ansible_version="" # latest 
+#   - ansible_version="<2.8" # 2.7.x
+#   - ansible_version="<2.7" # 2.6.x
+#   - ansible_version="<2.6" # 2.5.x
 
 sudo: required
 
