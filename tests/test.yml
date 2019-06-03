@@ -11,13 +11,23 @@
       changed_when: false
     - name: update ca-certs
       apt: name=ca-certificates state=latest
-    # - name: Remove default travis databases
-    #   package:
-    #     name: "{{ item }}"
-    #     state: absent
-    #   with_items:
-    #     - postgresql*
-    #     - mysql*
+
+    - name: Remove default travis databases
+      package:
+        name:
+          - postgresql*
+          - mysql*
+        state: absent
+      with_items:
+
+    - name: pre-install the db backend
+      package:
+        name: postgresql
+        state: present
+    - name: pre-activate the db backend
+      service:
+        name: postgresql
+        state: started
         
   vars:
      nextcloud_db_backend: "pgsql"
