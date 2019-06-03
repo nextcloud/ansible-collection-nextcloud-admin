@@ -14,9 +14,9 @@
       - "php{{ php_ver }}-intl"
   # notify: start apache2
 
-- name: "[NGINX] - the server is running"
+- name: "[APACHE] - the server is running"
   service:
-    name: nginx
+    name: apache2
     state: started
 
 - name: "[APACHE] -  APCu is installed."
