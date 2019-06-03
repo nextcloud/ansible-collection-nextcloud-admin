@@ -112,17 +112,4 @@
     path: /etc/nginx/sites-enabled/nc_{{ nextcloud_instance_name }}
     src: /etc/nginx/sites-available/nc_{{ nextcloud_instance_name }}.cnf
     state: link
-    # validate: "/usr/sbin/nginx -t #%s"
   notify: reload nginx
-# travis fix: check nginx intallation
-
-- block: 
-  - name: "[NGINX] -  Evalidate nginx conf"
-    command: nginx -t
-    register: valide_nginx
-    changed_when: false
-  rescue:
-  - name: "[NGINX] -  Error"
-    debug:
-      var: valide_nginx
-  
