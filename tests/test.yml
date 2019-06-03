@@ -18,7 +18,6 @@
           - postgresql*
           - mysql*
         state: absent
-      with_items:
 
     - name: pre-install the db backend
       package:
