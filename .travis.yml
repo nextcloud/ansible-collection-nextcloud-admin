@@ -2,11 +2,12 @@
 language: python
 python: "2.7"
 os: linux
-dist: trusty
+dist: xenial
 env:
-  - ansible_version="2.4.0.0"
-  - ansible_version="2.4.1.0"
-  - ansible_version="2.4.2.0"
+  - ansible_version="" # latest 
+  - ansible_version="<2.8" # 2.7.x
+  - ansible_version="<2.7" # 2.6.x
+  - ansible_version="<2.6" # 2.5.x
 
 sudo: required
 
@@ -16,7 +17,7 @@ before_install:
   - sudo apt-get install python-setuptools
   - sudo easy_install pip
   # Install ansible
-  - sudo pip install -I "ansible==$ansible_version"
+  - sudo pip install -I "ansible${ansible_version}"
   
 
 install:
