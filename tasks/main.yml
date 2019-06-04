@@ -4,37 +4,43 @@
   tags: always
   # load os specific variables
 
-- name: Verify permission for installed TLS certificates
-  include_tasks: ./tls_installed.yml
-  when: nextcloud_install_tls and nextcloud_tls_cert_method == "installed"
+- block:
+  - name: Verify permission for installed TLS certificates
+    include_tasks: ./tls_installed.yml
+    when: nextcloud_tls_cert_method == "installed"
 
-- name: Install given signed certificates
-  include_tasks: ./tls_signed.yml
-  when: nextcloud_install_tls and nextcloud_tls_cert_method == "signed"
+  - name: Install given signed certificates
+    include_tasks: ./tls_signed.yml
+    when: nextcloud_tls_cert_method == "signed"
 
-- name: configure self signed TLS certificates
-  include_tasks: ./tls_selfsigned.yml
-  when: nextcloud_install_tls and nextcloud_tls_cert_method == "self-signed"
+  - name: configure self signed TLS certificates
+    include_tasks: ./tls_selfsigned.yml
+    when: nextcloud_tls_cert_method == "self-signed"
+  when: nextcloud_install_tls
 
-- name: Configure Nginx web server.
-  include_tasks: ./http_nginx.yml
-  when: nextcloud_install_websrv and nextcloud_websrv in ["nginx"]
+- block:
+  - name: Configure Nginx web server.
+    include_tasks: ./http_nginx.yml
+    when: nextcloud_websrv in ["nginx"]
 
-- name: Configure Apache web server
-  include_tasks: ./http_apache.yml
-  when: nextcloud_install_websrv and nextcloud_websrv in ["apache", "apache2"]
+  - name: Configure Apache web server
+    include_tasks: ./http_apache.yml
+    when: nextcloud_websrv in ["apache", "apache2"]
+  when: nextcloud_install_websrv
 
 - name: Configure Redis server
   include_tasks: ./redis_server.yml
   when: (nextcloud_install_redis_server | bool)
 
-- name: Configure mysql/mariadb database
-  include_tasks: ./db_mysql.yml
-  when: nextcloud_install_db and nextcloud_db_backend in ["mysql", "mariadb"]
+- block:
+  - name: Configure mysql/mariadb database
+    include_tasks: ./db_mysql.yml
+    when: nextcloud_db_backend in ["mysql", "mariadb"]
 
-- name: Configure PostgreSQL database
-  include_tasks: ./db_postgresql.yml
-  when: nextcloud_install_db and nextcloud_db_backend in ["pgsql"]
+  - name: Configure PostgreSQL database
+    include_tasks: ./db_postgresql.yml
+    when: nextcloud_db_backend in ["pgsql"]
+  when: nextcloud_install_db
 
 - name: Check Nextcloud installed
   stat: "path={{ nextcloud_webroot }}/index.php"
@@ -57,7 +63,9 @@
 
 - name: Nextcloud installation
   include_tasks: ./nc_installation.yml
-  when: (not nc_nextcloud_conf.stat.exists) or (nc_nextcloud_configured.rc is defined and nc_nextcloud_configured.rc != 0)
+  when: |
+    (not nc_nextcloud_conf.stat.exists) or
+    (nc_nextcloud_configured.rc is defined and nc_nextcloud_configured.rc != 0)
 
 - block:
   - name: "[NC apps] - lists the number of apps available in the instance."
@@ -76,7 +84,11 @@
   - name: "[NC apps] - installation."
     include_tasks: ./nc_apps.yml
     # do if the app is not enabled and ( (archive path is not "") or (app is disabled) )
-    when: (item.key not in nc_available_apps.enabled) and ((item.value is not empty) or (item.key in nc_available_apps.disabled))
+    when:
+      - item.key not in nc_available_apps.enabled
+      - (item.value is not empty) or (item.key in nc_available_apps.disabled)
     with_dict: "{{ nextcloud_apps }}"
-  when: (nextcloud_apps is defined) and nextcloud_apps is mapping
+  when:
+    - nextcloud_apps is defined
+    - nextcloud_apps is mapping
   tags: install_apps

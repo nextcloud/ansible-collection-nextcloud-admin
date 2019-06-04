@@ -63,7 +63,9 @@
     command: "php -l {{ nextcloud_webroot }}/config/config.php"
     register: nc_installation_confphp
     changed_when: False
-    failed_when: nc_installation_confphp.rc is defined and nc_installation_confphp.rc != 0
+    failed_when:
+      - nc_installation_confphp.rc is defined
+      - nc_installation_confphp.rc != 0
 
   rescue:
     # - name: Unfix su issue with occ
