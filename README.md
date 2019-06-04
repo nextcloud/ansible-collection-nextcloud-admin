@@ -17,6 +17,11 @@ The role's main actions are:
 ## Requirements
 ### Ansible version
 Ansible 2.4
+### Python libraries
+To use `ipwrap` filter in Ansible, you need to install the netaddr Python library on a computer on which you use Ansible (it is not required on remote hosts). It can usually be installed with either your system package manager or using pip:
+```bash
+$ pip install netaddr
+```
 ### Setup module:
 The role uses facts gathered by Ansible on the remote host. If you disable the Setup module in your playbook, the role will not work properly.
 ### Root access
