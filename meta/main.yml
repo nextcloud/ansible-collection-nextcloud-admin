@@ -18,9 +18,9 @@ galaxy_info:
 
   galaxy_tags:
    - nextcloud
-   - file_sharing
+   - filesharing
    - installation
+   - private
    - cloud
-   - private_cloud
 
 dependencies: []
