@@ -2,12 +2,25 @@
 language: python
 python: "2.7"
 os: linux
-dist: trusty
-env:
-  - ansible_version="2.4.0.0"
-  - ansible_version="2.4.1.0"
-  - ansible_version="2.4.2.0"
-
+dist: xenial
+services:
+  - mysql
+  - redis
+matrix:
+  include:
+    # latest ansible + code coverage
+    - env: ansible_version="" NC_DB=mysql NC_WEB=apache2
+    - env: ansible_version="" NC_DB=mysql NC_WEB=nginx
+    - env: ansible_version="" NC_DB=pgsql NC_WEB=apache2
+    - env: ansible_version="" NC_DB=pgsql NC_WEB=nginx
+    # backward compatibility:
+    # ansible 2.7.x
+    - env: ansible_version="<2.8" NC_DB=mysql NC_WEB=apache2
+    # ansible 2.6.x
+    - env: ansible_version="<2.7" NC_DB=mysql NC_WEB=apache2
+    # ansible 2.5.x
+    - env: ansible_version="<2.6" NC_DB=mysql NC_WEB=apache2
+    
 sudo: required
 
 # Install ansible
@@ -16,7 +29,7 @@ before_install:
   - sudo apt-get install python-setuptools
   - sudo easy_install pip
   # Install ansible
-  - sudo pip install -I "ansible==$ansible_version"
+  - sudo pip install -I "ansible${ansible_version}"
   
 
 install:

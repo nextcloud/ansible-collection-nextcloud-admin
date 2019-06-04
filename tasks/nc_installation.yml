@@ -26,13 +26,6 @@
     owner: "{{ nextcloud_websrv_user }}"
     group: "{{ nextcloud_websrv_group }}"
 
-# fix for mariadb with occ
-- set_fact: nextcloud_tmp_backend="{{ nextcloud_db_backend }}"
-  when: nextcloud_db_backend != "mariadb"
-
-- set_fact: nextcloud_tmp_backend="mysql"
-  when: nextcloud_db_backend == "mariadb"
-
 - block:
   - name: "[NC] - removing possibly old or incomplete config.php"
     file:
@@ -41,6 +34,7 @@
 
   - name: "[NC] - Run occ installation command"
     become_user: "{{ nextcloud_websrv_user }}"
+    become_flags: "{{ ansible_become_flags | default(omit) }}"
     become: yes
     command: >
         php occ maintenance:install
@@ -55,6 +49,10 @@
     args:
       chdir: "{{ nextcloud_webroot }}"
       creates: "{{ nextcloud_webroot }}/config/config.php"
+    vars:
+      # mariadb is equal to mysql for occ
+      nextcloud_tmp_backend: "{{ 'mysql' if nextcloud_db_backend == 'mariadb' else nextcloud_db_backend }}"
+    notify: "reload {{ nextcloud_websrv }}"
 
   - name: "[NC] - Verify config.php - check filesize"
     stat: path="{{ nextcloud_webroot }}/config/config.php"
@@ -65,12 +63,14 @@
     command: "php -l {{ nextcloud_webroot }}/config/config.php"
     register: nc_installation_confphp
     changed_when: False
-    failed_when: nc_installation_confphp.rc is defined and nc_installation_confphp.rc != 0
+    failed_when:
+      - nc_installation_confphp.rc is defined
+      - nc_installation_confphp.rc != 0
 
   rescue:
-    - name: Unfix su issue with occ
-      include_tasks: tasks/unfix_su.yml
-      when: ansible_become_method == "su"
+    # - name: Unfix su issue with occ
+    #   include_tasks: tasks/unfix_su.yml
+    #   when: ansible_become_method == "su"
 
     - name: "[NC] - removing config.php when occ fail"
       file:
@@ -80,38 +80,45 @@
 
 - name: "[NC] - Set Trusted Domains"
   become_user: "{{ nextcloud_websrv_user }}"
+  become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: yes
   command: php occ config:system:set trusted_domains {{ item.0 }} --value="{{ item.1 }}"
   args:
     chdir: "{{ nextcloud_webroot }}"
   with_indexed_items: "{{ nextcloud_trusted_domain }}"
+  changed_when: true
 
 - name: "[NC] - Set Trusted Proxies"
   become_user: "{{ nextcloud_websrv_user }}"
+  become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: yes
   command: php occ config:system:set trusted_proxies {{ item.0 }} --value="{{ item.1 }}"
   args:
     chdir: "{{ nextcloud_webroot }}"
   with_indexed_items: "{{ nextcloud_trusted_proxies }}"
+  changed_when: true
 
 - name: "[NC] - Set Nextcloud settings in config.php"
   become_user: "{{ nextcloud_websrv_user }}"
+  become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: yes
   command: php occ config:system:set {{ item.name }} --value="{{ item.value }}"
   args:
     chdir: "{{ nextcloud_webroot }}"
   with_items:
     - "{{ nextcloud_config_settings }}"
+  changed_when: true
 
 - name: "[NC] - Set Redis Server"
   become_user: "{{ nextcloud_websrv_user }}"
+  become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: yes
   command: php occ config:system:set {{ item.name }} --value="{{ item.value }}"
   args:
     chdir: "{{ nextcloud_webroot }}"
   with_items:
     - "{{ nextcloud_redis_settings }}"
-  when: nextcloud_install_redis_server == True
+  when: (nextcloud_install_redis_server | bool)
 
 - name: "[NC] - Install Cronjob"
   cron:
@@ -120,15 +127,16 @@
     user: "{{ nextcloud_websrv_user }}"
     job: "php {{ nextcloud_webroot }}/cron.php"
     cron_file: "nextcloud"
-  when: nextcloud_background_cron == True
+  when: (nextcloud_background_cron | bool)
 
 - name: "[NC] - Set Cron method to Crontab"
   become_user: "{{ nextcloud_websrv_user }}"
+  become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: yes
   command: php occ background:cron
   args:
     chdir: "{{ nextcloud_webroot }}"
-  when: nextcloud_background_cron == True
+  when: (nextcloud_background_cron | bool)
 
 - name: "[NC] - Set Custom Mimetype"
   copy:
@@ -158,8 +166,3 @@
     - config
     - themes
     - updater
-
-- name: "[NC] - Give back execution permission to occ"
-  file:
-    path: "{{ nextcloud_webroot }}/occ"
-    mode: 0750

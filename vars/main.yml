@@ -6,6 +6,8 @@ nextcloud_dl_file_name:
   prereleases: "nextcloud-{{[nextcloud_version_full, nextcloud_version_special]|reject('undefined')|join()}}"
   daily: "nextcloud-{{nextcloud_version_major|d('')}}-daily-{{nextcloud_version_special|d('')}}"
 
+mysql_credential_file:
+  debian: '/etc/mysql/debian.cnf'
 ## finding the major version selected by the user :
 ## type : string
 # the user will set either nextcloud_version_major or nextcloud_version_full
