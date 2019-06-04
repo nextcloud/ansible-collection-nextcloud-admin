@@ -11,17 +11,32 @@
       changed_when: false
     - name: update ca-certs
       apt: name=ca-certificates state=latest
-    - name: Remove default travis databases
-      package:
-        name: "{{ item }}"
-        state: absent
-      with_items:
-        - postgresql*
-        - mysql*
+    - block: 
+      - name: Remove default travis databases
+        package:
+          name:
+            - postgresql*
+            - mysql*
+          state: absent
+
+      - name: pre-install the db backend
+        package:
+          name: "postgresql"
+          state: present
+      
+      - name: pre-activate the db backend
+        service:
+          name: "postgresql"
+          state: started
+      when: nextcloud_db_backend == 'pgsql'
         
   vars:
-     nextcloud_db_backend: "pgsql"
-     nextcloud_version_major: 10
-     nextcloud_apps:
-       files_external: "" #enable files_external which is already installed in nextcloud
-       calendar: "https://github.com/nextcloud/calendar/releases/download/v1.5.0/calendar.tar.gz" # download and install calendar app
+    nextcloud_db_backend: "{{ lookup( 'env', 'NC_DB' ) }}"
+    nextcloud_websrv: "{{ lookup( 'env', 'NC_WEB' ) }}"
+    nextcloud_version_major: 15
+    nextcloud_trusted_domain:
+      - localhost
+      - 127.0.0.1
+    #  nextcloud_apps:
+    #    files_external: "" #enable files_external which is already installed in nextcloud
+    #    calendar: "https://github.com/nextcloud/calendar/releases/download/v1.5.0/calendar.tar.gz" # download and install calendar app

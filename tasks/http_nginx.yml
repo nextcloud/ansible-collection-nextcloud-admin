@@ -29,6 +29,11 @@
     apt: "name={{ php_pkg_apcu }} state=present default_release=trusty-backports"
   when: ansible_distribution_release == "trusty"
 
+- name: "[NGINX] - the server is running"
+  service:
+    name: nginx
+    state: started
+
 - name: "[NGINX] -  remove some commented line in php-fpm conf"
   lineinfile:
     dest: "{{ php_dir }}/fpm/pool.d/www.conf"
@@ -107,5 +112,4 @@
     path: /etc/nginx/sites-enabled/nc_{{ nextcloud_instance_name }}
     src: /etc/nginx/sites-available/nc_{{ nextcloud_instance_name }}.cnf
     state: link
-    # validate: "/usr/sbin/nginx -t #%s"
   notify: reload nginx
