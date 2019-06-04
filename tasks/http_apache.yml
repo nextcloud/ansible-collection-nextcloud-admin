@@ -21,7 +21,7 @@
 
 - name: "[APACHE] -  APCu is installed."
   package: "name={{ php_pkg_apcu }} state=present"
-  when : ansible_distribution_release not in [ "trusty" ]
+  when: ansible_distribution_release not in [ "trusty" ]
 
 - block:
   # load APCu from backports as the default version for trusty is obsolete.

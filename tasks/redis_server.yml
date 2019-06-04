@@ -11,4 +11,3 @@
     dest: /etc/redis/redis.conf
     src: templates/redis.conf.j2
   notify: restart redis
-
