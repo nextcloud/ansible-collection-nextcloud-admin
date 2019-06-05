@@ -30,7 +30,7 @@ before_install:
   - sudo easy_install pip
   # Install ansible
   - sudo pip install -I "ansible${ansible_version}"
-  - sudo pip install netaddr
+  - sudo apt-get install python-netaddr
 
 
 install:
