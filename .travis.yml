@@ -20,7 +20,7 @@ matrix:
     - env: ansible_version="<2.7" NC_DB=mysql NC_WEB=apache2
     # ansible 2.5.x
     - env: ansible_version="<2.6" NC_DB=mysql NC_WEB=apache2
-    
+
 sudo: required
 
 # Install ansible
@@ -30,7 +30,8 @@ before_install:
   - sudo easy_install pip
   # Install ansible
   - sudo pip install -I "ansible${ansible_version}"
-  
+  - sudo apt-get install python-netaddr
+
 
 install:
   # Check ansible version

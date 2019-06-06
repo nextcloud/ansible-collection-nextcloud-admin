@@ -82,7 +82,7 @@
   become_user: "{{ nextcloud_websrv_user }}"
   become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: yes
-  command: php occ config:system:set trusted_domains {{ item.0 }} --value="{{ item.1 }}"
+  command: php occ config:system:set trusted_domains {{ item.0 }} --value="{{ item.1 | ipwrap }}"
   args:
     chdir: "{{ nextcloud_webroot }}"
   with_indexed_items: "{{ nextcloud_trusted_domain }}"
