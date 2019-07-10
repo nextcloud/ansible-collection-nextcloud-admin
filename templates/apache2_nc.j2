@@ -18,8 +18,8 @@
 {% endfor %}
   DocumentRoot {{ nextcloud_webroot }}
 
-  {%- if ((nextcloud_max_upload_size | human_to_bytes) =< 2147483647) %}
-  LimitRequestBody {{ nextcloud_max_upload_size | human_to_bytes }}
+  {%- if nextcloud_max_upload_size_in_bytes =< 2147483647 %}
+  LimitRequestBody {{ nextcloud_max_upload_size_in_bytes }}
   {% endif -%}
 
   <Directory {{ nextcloud_webroot }}>
@@ -47,8 +47,8 @@
 {% endfor %}
   DocumentRoot {{ nextcloud_webroot }}
 
-  {%- if ((nextcloud_max_upload_size | human_to_bytes) =< 2147483647) %}
-  LimitRequestBody {{ nextcloud_max_upload_size | human_to_bytes }}
+  {%- if nextcloud_max_upload_size_in_bytes =< 2147483647 %}
+  LimitRequestBody {{ nextcloud_max_upload_size_in_bytes }}
   {% endif -%}
 
   SSLEngine on
