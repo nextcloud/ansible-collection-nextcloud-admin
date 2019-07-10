@@ -17,6 +17,11 @@
   ServerAlias {{ nextcloud_trusted_domain[index]}}
 {% endfor %}
   DocumentRoot {{ nextcloud_webroot }}
+
+  {%- if (nextcloud_max_upload_size | human_to_bytes) =< 2147483647 %}
+  LimitRequestBody {{ nextcloud_max_upload_size | human_to_bytes }}
+  {% endif -%}
+
   <Directory {{ nextcloud_webroot }}>
     Allow from all
     Satisfy Any
@@ -41,6 +46,10 @@
   ServerAlias {{ nextcloud_trusted_domain[index]}}
 {% endfor %}
   DocumentRoot {{ nextcloud_webroot }}
+
+  {%- if (nextcloud_max_upload_size | human_to_bytes) =< 2147483647 %}
+  LimitRequestBody {{ nextcloud_max_upload_size | human_to_bytes }}
+  {% endif -%}
 
   SSLEngine on
   SSLCertificateFile      {{ nextcloud_tls_cert_file }}

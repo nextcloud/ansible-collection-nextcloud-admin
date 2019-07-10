@@ -66,6 +66,8 @@ nextcloud_db_admin: "ncadmin"
 # nextcloud_db_pwd: "secret"
 
 # [TLS] parameters used in the apache2 & nginx templates
+##  max file's size allowed to be uploaded on the server
+nextcloud_max_upload_size: 512m # in Byte or human readable size notation (g|m|k)
 nextcloud_install_tls: true
 nextcloud_tls_enforce: true
 nextcloud_mozilla_modern_ssl_profile: false # when false, intermediate profile is used
