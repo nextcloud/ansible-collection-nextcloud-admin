@@ -18,7 +18,7 @@
 {% endfor %}
   DocumentRoot {{ nextcloud_webroot }}
 
-  {%- if nextcloud_max_upload_size_in_bytes =< 2147483647 %}
+  {%- if nextcloud_max_upload_size_in_bytes <= 2147483647 %}
   LimitRequestBody {{ nextcloud_max_upload_size_in_bytes }}
   {% endif -%}
 
@@ -47,7 +47,7 @@
 {% endfor %}
   DocumentRoot {{ nextcloud_webroot }}
 
-  {%- if nextcloud_max_upload_size_in_bytes =< 2147483647 %}
+  {%- if nextcloud_max_upload_size_in_bytes <= 2147483647 %}
   LimitRequestBody {{ nextcloud_max_upload_size_in_bytes }}
   {% endif -%}
 
