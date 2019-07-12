@@ -90,7 +90,7 @@ server {
     }
 
     # set max upload size
-    client_max_body_size 512M;
+    client_max_body_size {{ nextcloud_max_upload_size }};
     fastcgi_buffers 64 4K;
 
 {% if (nextcloud_computed_major_version|int) > 13 %}
