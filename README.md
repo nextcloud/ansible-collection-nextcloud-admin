@@ -193,11 +193,16 @@ Defines the Nextcloud admin's login.
 ```YAML
 nextcloud_admin_pwd: "secret"
 ```
-Defines the Nextcloud admin's password.
-
-**Not defined by default**
-
+Defines the Nextcloud admin's password.  
+**Not defined by default**  
 If not defined by the user, a random password will be generated.
+
+```YAML
+nextcloud_max_upload_size: "512m"
+```
+Defines the max size allowed to be uploaded on the server.  
+Use 0 to __disable__.
+
 ### Redis Server configuration
 ```YAML
 nextcloud_install_redis_server: true
