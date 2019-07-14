@@ -7,7 +7,7 @@
 {% for domain in nextcloud_trusted_domain %}
 <VirtualHost *:80>
   ServerName {{ domain }}
-  Redirect permanent / https://{{ domain }}/
+  Redirect permanent / https://{{ domain | ipwrap }}/
 </VirtualHost>
 {% endfor %}
 {% else %}
@@ -17,6 +17,9 @@
   ServerAlias {{ nextcloud_trusted_domain[index]}}
 {% endfor %}
   DocumentRoot {{ nextcloud_webroot }}
+  {% if (nextcloud_max_upload_size_in_bytes|int) <= 2147483647-%}
+  LimitRequestBody {{ nextcloud_max_upload_size_in_bytes }}
+  {% endif -%}
   <Directory {{ nextcloud_webroot }}>
     Allow from all
     Satisfy Any
@@ -41,7 +44,9 @@
   ServerAlias {{ nextcloud_trusted_domain[index]}}
 {% endfor %}
   DocumentRoot {{ nextcloud_webroot }}
-
+  {% if (nextcloud_max_upload_size_in_bytes|int) <= 2147483647-%}
+  LimitRequestBody {{ nextcloud_max_upload_size_in_bytes }}
+  {% endif -%}
   SSLEngine on
   SSLCertificateFile      {{ nextcloud_tls_cert_file }}
   SSLCertificateKeyFile   {{ nextcloud_tls_cert_key_file }}

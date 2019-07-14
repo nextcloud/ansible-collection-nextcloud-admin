@@ -66,12 +66,14 @@ nextcloud_db_admin: "ncadmin"
 # nextcloud_db_pwd: "secret"
 
 # [TLS] parameters used in the apache2 & nginx templates
+##  max file's size allowed to be uploaded on the server
+nextcloud_max_upload_size: 512m # in Byte or human readable size notation (g|m|k)
 nextcloud_install_tls: true
 nextcloud_tls_enforce: true
 nextcloud_mozilla_modern_ssl_profile: false # when false, intermediate profile is used
 nextcloud_tls_cert_method: "self-signed" # "self-signed" | "signed" | "installed"
 nextcloud_tls_dhparam: "/etc/ssl/dhparam.pem"
-nextcloud_hsts: false
+nextcloud_hsts: false # recommended >= 15552000
 # nextcloud_tls_cert: /path/to/cert
 # nextcloud_tls_cert_key: /path/to/cert/key
 # nextcloud_tls_cert_chain: /path/to/cert/chain

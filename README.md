@@ -6,22 +6,28 @@
 This role installs and configures an Nextcloud instance for a debian/Ubuntu server.
 
 The role's main actions are:
-- [x] Packages dependencies installation.
-- [x] Database configuration (if located on the same host).
-- [x] Strengthened files permissions and ownership following Nextcloud recommendations.
-- [x] Web server configuration.
-- [x] Redis Server installation.
-- [x] Strengthened TLS configuration following _Mozilla SSL Configuration Generator_, intermediate profile by default, modern profile available.
-- [x] Post installation of Nextcloud applications
+-   [x] Packages dependencies installation.
+-   [x] Database configuration (if located on the same host).
+-   [x] Strengthened files permissions and ownership following Nextcloud recommendations.
+-   [x] Web server configuration.
+-   [x] Redis Server installation.
+-   [x] Strengthened TLS configuration following _Mozilla SSL Configuration Generator_, intermediate profile by default, modern profile available.
+-   [x] Post installation of Nextcloud applications
 
 ## Requirements
 ### Ansible version
 Ansible 2.4
+### Python libraries
+To use `ipwrap` filter in Ansible, you need to install the netaddr Python library on a computer on which you use Ansible (it is not required on remote hosts). It can usually be installed with either your system package manager or using pip:
+```bash
+$ pip install netaddr
+```
 ### Setup module:
 The role uses facts gathered by Ansible on the remote host. If you disable the Setup module in your playbook, the role will not work properly.
 ### Root access
 This role requires root access, so either configure it in your inventory files, run it in a playbook with a global `become: yes` or invoke the role in your playbook like:
 > playbook.yml:
+
 ```YAML
 - hosts: dnsserver
   become: yes
@@ -35,7 +41,7 @@ Role's variables (and their default values):
 
 ### Choose the version
 
-_*WARNING: Since nextcloud 11 requires php v5.6 or later, command line installation will fail on old OS without php v5.6+ support.*_
+**_WARNING: Since Nexcloud 11 requires php v5.6 or later, command line installation will fail on old OS without php v5.6+ support._**
 
 _Known issue while installing Nextcloud 11 on an Ubuntu 14.04 system:_ [#27](https://github.com/aalaesar/install_nextcloud/issues/27)
 
@@ -52,7 +58,7 @@ This table summarize the possible cases.
 |**prereleases**|_null_|_null_|_null_|"11.0.1"|_null_ \|"RC(n)\|beta(n)"|
 |**daily**|yes/no|_null_ \|master\|stable9\|...|master\|9\|10\|...|_null_|_null_ \|"YYYY-MM-DD"|
 
-__major&latest__ = major value when latest is true
+**major&latest** = major value when latest is true
 _null_ = "not used"
 #### version variables:
 ```YAML
@@ -102,41 +108,41 @@ Specify directly a full URL to the archive. The role will skip the url generatio
 nextcloud_full_url: https://h2g2.com/42/nextcloud.zip
 nextcloud_version_major: 42
 ```
-- Choose the latest release (default):
+-   Choose the latest release (default):
 ```YAML
 nextcloud_version_channel: "releases"
 nextcloud_get_latest: true
 ```
-- Choose the latest v10 release:
+-   Choose the latest v10 release:
 ```YAML
 nextcloud_version_channel: "releases"
 nextcloud_get_latest: true
 nextcloud_version_major: 10
 ```
-- Choose a specific release:
+-   Choose a specific release:
 ```YAML
 nextcloud_version_channel: "releases"
 nextcloud_get_latest: false
 nextcloud_full_version: "10.0.3"
 ```
-- Get the nextcloud 11.0.1 prerelease 1:
+-   Get the nextcloud 11.0.1 prerelease 1:
 ```YAML
 nextcloud_version_channel: "prereleases"
 nextcloud_version_full: "11.0.1"
 nextcloud_version_special: "RC1"
 ```
-- Get the latest daily:
+-   Get the latest daily:
 ```YAML
 nextcloud_version_channel: "daily"
 nextcloud_get_latest: true
 ```
-- Get the latest daily for stable 10:
+-   Get the latest daily for stable 10:
 ```YAML
 nextcloud_version_channel: "daily"
 nextcloud_get_latest: true
 nextcloud_version_major: "stable10"
 ```
-- Get the daily for master at january 1rst 2017:
+-   Get the daily for master at january 1rst 2017:
 ```YAML
 nextcloud_version_channel: "daily"
 nextcloud_get_latest: false
@@ -231,11 +237,11 @@ nextcloud_config_settings:
 Setting custom Nextcloud setting in config.php ( [Config.php Parameters Documentations](https://docs.nextcloud.com/server/12/admin_manual/configuration_server/config_sample_php_parameters.html) )
 
 Default custom settings:
-- **Base URL**: https://\<first element in the list of trusted domains>
-- **Memcache local**: APCu
-- **Mysql Character Set**: utf8mb4
-- **PHP read access to /dev/urandom**: Enabled
-- **Updater Relese Channel:** Production
+-   **Base URL**: 'https:// {{nextcloud_instance_name}}'
+-   **Memcache local**: APCu
+-   **Mysql Character Set**: utf8mb4
+-   **PHP read access to /dev/urandom**: Enabled
+-   **Updater Relese Channel:** Production
 ### Database configuration
 ```YAML
 nextcloud_install_db: true
@@ -251,9 +257,9 @@ nextcloud_db_backend: "mysql"
 Database type used by nextcloud.
 
 Supported values are:
-- mysql
-- mariadb
-- pgsql _(PostgreSQL)_
+-   mysql
+-   mariadb
+-   pgsql _(PostgreSQL)_
 
 ```YAML
 nextcloud_db_name: "nextcloud"
@@ -290,13 +296,13 @@ nextcloud_hsts: false
 ```
 Set HTTP Strict-Transport-Security header (e.g. "max-age=15768000; includeSubDomains; preload").
 
-*(Before enabling HSTS, please read into this topic first)*
+_(Before enabling HSTS, please read into this topic first)_
 ```YAML
 nextcloud_tls_cert_method: "self-signed"
 ```
 Defines various method for retrieving a TLS certificate.
-- **self-signed**: generate a _one year_ self-signed certificate for the trusted domain on the remote host and store it in _/etc/ssl_.
-- **signed**: copy provided signed certificate for the trusted domain to the remote host or in /etc/ssl by default.
+-   **self-signed**: generate a _one year_ self-signed certificate for the trusted domain on the remote host and store it in _/etc/ssl_.
+-   **signed**: copy provided signed certificate for the trusted domain to the remote host or in /etc/ssl by default.
   Uses:
 ```YAML
   # Mandatory:
@@ -311,7 +317,7 @@ Defines various method for retrieving a TLS certificate.
   nextcloud_tls_cert_key: "/etc/ssl/{{ nextcloud_trusted_domain }}.key"
   # ^remote absolute path to the certificate.
 ```
-- **installed**: if the certificate for the trusted domain is already on the remote host, specify its location.
+-   **installed**: if the certificate for the trusted domain is already on the remote host, specify its location.
   Uses:
 ```YAML
   nextcloud_tls_cert: /path/to/cert
@@ -324,7 +330,7 @@ Defines various method for retrieving a TLS certificate.
 
 ### System configuration
 
-install and use a custom version for PHP instead of the default one: 
+install and use a custom version for PHP instead of the default one:
 ```YAML
 php_version: '7.1'
 php_custom: yes
@@ -339,6 +345,7 @@ php_pkg_spe:
   - "php{{ php_version }}-zip"
   - "php{{ php_version }}-mbstring"
   - "php-redis"
+php_socket: "/run/php/{{ php_version }}-fpm.sock"
 ```
 
 ```YAML
@@ -360,18 +367,18 @@ If not defined by the user, and mysql/mariadb is installed during the run, a ran
 
 ### Generated password
 The role uses Ansible's password Lookup:
-- If a password is generated by the role, ansible stores it **locally** in **nextcloud_instances/{{ nextcloud_trusted_domain }}/** (relative to the working directory)
-- if the file already exist, it reuse its content
-- see http://docs.ansible.com/ansible/playbooks_lookups.html#the-password-lookup for more info
+-   If a password is generated by the role, ansible stores it **locally** in **nextcloud_instances/{{ nextcloud_trusted_domain }}/** (relative to the working directory)
+-   if the file already exist, it reuse its content
+-   see [the ansible password lookup documentation](https://docs.ansible.com/ansible/latest/plugins/lookup/password.html) for more info
 
 ### Post installation:
 #### Applications installation
 
-Since __v1.3.0__, it is possible to download, install and enable nextcloud applications during a post-install process.
+Since **v1.3.0**, it is possible to download, install and enable nextcloud applications during a post-install process.
 
 The application (app) to install have to be declared in the `nextcloud_apps` dictionary in a "key:value" pair.
-- The app name is the key
-- The download link, is the value.
+-   The app name is the key
+-   The download link, is the value.
 
 ```YAML
 nextcloud_apps:
@@ -390,14 +397,14 @@ nextcloud_apps:
 ```
 
 **Notes:**
-- Because the role is using nextcloud's occ, it is not possible to install an app from the official nextcloud app store.
-- If you know that the app is already installed, you can give an empty string to skip the download.
-- The app name need the be equal to the folder name located in the __apps folder__ of the nextcloud instance, which is extracted from the downloaded archive.
-The name may not be canon some times. (like *appName-x.y.z** instead of **appName**)
-- The role will __not__ update an already enabled application.
-- The configuration is applied only when the app in enabled the first time:
-Changing a parameter, then running the role again while the app is already enabled will __not__ update its configuration.
-- this post_install process is tagged and can be called directly using the `--tags install_apps` option.
+-   Because the role is using nextcloud's occ, it is not possible to install an app from the official nextcloud app store.
+-   If you know that the app is already installed, you can give an empty string to skip the download.
+-   The app name need the be equal to the folder name located in the **apps folder** of the nextcloud instance, which is extracted from the downloaded archive.
+The name may not be canon some times. (like **appName-x.y.z** instead of **appName**)
+-   The role will **not** update an already enabled application.
+-   The configuration is applied only when the app in enabled the first time:
+Changing a parameter, then running the role again while the app is already enabled will **not** update its configuration.
+-   this post_install process is tagged and can be called directly using the `--tags install_apps` option.
 
 ## Dependencies
 
@@ -414,9 +421,9 @@ In some case, you may want to deploy quickly many instances of Nextcloud on mult
    - role: aalaesar.install_nextcloud
 ```
 
-- This will install a Nextcloud 10.0.1 instance in /opt/nextcloud using apache2 and mysql.
-- it will be available at **https://{{ ansible default ipv4 }}**  using a self signed certificate.
-- Generated passwords are stored in **nextcloud_instances/{{ nextcloud_trusted_domain }}/** from your working directory.
+-   This will install a Nextcloud 10.0.1 instance in /opt/nextcloud using apache2 and mysql.
+-   it will be available at **https:// {{ ansible default ipv4 }}**  using a self signed certificate.
+-   Generated passwords are stored in **nextcloud_instances/{{ nextcloud_trusted_domain }}/** from your working directory.
 
 ### Case 1.1: specifying the version channel, branch, etc.
 You can choose the version channel to download a specific version of nextcloud. Here's a variation of the previous case, this time installing the latest nightly in master.
@@ -432,7 +439,7 @@ You can choose the version channel to download a specific version of nextcloud. 
 ### Case 2: Using letsencrypt with this role.
 This role is not designed to manage letsencrypt certificates. However you can still use your certificates with nextcloud.
 
-You must create first your certificates using a letsencrypt ACME client or an Ansible role like [ this one] (https://github.com/jaywink/ansible-letsencrypt)
+You must create first your certificates using a letsencrypt ACME client or an Ansible role like [this one] (https://github.com/jaywink/ansible-letsencrypt)
 
 then call _install_nextcloud_ by setting `nextcloud_tls_cert_method: "installed"`
 
@@ -459,12 +466,12 @@ Here 2 examples for apache and nginx (because they have slightly different confi
       nextcloud_tls_cert_key: "/etc/letsencrypt/live/example2.com/privkey.pem"
 ```
 ### Case 3: integration to an existing system.
-- An Ansible master want to install a new Nextcloud instance on an existing Ubuntu 14.04 server with nginx & mariadb installed.
-- As is server do not meet the php requirements for Nextcloud 11, he chooses to use the lastest Nextcloud 10 release.
-- He wants it to be accessible from internet at _cloud.example.tld_ and from his intranet at _dbox.intra.net_.
-- He already have a valid certificate for the intranet domain in /etc/nginx/certs/ installed
-- he wants the following apps to be installed & enabled : files_external, calendar, agenda, richdocuments (Collabora)
-- The richdocuments app has to be configured to point out to the Collabora domain.
+-   An Ansible master want to install a new Nextcloud instance on an existing Ubuntu 14.04 server with nginx & mariadb installed.
+-   As is server do not meet the php requirements for Nextcloud 11, he chooses to use the lastest Nextcloud 10 release.
+-   He wants it to be accessible from internet at _cloud.example.tld_ and from his intranet at _dbox.intra.net_.
+-   He already have a valid certificate for the intranet domain in /etc/nginx/certs/ installed
+-   he wants the following apps to be installed & enabled : files_external, calendar, agenda, richdocuments (Collabora)
+-   The richdocuments app has to be configured to point out to the Collabora domain.
 
 He can run the role with the following variables to install Nextcloud accordingly to its existing requirements .
 
@@ -487,7 +494,7 @@ He can run the role with the following variables to install Nextcloud accordingl
      nextcloud_tls_cert_key: "/etc/nginx/certs/nextcloud.key"
      nextcloud_mysql_root_pwd: "42h2g2"
      nextcloud_apps:
-       files_external: "" #enable files_external which is already installed in nextcloud  
+       files_external: "" #enable files_external which is already installed in nextcloud
        calendar: "https://github.com/nextcloud/calendar/releases/download/v1.5.0/calendar.tar.gz"
        contacts: "https://github.com/nextcloud/contacts/releases/download/v1.5.3/contacts.tar.gz"
        richdocuments-1.1.25: # the app name is equal to the extracted folder name from the archive
@@ -496,6 +503,6 @@ He can run the role with the following variables to install Nextcloud accordingl
             wopi_url: 'https://office.example.tld'
 ```
 
-License
--------
+## License
+
 BSD
