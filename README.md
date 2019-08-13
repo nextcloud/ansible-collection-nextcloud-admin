@@ -159,7 +159,7 @@ The list of domains you will use to access the same Nextcloud instance.
 ```YAML
 nextcloud_trusted_proxies: []
 ```
-The list of trusted proxies IPs if Nextcloud runs through a reverse proxy you.
+The list of trusted proxies IPs if Nextcloud runs through a reverse proxy.
 ```YAML
 nextcloud_instance_name: "{{ nextcloud_trusted_domain | first }}"
 ```
