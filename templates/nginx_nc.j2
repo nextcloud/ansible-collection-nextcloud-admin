@@ -124,7 +124,7 @@ server {
         deny all;
     }
 
-    location ~ ^/(?:index|remote|public|cron|core/ajax/update|status|ocs/v[12]|updater/.+|ocs-provider/.+|core/templates/40[34])\.php(?:$|/) {
+    location ~ ^/(?:index|remote|public|cron|core/ajax/update|status|ocs/v[12]|updater/.+|oc[ms]-provider/.+|core/templates/40[34])\.php(?:$|/) {
         # include fastcgi_params;
         fastcgi_split_path_info ^(.+\.php)(/.*)$;
         include fastcgi_params;
@@ -139,7 +139,7 @@ server {
         #fastcgi_request_buffering off;
     }
 
-    location ~ ^/(?:updater|ocs-provider)(?:$|/) {
+    location ~ ^/(?:updater|oc[ms]-provider)(?:$|/) {
         try_files $uri/ =404;
         index index.php;
     }
