@@ -234,7 +234,7 @@ nextcloud_config_settings:
   - { name: 'mysql.utf8mb4', value: 'true' }
   - { name: 'updater.release.channel', value: 'production' } # production | stable | daily | beta
 ```
-Setting custom Nextcloud setting in config.php ( [Config.php Parameters Documentations](https://docs.nextcloud.com/server/12/admin_manual/configuration_server/config_sample_php_parameters.html) )
+Setting custom Nextcloud setting in config.php ( [Config.php Parameters Documentations](https://docs.nextcloud.com/server/stable/admin_manual/) )
 
 Default custom settings:
 -   **Base URL**: 'https:// {{nextcloud_instance_name}}'
