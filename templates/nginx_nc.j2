@@ -114,7 +114,7 @@ server {
     error_page 404 /core/templates/404.php;
 
     location / {
-        rewrite ^ /index.php$uri;
+        rewrite ^ /index.php;
     }
 
     location ~ ^/(?:build|tests|config|lib|3rdparty|templates|data)/ {
@@ -127,6 +127,7 @@ server {
     location ~ ^/(?:index|remote|public|cron|core/ajax/update|status|ocs/v[12]|updater/.+|oc[ms]-provider/.+|core/templates/40[34])\.php(?:$|/) {
         # include fastcgi_params;
         fastcgi_split_path_info ^(.+\.php)(/.*)$;
+        try_files $fastcgi_script_name =404;
         include fastcgi_params;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
         fastcgi_param PATH_INFO $fastcgi_path_info;
