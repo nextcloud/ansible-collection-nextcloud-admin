@@ -23,7 +23,7 @@
     - { regexp: 'opcache.save_comments', line: 'opcache.save_comments=1' }
     - { regexp: 'opcache.revalidate_freq', line: 'opcache.revalidate_freq=1' }
     # validate: "/usr/sbin/{{ php_bin }} -t #%s"
-  notify: reload apache2
+  notify: reload http
 
 - name: "[APACHE] -  Required Apache2 modules are enabled"
   apache2_module: state=present name={{ item }}
@@ -33,24 +33,24 @@
     - env
     - dir
     - mime
-  notify: restart apache2
+  notify: restart http
 
 - name: "[APACHE] -  Ssl Apache2 module is enabled"
   apache2_module: state=present name={{ item }}
   with_items:
     - ssl
   when: (nextcloud_install_tls | bool)
-  notify: restart apache2
+  notify: restart http
 
 - name: "[APACHE] -  generate Nextcloud configuration for apache"
   template:
     dest: /etc/apache2/sites-available/nc_{{ nextcloud_instance_name }}.conf
     src: "{{ nextcloud_websrv_template }}"
-  notify: reload apache2
+  notify: reload http
 
 - name: "[APACHE] -  Enable Nextcloud site in apache conf"
   file:
     path: /etc/apache2/sites-enabled/nc_{{ nextcloud_instance_name }}.conf
     src: /etc/apache2/sites-available/nc_{{ nextcloud_instance_name }}.conf
     state: link
-  notify: reload apache2
+  notify: reload http

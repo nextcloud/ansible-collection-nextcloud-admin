@@ -64,17 +64,17 @@
     path: /etc/nginx/sites-enabled/php_handler
     src: /etc/nginx/sites-available/php_handler.cnf
     state: link
-  notify: reload nginx
+  notify: reload http
 
 - name: "[NGINX] -  generate Nextcloud configuration for nginx"
   template:
     dest: /etc/nginx/sites-available/nc_{{ nextcloud_instance_name }}.cnf
     src: "{{ nextcloud_websrv_template }}"
-  notify: reload nginx
+  notify: reload http
 
 - name: "[NGINX] -  Enable Nextcloud in nginx conf"
   file:
     path: /etc/nginx/sites-enabled/nc_{{ nextcloud_instance_name }}
     src: /etc/nginx/sites-available/nc_{{ nextcloud_instance_name }}.cnf
     state: link
-  notify: reload nginx
+  notify: reload http
