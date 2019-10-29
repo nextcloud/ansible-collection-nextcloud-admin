@@ -159,7 +159,7 @@ The list of domains you will use to access the same Nextcloud instance.
 ```YAML
 nextcloud_trusted_proxies: []
 ```
-The list of trusted proxies IPs if Nextcloud runs through a reverse proxy you.
+The list of trusted proxies IPs if Nextcloud runs through a reverse proxy.
 ```YAML
 nextcloud_instance_name: "{{ nextcloud_trusted_domain | first }}"
 ```
@@ -193,11 +193,16 @@ Defines the Nextcloud admin's login.
 ```YAML
 nextcloud_admin_pwd: "secret"
 ```
-Defines the Nextcloud admin's password.
-
-**Not defined by default**
-
+Defines the Nextcloud admin's password.  
+**Not defined by default**  
 If not defined by the user, a random password will be generated.
+
+```YAML
+nextcloud_max_upload_size: "512m"
+```
+Defines the max size allowed to be uploaded on the server.  
+Use 0 to __disable__.
+
 ### Redis Server configuration
 ```YAML
 nextcloud_install_redis_server: true
@@ -234,7 +239,7 @@ nextcloud_config_settings:
   - { name: 'mysql.utf8mb4', value: 'true' }
   - { name: 'updater.release.channel', value: 'production' } # production | stable | daily | beta
 ```
-Setting custom Nextcloud setting in config.php ( [Config.php Parameters Documentations](https://docs.nextcloud.com/server/12/admin_manual/configuration_server/config_sample_php_parameters.html) )
+Setting custom Nextcloud setting in config.php ( [Config.php Parameters Documentations](https://docs.nextcloud.com/server/stable/admin_manual/) )
 
 Default custom settings:
 -   **Base URL**: 'https:// {{nextcloud_instance_name}}'
