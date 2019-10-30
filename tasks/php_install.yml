@@ -15,7 +15,6 @@
     - "php{{ php_ver }}-mcrypt"
   notify:
     - start http
-    - start php-fpm
 
 - name: "[INSTALL] -  Apache Required package is installed."
   package:
@@ -32,7 +31,7 @@
   when: nextcloud_websrv == "nginx"
   notify:
     - start http
-
+    - start php-fpm
 
 - name: "[INSTALL] -  PHP extra Packages are installed."
   package:
