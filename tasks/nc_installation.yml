@@ -52,7 +52,7 @@
     vars:
       # mariadb is equal to mysql for occ
       nextcloud_tmp_backend: "{{ 'mysql' if nextcloud_db_backend == 'mariadb' else nextcloud_db_backend }}"
-    notify: "reload {{ nextcloud_websrv }}"
+    notify: reload http
 
   - name: "[NC] - Verify config.php - check filesize"
     stat: path="{{ nextcloud_webroot }}/config/config.php"
