@@ -57,7 +57,7 @@
   template:
     dest: /etc/nginx/sites-available/php_handler.cnf
     src: templates/nginx_php_handler.j2
-  notify: reload nginx
+  notify: reload http
 
 - name: "[NGINX] -  php handler is enabled"
   file:
