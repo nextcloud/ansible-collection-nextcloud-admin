@@ -1,7 +1,6 @@
 ---
 # [system]
-# system_configuration for php 7.0:
-php_ver: "7.2"
+# system_configuration for php 7.2:
 php_dir: "/etc/php/7.2"
 php_bin: "php-fpm7.2"
 php_pkg_apcu: "php-apcu"

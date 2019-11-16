@@ -1,0 +1,23 @@
+---
+- hosts:
+    - debian-jessie
+    - ubuntu-trusty
+    - debian-stretch
+    - ubuntu-xenial
+    - ubuntu-bionic
+    - centos7
+  become: True
+  remote_user: root
+
+  vars:
+    nextcloud_full_url: https://download.nextcloud.com/server/releases/nextcloud-15.0.12.zip
+    nextcloud_version_major: 15
+    nextcloud_websrv: "apache2"
+    nextcloud_webroot: "/srv/nextcloud/webroot"
+    nextcloud_db_backend: "mysql"
+    nextcloud_install_redis_server: true
+    nextcloud_apps:
+       files_external: ""
+
+  roles:
+    - ../../aalaesar.install_nextcloud

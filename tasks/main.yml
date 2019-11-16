@@ -1,8 +1,13 @@
 ---
 # tasks file for nextcloud
+
+# load os specific variables
 - include_tasks: ./setup_env.yml
   tags: always
-  # load os specific variables
+
+# install required packages
+- include_tasks: php_install.yml
+  tags: always
 
 - block:
   - name: Verify permission for installed TLS certificates

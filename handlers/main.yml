@@ -5,14 +5,19 @@
     name: mysql
     state: restarted
 
-- name: start nginx
+- name: start http
   service:
-    name: nginx
+    name: "{{ nextcloud_websrv }}"
     state: started
 
-- name: reload nginx
+- name: restart http
   service:
-    name: nginx
+    name: "{{ nextcloud_websrv }}"
+    state: restarted
+
+- name: reload http
+  service:
+    name: "{{ nextcloud_websrv }}"
     state: reloaded
 
 - name: start php-fpm
@@ -23,21 +28,6 @@
 - name: reload php-fpm
   service:
     name: php{{ php_ver }}-fpm
-    state: reloaded
-
-- name: start apache2
-  service:
-    name: apache2
-    state: started
-
-- name: restart apache2
-  service:
-    name: apache2
-    state: restarted
-
-- name: reload apache2
-  service:
-    name: apache2
     state: reloaded
 
 - name: start redis

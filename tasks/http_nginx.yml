@@ -1,39 +1,4 @@
 ---
-- name: "[NGINX] -  Required and recommended packages are installed."
-  package: "name={{ nginx_deps + php_pkg_spe }} state=present"
-  vars:
-    nginx_deps:
-      - nginx
-      - smbclient
-      - "php{{ php_ver }}-fpm"
-      - "php{{ php_ver }}-gd"
-      - "php{{ php_ver }}-ldap"
-      - "php{{ php_ver }}-imap"
-      - "php{{ php_ver }}-json"
-      - "php{{ php_ver }}-curl"
-      - "php{{ php_ver }}-intl"
-  notify: [ "start nginx", "start php-fpm" ]
-
-- name: "[NGINX] -  APCu is installed."
-  package: "name={{ php_pkg_apcu }} state=present"
-  when: ansible_distribution_release not in [ "trusty" ]
-
-- block:
-  # load APCu from backports as the default version for trusty is obsolete.
-  - name: "[NGINX] -  Configure trusty backports."
-    apt_repository:
-      repo: "deb http://fr.archive.ubuntu.com/ubuntu/ trusty-backports main restricted universe multiverse"
-      state: present
-      update_cache: yes
-  - name: "[NGINX] -  Install APCu from backports."
-    apt: "name={{ php_pkg_apcu }} state=present default_release=trusty-backports"
-  when: ansible_distribution_release == "trusty"
-
-- name: "[NGINX] - the server is running"
-  service:
-    name: nginx
-    state: started
-
 - name: "[NGINX] -  remove some commented line in php-fpm conf"
   lineinfile:
     dest: "{{ php_dir }}/fpm/pool.d/www.conf"
@@ -92,24 +57,24 @@
   template:
     dest: /etc/nginx/sites-available/php_handler.cnf
     src: templates/nginx_php_handler.j2
-  notify: reload nginx
+  notify: reload http
 
 - name: "[NGINX] -  php handler is enabled"
   file:
     path: /etc/nginx/sites-enabled/php_handler
     src: /etc/nginx/sites-available/php_handler.cnf
     state: link
-  notify: reload nginx
+  notify: reload http
 
 - name: "[NGINX] -  generate Nextcloud configuration for nginx"
   template:
     dest: /etc/nginx/sites-available/nc_{{ nextcloud_instance_name }}.cnf
     src: "{{ nextcloud_websrv_template }}"
-  notify: reload nginx
+  notify: reload http
 
 - name: "[NGINX] -  Enable Nextcloud in nginx conf"
   file:
     path: /etc/nginx/sites-enabled/nc_{{ nextcloud_instance_name }}
     src: /etc/nginx/sites-available/nc_{{ nextcloud_instance_name }}.cnf
     state: link
-  notify: reload nginx
+  notify: reload http
