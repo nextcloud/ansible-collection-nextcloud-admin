@@ -125,6 +125,8 @@ server {
     }
 
     location ~ ^/(?:index|remote|public|cron|core/ajax/update|status|ocs/v[12]|updater/.+|oc[ms]-provider/.+|core/templates/40[34])\.php(?:$|/) {
+        # Prevent 504 Error on web-update and large file upload
+        client_body_timeout 3600;
         # include fastcgi_params;
         fastcgi_split_path_info ^(.+\.php)(/.*)$;
         try_files $fastcgi_script_name =404;
