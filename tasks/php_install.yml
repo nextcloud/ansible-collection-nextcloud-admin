@@ -12,7 +12,8 @@
     - "php{{ php_ver }}-json"
     - "php{{ php_ver }}-curl"
     - "php{{ php_ver }}-intl"
-    - "php{{ php_ver }}-mcrypt"
+    # Debian Buster lacks the php7.3-mcrypt package
+    - "{{ 'php'+php_ver+'-mcrypt' if php_ver != 7.3 else omit }}"
   notify:
     - start http
 
