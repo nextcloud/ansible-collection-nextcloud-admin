@@ -23,7 +23,6 @@
 - name: "[mySQL] - Update {{ nextcloud_db_backend }} root password"
   mysql_user:
     name: root
-
     password: "{{ nextcloud_mysql_root_pwd }}"
     config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
     check_implicit_admin: yes
