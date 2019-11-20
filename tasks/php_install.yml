@@ -12,7 +12,6 @@
     - "php{{ php_ver }}-json"
     - "php{{ php_ver }}-curl"
     - "php{{ php_ver }}-intl"
-    - "php{{ php_ver }}-mcrypt"
   notify:
     - start http
 
