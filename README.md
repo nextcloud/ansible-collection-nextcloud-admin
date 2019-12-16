@@ -174,6 +174,10 @@ nextcloud_websrv: "apache2"
 ```
 The http server used by nextcloud. Available values are: **apache2** or **nginx**.
 ```YAML
+nextcloud_disable_websrv_default_site: false
+```
+Disable the default site of the chosen http server. (`000-default.conf` in Apache, `default` in Nginx.)
+```YAML
 nextcloud_websrv_template: "templates/{{nextcloud_websrv}}_nc.j2"
 ```
 The jinja2 template creating the instance configuration for your webserver.

@@ -59,4 +59,5 @@
   file:
     path: /etc/apache2/sites-enabled/000-default.conf
     state: absent
+  when: nextcloud_disable_websrv_default_site | bool
   notify: reload http
