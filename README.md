@@ -232,7 +232,7 @@ Settings to use redis server with Nextcloud
 ```YAML
 nextcloud_background_cron: True
 ```
-Set opereting system cron for executing Nextcloud regular tasks. This method enables the execution of scheduled jobs without the inherent limitations the Web server might have.
+Set operating system cron for executing Nextcloud regular tasks. This method enables the execution of scheduled jobs without the inherent limitations the Web server might have.
 
 ### Custom nextcloud settings
 ```YAML
