@@ -54,3 +54,10 @@
     src: /etc/apache2/sites-available/nc_{{ nextcloud_instance_name }}.conf
     state: link
   notify: reload http
+
+- name: "[APACHE] -  Disable apache default site"
+  file:
+    path: /etc/apache2/sites-enabled/000-default.conf
+    state: absent
+  when: nextcloud_disable_websrv_default_site | bool
+  notify: reload http

@@ -78,3 +78,10 @@
     src: /etc/nginx/sites-available/nc_{{ nextcloud_instance_name }}.cnf
     state: link
   notify: reload http
+
+- name: "[NGINX] -  Disable nginx default site"
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  when: nextcloud_disable_websrv_default_site | bool
+  notify: reload http
