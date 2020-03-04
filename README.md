@@ -341,20 +341,20 @@ Defines various method for retrieving a TLS certificate.
 
 install and use a custom version for PHP instead of the default one:
 ```YAML
-php_version: '7.1'
+php_ver: '7.1'
 php_custom: yes
-php_ver: "{{ php_version }}"
-php_dir: "/etc/php/{{ php_version }}"
-php_bin: "php-fpm{{ php_version }}"
+php_ver: "{{ php_ver }}"
+php_dir: "/etc/php/{{ php_ver }}"
+php_bin: "php-fpm{{ php_ver }}"
 php_pkg_apcu: "php-apcu"
 php_pkg_spe:
-  - "php{{ php_version }}-imap"
-  - "php{{ php_version }}-imagick"
-  - "php{{ php_version }}-xml"
-  - "php{{ php_version }}-zip"
-  - "php{{ php_version }}-mbstring"
+  - "php{{ php_ver }}-imap"
+  - "php{{ php_ver }}-imagick"
+  - "php{{ php_ver }}-xml"
+  - "php{{ php_ver }}-zip"
+  - "php{{ php_ver }}-mbstring"
   - "php-redis"
-php_socket: "/run/php/{{ php_version }}-fpm.sock"
+php_socket: "/run/php/{{ php_ver }}-fpm.sock"
 ```
 
 ```YAML
