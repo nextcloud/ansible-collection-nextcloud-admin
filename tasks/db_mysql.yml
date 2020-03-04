@@ -1,17 +1,9 @@
 ---
-- name: "[mySQL] - Service is installed."
-  package:
-    name: "{{ nextcloud_db_backend }}-server"
-    state: present
-  register: nc_mysql_db_install
-  when: ansible_distribution != "Debian"
-  
 - name: "[mySQL: Debian] - Service is installed."
   package:
-    name: "default-{{ nextcloud_db_backend }}-server"
+    name: "{{ 'default-' if (ansible_distribution|lower) == 'debian' else '' }}{{ nextcloud_db_backend }}-server"
     state: present
   register: nc_mysql_db_install
-  when: ansible_distribution == "Debian"
 
 - name: "[mySQL] - Packages are installed."
   package:
