@@ -1,8 +1,8 @@
 ---
 language: python
-python: "3.8.2"
+python: "2.7"
 os: linux
-dist: buster
+dist: xenial
 services:
   - mysql
   - redis
