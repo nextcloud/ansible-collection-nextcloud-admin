@@ -33,6 +33,7 @@ before_install:
   # Install ansible
   - sudo pip install -I "ansible${ansible_version}"
   - sudo apt-get install python-netaddr
+  - sudo ansible-galaxy install nginxinc.nginx
 
 
 install:

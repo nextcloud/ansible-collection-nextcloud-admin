@@ -55,33 +55,21 @@
 
 - name: "[NGINX] -  php handler configuration is present."
   template:
-    dest: /etc/nginx/sites-available/php_handler.cnf
+    dest: /etc/nginx/conf.d/php_handler.conf
     src: templates/nginx_php_handler.j2
   notify: reload http
 
-- name: "[NGINX] -  php handler is enabled"
-  file:
-    path: /etc/nginx/sites-enabled/php_handler
-    src: /etc/nginx/sites-available/php_handler.cnf
-    state: link
-  notify: reload http
 
 - name: "[NGINX] -  generate Nextcloud configuration for nginx"
   template:
-    dest: /etc/nginx/sites-available/nc_{{ nextcloud_instance_name }}.cnf
+    dest: /etc/nginx/conf.d/nc_{{ nextcloud_instance_name }}.conf
     src: "{{ nextcloud_websrv_template }}"
   notify: reload http
 
-- name: "[NGINX] -  Enable Nextcloud in nginx conf"
-  file:
-    path: /etc/nginx/sites-enabled/nc_{{ nextcloud_instance_name }}
-    src: /etc/nginx/sites-available/nc_{{ nextcloud_instance_name }}.cnf
-    state: link
-  notify: reload http
 
 - name: "[NGINX] -  Disable nginx default site"
   file:
-    path: /etc/nginx/sites-enabled/default
+    path: /etc/nginx/conf.d/default.conf
     state: absent
   when: nextcloud_disable_websrv_default_site | bool
   notify: reload http
