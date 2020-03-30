@@ -56,7 +56,7 @@
   - name: "[INSTALL] -  Install APCu from backports."
     package:
       name: "{{ php_pkg_apcu }}"
-      state: latest
+      state: present
       default_release: trusty-backports
   when: ansible_distribution_release == "trusty"
 
