@@ -13,7 +13,7 @@
       owner: "{{ nextcloud_websrv_user }}"
       group: "{{ nextcloud_websrv_group }}"
       creates: "{{ nextcloud_webroot }}/apps/{{ nc_app_name }}"
-    when: nc_app_cfg is not empty
+    when: nc_app_cfg|length > 0
 
   - name: "[ App {{ nc_app_name }} ] - enable the application."
     become_user: "{{ nextcloud_websrv_user }}"

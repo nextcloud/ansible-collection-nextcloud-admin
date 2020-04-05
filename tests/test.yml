@@ -37,6 +37,6 @@
     nextcloud_trusted_domain:
       - localhost
       - 127.0.0.1
-    #  nextcloud_apps:
-    #    files_external: "" #enable files_external which is already installed in nextcloud
-    #    calendar: "https://github.com/nextcloud/calendar/releases/download/v1.5.0/calendar.tar.gz" # download and install calendar app
+    nextcloud_apps:
+      files_external: "" #enable files_external which is already installed in nextcloud
+      calendar: "https://github.com/nextcloud/calendar/releases/download/v1.5.0/calendar.tar.gz" # download and install calendar app

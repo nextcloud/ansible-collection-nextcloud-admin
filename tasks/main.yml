@@ -91,7 +91,7 @@
     # do if the app is not enabled and ( (archive path is not "") or (app is disabled) )
     when:
       - item.key not in nc_available_apps.enabled
-      - (item.value is not empty) or (item.key in nc_available_apps.disabled)
+      - (item.value|length > 0) or (item.key in nc_available_apps.disabled)
     with_dict: "{{ nextcloud_apps }}"
   when:
     - nextcloud_apps is defined
