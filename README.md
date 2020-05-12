@@ -336,6 +336,10 @@ Defines various method for retrieving a TLS certificate.
   nextcloud_tls_cert_chain: /path/to/cert/chain
   # ^remote absolute path to the certificate's full chain- used only by apache - Optional
 ```
+```YAML
+nextcloud_tls_session_cache_size: 50m 
+```
+Set the size of the shared nginx TLS session cache to 50 MB.
 
 ### System configuration
 
