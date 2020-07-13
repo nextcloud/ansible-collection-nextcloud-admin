@@ -97,3 +97,11 @@
     - nextcloud_apps is defined
     - nextcloud_apps is mapping
   tags: install_apps
+
+- name: Add indices
+  command: php occ db:add-missing-indices
+  args: 
+    chdir: "{{ nextcloud_webroot }}"
+  become_user: "{{ nextcloud_websrv_user }}"
+  become: yes
+  become_flags: "{{ ansible_become_flags | default(omit) }}"
