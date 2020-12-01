@@ -1,15 +1,25 @@
 ---
-# additionnal setup and fixes for OS dependent environment
-- name: "controls nextcloud_trusted_domain type"
+# additional setup and fixes for OS dependent environment
+- name: "[ENV] controls nextcloud_trusted_domain type"
   fail:
     msg: "New versions require nextcloud_trusted_domain to be declared as a list."
   when: nextcloud_trusted_domain is string
+
+- name: "[ENV] remember custom php version"
+  set_fact: 
+    php_ver_custom: "{{ php_ver }}"
+  when: php_ver is defined
 
 - name: "[ENV] include OS static vars"
   include_vars: '{{ item }}'
   loop:
     - '{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml'
     - '{{ ansible_os_family }}.yml'
+
+- name: "[ENV] Overwrite OS php_ver with custom php version if defined"
+  set_fact:
+    php_ver: "{{ php_ver_custom }}"
+  when: php_ver_custom is defined
 
 - name: "[ENV] - ca-certificate are up to date"
   # needed for downloading from download.nextcloud.com as the site use letsencrypt certificates
@@ -44,4 +54,3 @@
   when:
     - nc_sudo_installed_result.rc is defined
     - nc_sudo_installed_result.rc != 0
-
