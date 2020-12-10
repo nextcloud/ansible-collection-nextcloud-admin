@@ -3,12 +3,14 @@
 # system_configuration for php 7.4:
 php_dir: "/etc/php/7.4"
 php_bin: "php-fpm7.4"
-php_pkg_apcu: "php-apcu"
+php_pkg_apcu: "php7.4-apcu"
 php_pkg_spe:
-  - "php-imap"
-  - "php-imagick"
-  - "php-redis"
+  - "php7.4-bcmath"
+  - "php7.4-gmp"
+  - "php7.4-imagick"
+  - "php7.4-mbstring"
+  - "php7.4-redis"
   - "php7.4-xml"
   - "php7.4-zip"
-  - "php7.4-mbstring"
+
 php_socket: "/run/php/php7.4-fpm.sock"
