@@ -467,7 +467,7 @@ Here 2 examples for apache and nginx (because they have slightly different confi
      nextcloud_tls_cert_method: "installed"
      nextcloud_tls_cert: "/etc/letsencrypt/live/example.com/cert.pem"
      nextcloud_tls_cert_key: "/etc/letsencrypt/live/example.com/privkey.pem"
-     nextcloud_tls_cert_chain: "/etc/letsencrypt/live/example.com/fullchain.pem"
+     nextcloud_tls_cert_chain: "/etc/letsencrypt/live/example.com/chain.pem"
 
 - hosts: nginx_server
   roles:
