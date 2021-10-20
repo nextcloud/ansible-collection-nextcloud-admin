@@ -19,6 +19,15 @@
     nextcloud_mysql_root_pwd: "{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/mysql_root.pwd' ) }}"
   when: nextcloud_mysql_root_pwd is not defined
 
+- name: "[mySQL] - save {{ nextcloud_db_backend }} root password in config file"
+  ini_file:
+    path: "{{ mysql_credential_file[(ansible_os_family|lower)] }}"
+    section: client
+    option: password
+    value: "{{ nextcloud_mysql_root_pwd }}"
+  no_log: true
+  when: mysql_credential_file[(ansible_os_family|lower)] is defined
+
 # use debian default credentials to work on user root password
 - name: "[mySQL] - Update {{ nextcloud_db_backend }} root password"
   mysql_user:
