@@ -5,6 +5,7 @@
     state: present
   with_items:
     - "{{ nextcloud_websrv }}"
+    - imagemagick
     - smbclient
     - "php{{ php_ver }}-gd"
     - "php{{ php_ver }}-ldap"
