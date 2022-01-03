@@ -3,7 +3,7 @@
 
 # install_nextcloud
 
-This role installs and configures an Nextcloud instance for a debian/Ubuntu server.
+This role installs and configures an Nextcloud instance for a Debian/Ubuntu server.
 
 The role's main actions are:
 -   [x] Packages dependencies installation.
@@ -16,7 +16,7 @@ The role's main actions are:
 
 ## Requirements
 ### Ansible version
-Ansible 2.4
+Ansible >2.4
 ### Python libraries
 To use `ipwrap` filter in Ansible, you need to install the netaddr Python library on a computer on which you use Ansible (it is not required on remote hosts). It can usually be installed with either your system package manager or using pip:
 ```bash
@@ -105,7 +105,7 @@ Specify directly a full URL to the archive. The role will skip the url generatio
 - Download your own archive:
   (_you **must** specify the nextcloud major version along_)
 ```YAML
-nextcloud_full_url: https://h2g2.com/42/nextcloud.zip
+nextcloud_full_url: https://download.nextcloud.com/server/releases/nextcloud-23.0.0.zip
 nextcloud_version_major: 42
 ```
 -   Choose the latest release (default):
@@ -113,23 +113,23 @@ nextcloud_version_major: 42
 nextcloud_version_channel: "releases"
 nextcloud_get_latest: true
 ```
--   Choose the latest v10 release:
+-   Choose the latest v23 release:
 ```YAML
 nextcloud_version_channel: "releases"
 nextcloud_get_latest: true
-nextcloud_version_major: 10
+nextcloud_version_major: 23
 ```
 -   Choose a specific release:
 ```YAML
 nextcloud_version_channel: "releases"
 nextcloud_get_latest: false
-nextcloud_full_version: "10.0.3"
+nextcloud_version_full: "23.0.0"
 ```
--   Get the nextcloud 11.0.1 prerelease 1:
+-   Get the nextcloud 24.0.1 prerelease 1:
 ```YAML
 nextcloud_version_channel: "prereleases"
-nextcloud_version_full: "11.0.1"
-nextcloud_version_special: "RC1"
+nextcloud_version_full: "23.0.0"
+nextcloud_version_special: "RC3"
 ```
 -   Get the latest daily:
 ```YAML
@@ -140,14 +140,14 @@ nextcloud_get_latest: true
 ```YAML
 nextcloud_version_channel: "daily"
 nextcloud_get_latest: true
-nextcloud_version_major: "stable10"
+nextcloud_version_major: "stable23"
 ```
--   Get the daily for master at january 1rst 2017:
+-   Get the daily for master at january 1rst 2022:
 ```YAML
 nextcloud_version_channel: "daily"
 nextcloud_get_latest: false
 nextcloud_version_major: "master"
-nextcloud_version_special: "2017-01-01"
+nextcloud_version_special: "2022-01-01"
 ```
 ### Main configuration
 ```YAML
@@ -359,6 +359,7 @@ php_pkg_spe:
   - "php{{ php_ver }}-mbstring"
   - "php-redis"
 php_socket: "/run/php/{{ php_ver }}-fpm.sock"
+php_memory_limit: 512M
 ```
 
 ```YAML
@@ -493,7 +494,7 @@ He can run the role with the following variables to install Nextcloud accordingl
 - hosts: server
   roles:
    - role: aalaesar.install_nextcloud
-     nextcloud_version_major: 10
+     nextcloud_version_major: 23
      nextcloud_trusted_domain:
        - "cloud.example.tld"
        - "dbox.intra.net"
