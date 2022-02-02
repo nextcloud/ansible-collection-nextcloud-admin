@@ -15,7 +15,7 @@ nextcloud_get_latest: true # mandatory # specify if the latest archive should be
 # nextcloud_version_special: "" #  For prereleases: "RCn|beta" | for daily "YYYY-MM-DD"
 nextcloud_repository: "https://download.nextcloud.com/server" # Domain URL where to download Nextcloud.
 nextcloud_archive_format: "zip" # zip | tar.bz2
-# nextcloud_full_url: "https://h2g2.com/downloads/42/my_nextcloud.zip" # specify directly a full URL to the archive if you don't like rules.
+# nextcloud_full_url: "https://download.nextcloud.com/server/releases/nextcloud-23.0.0.zip" # specify directly a full URL to the archive if you don't like rules.
 
 
 # [CONFIG]
@@ -89,3 +89,4 @@ nextcloud_apps: {}
 #nextcloud_mysql_root_pwd: "secret"
 
 php_custom: false
+php_memory_limit: 512M
