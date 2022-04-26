@@ -1,0 +1,6 @@
+nextcloudInstanceName: "nextcloud"
+nextcloudBackupTargetDir: "/opt/nextcloud_backups"
+nextcloud_webroot: "/opt/nextcloud"
+nextcloud_data_dir: "/var/ncdata"
+nextcloudExitMaintenanceMode: true
+nextcloud_websrv_user: www-data

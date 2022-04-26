@@ -1,0 +1,1 @@
+nc_status: "{{ _nc_status.stdout |from_json }}"
