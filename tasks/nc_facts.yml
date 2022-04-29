@@ -1,11 +1,33 @@
 - name: get nextcloud status
-  command: "php {{nextcloud_webroot}}/occ status --output=json"
+  ansible.builtin.command: "php {{nextcloud_webroot}}/occ status --output=json"
   become_user: "{{ nextcloud_websrv_user }}"
   become: true
   become_method: su
   become_flags: -s /bin/sh
   register: _nc_status
 
+- name: get Nextcloud instance ID
+  ansible.builtin.command: "php {{nextcloud_webroot}}/occ config:system:get instanceid"
+  become_user: "{{ nextcloud_websrv_user }}"
+  become: true
+  become_method: su
+  become_flags: -s /bin/sh
+  register: _nc_id
+  changed_when: false
+
+- block:
+  - name: get the data directory
+    ansible.builtin.command: "php {{nextcloud_webroot}}/occ config:system:get datadirectory"
+    become_user: "{{ nextcloud_websrv_user }}"
+    become: true
+    become_method: su
+    become_flags: -s /bin/sh
+    register: nc_data_dir
+    changed_when: false
+  - set_fact:
+      nextcloud_data_dir: nc_data_dir.stdout
+  when:
+    - nextcloud_data_dir|d('') == ''
 
 - name: get the list of apps installed
   ansible.builtin.command: "php {{nextcloud_webroot}}/occ app:list --output=json"
@@ -14,4 +36,13 @@
   become_method: su
   become_flags: -s /bin/sh
   register: _nc_app_list
+  changed_when: false
+
+- name: get the list of users
+  ansible.builtin.command: "php {{nextcloud_webroot}}/occ user:list --output=json"
+  become_user: "{{ nextcloud_websrv_user }}"
+  become: true
+  become_method: su
+  become_flags: -s /bin/sh
+  register: _nc_user_list
   changed_when: false

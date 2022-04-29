@@ -15,6 +15,8 @@
     - __goto_maintenance.stdout | regex_search('already') == none
 
 - import_tasks: files.yml
+- import_tasks: user_data.yml
+- import_tasks: app_data.yml
 
 - name: leave maintenance mode
   command: "php {{nextcloud_webroot}}/occ maintenance:mode --off"

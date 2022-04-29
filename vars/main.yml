@@ -1,1 +1,3 @@
 nc_status: "{{ _nc_status.stdout |from_json }}"
+nc_id: "{{ _nc_id.stdout }}"
+nc_user_list: "{{ (_nc_user_list.stdout |from_json).keys() }}"

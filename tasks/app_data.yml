@@ -1,0 +1,12 @@
+- name: the app_data backup folder exists
+  ansible.builtin.file:
+    path: "{{ nc_archive_path }}/data"
+    state: directory
+
+- name: backup applications data
+  ansible.builtin.command: >-
+    rsync -r {{ _exclude_folders }}
+    {{ nextcloud_data_dir }}/appdata_{{ nc_id }}
+    {{ nc_archive_path }}/data
+  vars:
+    _exclude_folders: "{% for _folder in nextcloud_backup_app_data_exclude_folder %}--exclude={{_folder}} {% endfor %}"

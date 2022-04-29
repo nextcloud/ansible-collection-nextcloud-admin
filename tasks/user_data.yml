@@ -1,0 +1,17 @@
+- name: the data backup folder exists
+  ansible.builtin.file:
+    path: "{{ nc_archive_path }}/data"
+    state: directory
+
+- name: backup user data
+  ansible.builtin.command: >-
+    rsync -r {{ _exclude_folders }}
+    {{ nextcloud_data_dir }}/{{ item }}
+    {{ nc_archive_path }}/data
+  loop: "{{ nc_user_list| difference(nextcloud_backup_exclude_users) }}"
+  vars:
+    _exclude_folders: >-
+      {{ '' if nextcloud_backup_user_files_trashbin else '--exclude=files_trashbin' }}
+      {{ '' if nextcloud_backup_user_files_versions else '--exclude=files_versions' }}
+      {{ '' if nextcloud_backup_user_uploads else '--exclude=uploads' }}
+      {{ '' if nextcloud_backup_user_cache else '--exclude=cache' }}

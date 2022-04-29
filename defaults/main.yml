@@ -4,3 +4,12 @@ nextcloud_webroot: "/opt/nextcloud"
 nextcloud_data_dir: "/var/ncdata"
 nextcloudExitMaintenanceMode: true
 nextcloud_websrv_user: www-data
+nextcloud_backup_app_data: true
+nextcloud_backup_app_data_exclude_folder:
+  - preview
+nextcloud_backup_exclude_users: []
+nextcloud_backup_user: true
+nextcloud_backup_user_files_trashbin: true
+nextcloud_backup_user_files_versions: true
+nextcloud_backup_user_uploads: true
+nextcloud_backup_user_cache: true
