@@ -14,13 +14,6 @@
     checksum: "sha512:{{ nc_server_dl_url }}.sha512"
     dest: "{{ nc_archive_path }}/nextcloud-{{ nc_status.versionstring }}.zip"
 
-- name: get the list of apps installed
-  command: "php {{nextcloud_webroot}}/occ app:list --output=json"
-  become_user: "{{ nextcloud_websrv_user }}"
-  become: true
-  become_method: su
-  become_flags: -s /bin/sh
-  register: _nc_app_list
 
 - name: export the list of apps in the backup
   copy:

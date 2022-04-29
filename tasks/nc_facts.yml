@@ -5,3 +5,13 @@
   become_method: su
   become_flags: -s /bin/sh
   register: _nc_status
+
+
+- name: get the list of apps installed
+  ansible.builtin.command: "php {{nextcloud_webroot}}/occ app:list --output=json"
+  become_user: "{{ nextcloud_websrv_user }}"
+  become: true
+  become_method: su
+  become_flags: -s /bin/sh
+  register: _nc_app_list
+  changed_when: false
