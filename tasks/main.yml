@@ -1,4 +1,4 @@
-- include_tasks: nc_facts.yml
+- import_tasks: nc_facts.yml
 - name: set archive name
   set_fact:
     nc_archive_path: "{{ nextcloudBackupTargetDir }}/{{ nc_archive_name }}"
@@ -14,5 +14,15 @@
   changed_when:
     - __goto_maintenance.stdout | regex_search('already') == none
 
+- import_tasks: files.yml
 
-- include_tasks: files.yml
+- name: leave maintenance mode
+  command: "php {{nextcloud_webroot}}/occ maintenance:mode --off"
+  become_user: "{{ nextcloud_websrv_user }}"
+  become: true
+  become_method: su
+  become_flags: -s /bin/sh
+  register: __leave_maintenance
+  changed_when:
+    - __leave_maintenance.stdout | regex_search('already') == none
+  when: nextcloudExitMaintenanceMode
