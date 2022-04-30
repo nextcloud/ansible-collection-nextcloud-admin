@@ -13,3 +13,4 @@ nextcloud_backup_user_files_trashbin: true
 nextcloud_backup_user_files_versions: true
 nextcloud_backup_user_uploads: true
 nextcloud_backup_user_cache: true
+nextcloud_backup_database: true

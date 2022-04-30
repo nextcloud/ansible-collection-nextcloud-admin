@@ -1,9 +1,14 @@
 - import_tasks: nc_facts.yml
+  tags:
+    - always
+    - facts
 - name: set archive name
   set_fact:
     nc_archive_path: "{{ nextcloudBackupTargetDir }}/{{ nc_archive_name }}"
   vars:
     nc_archive_name: "{{ nextcloudInstanceName }}_nextcloud-{{ nc_status.versionstring }}_{{ ansible_date_time.iso8601_basic_short }}"
+  tags:
+    - always
 - name: enter maintenance mode
   command: "php {{nextcloud_webroot}}/occ maintenance:mode --on"
   become_user: "{{ nextcloud_websrv_user }}"
@@ -13,10 +18,16 @@
   register: __goto_maintenance
   changed_when:
     - __goto_maintenance.stdout | regex_search('already') == none
+  tags:
+    - always
 
 - import_tasks: files.yml
 - import_tasks: user_data.yml
 - import_tasks: app_data.yml
+- import_tasks: database.yml
+  when: nextcloud_backup_database
+  tags:
+    - db_dump
 
 - name: leave maintenance mode
   command: "php {{nextcloud_webroot}}/occ maintenance:mode --off"
@@ -28,3 +39,5 @@
   changed_when:
     - __leave_maintenance.stdout | regex_search('already') == none
   when: nextcloudExitMaintenanceMode
+  tags:
+    - always

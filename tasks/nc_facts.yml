@@ -5,6 +5,7 @@
   become_method: su
   become_flags: -s /bin/sh
   register: _nc_status
+  changed_when: false
 
 - name: get Nextcloud instance ID
   ansible.builtin.command: "php {{nextcloud_webroot}}/occ config:system:get instanceid"
@@ -46,3 +47,32 @@
   become_flags: -s /bin/sh
   register: _nc_user_list
   changed_when: false
+
+- block:
+  - name: get database type
+    ansible.builtin.command: "php {{nextcloud_webroot}}/occ config:system:get dbtype"
+    register: _nc_dbtype
+    changed_when: false
+  - name: get DB host
+    ansible.builtin.command: "php {{nextcloud_webroot}}/occ config:system:get dbhost"
+    register: _nc_dbhost
+    changed_when: false
+  - name: get DB name
+    ansible.builtin.command: "php {{nextcloud_webroot}}/occ config:system:get dbname"
+    register: _nc_dbname
+    changed_when: false
+  - name: get DB user
+    ansible.builtin.command: "php {{nextcloud_webroot}}/occ config:system:get dbuser"
+    register: _nc_dbuser
+    changed_when: false
+  - name: get DB password
+    ansible.builtin.command: "php {{nextcloud_webroot}}/occ config:system:get dbpassword"
+    register: _nc_dbpassword
+    changed_when: false
+    no_log: true
+  when:
+    - nextcloud_backup_database
+  become_user: "{{ nextcloud_websrv_user }}"
+  become: true
+  become_method: su
+  become_flags: -s /bin/sh
