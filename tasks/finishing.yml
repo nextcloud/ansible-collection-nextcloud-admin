@@ -21,6 +21,6 @@
   register: __leave_maintenance
   changed_when:
     - __leave_maintenance.stdout | regex_search('already') == none
-  when: nextcloudExitMaintenanceMode
+  when: nextcloud_exit_maintenance_mode
   tags:
     - always

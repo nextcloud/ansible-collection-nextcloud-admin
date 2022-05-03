@@ -1,9 +1,9 @@
 ### APPLICATION SETTINGS ##
-nextcloudInstanceName: "nextcloud"
-nextcloudBackupTargetDir: "/opt/nextcloud_backups"
+nextcloud_instance_name: "nextcloud"
+nextcloud_backup_target_dir: "/opt/nextcloud_backups"
 nextcloud_webroot: "/opt/nextcloud"
 # nextcloud_data_dir: "/var/ncdata"
-nextcloudExitMaintenanceMode: true
+nextcloud_exit_maintenance_mode: true
 nextcloud_websrv_user: www-data
 
 ### ARCHIVE NAME ###
