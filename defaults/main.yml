@@ -6,8 +6,11 @@ nextcloud_webroot: "/opt/nextcloud"
 nextcloud_exit_maintenance_mode: true
 nextcloud_websrv_user: www-data
 
-### ARCHIVE NAME ###
+### ARCHIVE PROPERTIES ###
 nextcloud_backup_suffix: ""
+nextcloud_backup_owner: "{{ nextcloud_websrv_user }}"
+nextcloud_backup_group: "{{ nextcloud_websrv_user }}"
+nextcloud_backup_mode: "0640"
 
 ### APPS BACKUPS ###
 nextcloud_backup_app_data: true

@@ -3,14 +3,15 @@
     - always
     - facts
 - name: set archive name
-  set_fact:
+  ansible.builtin.set_fact:
     nc_archive_path: "{{ nextcloud_backup_target_dir }}/{{ nc_archive_name }}"
   vars:
-    nc_archive_name: "{{ nextcloud_instance_name }}_nextcloud-{{ nc_status.versionstring }}_{{ ansible_date_time.iso8601_basic_short }}{{ nextcloud_backup_suffix }}"
+    nc_archive_name: >-
+      {{ nextcloud_instance_name }}_nextcloud-{{ nc_status.versionstring }}_{{ ansible_date_time.iso8601_basic_short }}{{ nextcloud_backup_suffix }}
   tags:
     - always
 - name: enter maintenance mode
-  command: "php {{nextcloud_webroot}}/occ maintenance:mode --on"
+  ansible.builtin.command: "php {{ nextcloud_webroot }}/occ maintenance:mode --on"
   become_user: "{{ nextcloud_websrv_user }}"
   become: true
   become_method: su

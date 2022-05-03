@@ -2,6 +2,9 @@
   ansible.builtin.file:
     path: "{{ nc_archive_path }}"
     state: directory
+    owner: "{{ nextcloud_backup_owner }}"
+    group: "{{ nextcloud_backup_group }}"
+    mode: "{{ nextcloud_backup_mode }}"
 
 - name: create a dump of the mysql database
   ansible.builtin.shell: >-
@@ -15,7 +18,7 @@
     - _nc_dbtype.stdout == 'mysql'
 
 - name: create a dump of the postgreSQL database
-  ansible.builtin.shell: >-
+  ansible.builtin.command: >-
     pg_dump {{ _nc_dbname.stdout }}
     -h {{ _nc_dbhost.stdout }}
     -U {{ _nc_dbuser.stdout }}

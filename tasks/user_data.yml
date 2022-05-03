@@ -2,6 +2,9 @@
   ansible.builtin.file:
     path: "{{ nc_archive_path }}/data"
     state: directory
+    owner: "{{ nextcloud_backup_owner }}"
+    group: "{{ nextcloud_backup_group }}"
+    mode: "{{ nextcloud_backup_mode }}"
 
 - name: backup user data
   ansible.builtin.command: >-
@@ -15,3 +18,5 @@
       {{ '' if nextcloud_backup_user_files_versions else '--exclude=files_versions' }}
       {{ '' if nextcloud_backup_user_uploads else '--exclude=uploads' }}
       {{ '' if nextcloud_backup_user_cache else '--exclude=cache' }}
+  tags:
+    - skip_ansible_lint
