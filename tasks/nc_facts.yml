@@ -15,6 +15,7 @@
   become_flags: -s /bin/sh
   register: _nc_id
   changed_when: false
+  when: nextcloud_backup_app_data or nextcloud_backup_user
 
 - block:
   - name: get the data directory
@@ -28,6 +29,7 @@
   - set_fact:
       nextcloud_data_dir: nc_data_dir.stdout
   when:
+    - nextcloud_backup_app_data or nextcloud_backup_user
     - nextcloud_data_dir|d('') == ''
 
 - name: get the list of apps installed
@@ -47,6 +49,8 @@
   become_flags: -s /bin/sh
   register: _nc_user_list
   changed_when: false
+  when:
+    - nextcloud_backup_user
 
 - block:
   - name: get database type

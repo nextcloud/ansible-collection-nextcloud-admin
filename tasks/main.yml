@@ -6,7 +6,7 @@
   set_fact:
     nc_archive_path: "{{ nextcloudBackupTargetDir }}/{{ nc_archive_name }}"
   vars:
-    nc_archive_name: "{{ nextcloudInstanceName }}_nextcloud-{{ nc_status.versionstring }}_{{ ansible_date_time.iso8601_basic_short }}"
+    nc_archive_name: "{{ nextcloudInstanceName }}_nextcloud-{{ nc_status.versionstring }}_{{ ansible_date_time.iso8601_basic_short }}{{ nextcloud_backup_suffix }}"
   tags:
     - always
 - name: enter maintenance mode
@@ -23,21 +23,11 @@
 
 - import_tasks: files.yml
 - import_tasks: user_data.yml
+  when: nextcloud_backup_user
 - import_tasks: app_data.yml
+  when: nextcloud_backup_user
 - import_tasks: database.yml
   when: nextcloud_backup_database
   tags:
     - db_dump
-
-- name: leave maintenance mode
-  command: "php {{nextcloud_webroot}}/occ maintenance:mode --off"
-  become_user: "{{ nextcloud_websrv_user }}"
-  become: true
-  become_method: su
-  become_flags: -s /bin/sh
-  register: __leave_maintenance
-  changed_when:
-    - __leave_maintenance.stdout | regex_search('already') == none
-  when: nextcloudExitMaintenanceMode
-  tags:
-    - always
+- import_tasks: finishing.yml
