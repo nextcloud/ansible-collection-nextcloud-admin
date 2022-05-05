@@ -1,0 +1,19 @@
+galaxy_info:
+  author: Aalaesar
+  description: Create a backup of your nextcloud server with this ansible role
+
+  license: license GPL-3.0-only
+
+  min_ansible_version: "2.9"
+
+  platforms:
+    - name: Debian
+      versions:
+        - all
+
+  galaxy_tags:
+    - nextcloud
+    - selfhosted
+    - backup
+
+dependencies: []

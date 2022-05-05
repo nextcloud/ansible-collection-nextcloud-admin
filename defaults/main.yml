@@ -3,8 +3,9 @@ nextcloud_instance_name: "nextcloud"
 nextcloud_backup_target_dir: "/opt/nextcloud_backups"
 nextcloud_webroot: "/opt/nextcloud"
 # nextcloud_data_dir: "/var/ncdata"
-nextcloud_exit_maintenance_mode: true
 nextcloud_websrv_user: www-data
+
+nextcloud_exit_maintenance_mode: true
 
 ### ARCHIVE PROPERTIES ###
 nextcloud_backup_suffix: ""

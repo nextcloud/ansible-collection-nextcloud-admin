@@ -5,9 +5,6 @@
 - name: set archive name
   ansible.builtin.set_fact:
     nc_archive_path: "{{ nextcloud_backup_target_dir }}/{{ nc_archive_name }}"
-  vars:
-    nc_archive_name: >-
-      {{ nextcloud_instance_name }}_nextcloud-{{ nc_status.versionstring }}_{{ ansible_date_time.iso8601_basic_short }}{{ nextcloud_backup_suffix }}
   tags:
     - always
 - name: enter maintenance mode
