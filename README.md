@@ -91,11 +91,22 @@ None
 
 ## Example Playbook
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+### Running a full backup of your nextcloud server:
+```yaml
+- hosts: nextcloud
+  roles:
+      - role: aalaesar.backup_nextcloud
+```
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+### Making a partial backup with only the app_data
+```yaml
+- hosts: nextcloud
+  roles:
+      - role: aalaesar.backup_nextcloud
+        nextcloud_backup_suffix: _only_app_data
+        nextcloud_backup_user: false
+        nextcloud_backup_database: false
+```
 
 ## License
 
