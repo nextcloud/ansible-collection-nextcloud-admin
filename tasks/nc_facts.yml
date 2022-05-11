@@ -17,7 +17,8 @@
   changed_when: false
   when: nextcloud_backup_app_data or nextcloud_backup_user
 
-- block:
+- name: find the data folder if required
+  block:
   - name: get the data directory
     ansible.builtin.command: "php {{ nextcloud_webroot }}/occ config:system:get datadirectory"
     become_user: "{{ nextcloud_websrv_user }}"
@@ -53,7 +54,8 @@
   when:
     - nextcloud_backup_user
 
-- block:
+- name: find the DB credential if required
+  block:
     - name: get database type
       ansible.builtin.command: "php {{ nextcloud_webroot }}/occ config:system:get dbtype"
       register: _nc_dbtype

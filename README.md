@@ -1,4 +1,4 @@
-# backup-nextcloud
+# backup_nextcloud
 
 An ansible role that creates a backup of a Nextcloud server. The backup is kept on the server.
 
