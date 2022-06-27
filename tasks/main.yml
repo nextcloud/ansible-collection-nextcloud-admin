@@ -81,6 +81,7 @@
     become: yes
     become_flags: "{{ ansible_become_flags | default(omit) }}"
     changed_when: false
+    check_mode: false
     register: nc_apps_list
 
   - name: "[NC apps] - convert list to yaml."
