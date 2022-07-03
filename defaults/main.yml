@@ -52,7 +52,7 @@ nextcloud_background_cron: True
 ## Custom nextcloud settings
 ## https://docs.nextcloud.com/server/12/admin_manual/configuration_server/config_sample_php_parameters.html
 nextcloud_config_settings:
-  - { name: 'default_phone_region', value: 'DE' } # use a country code
+  - { name: 'default_phone_region', value: 'DE' } # set a country code using ISO 3166-1
   - { name: 'overwrite.cli.url', value: 'https://{{ nextcloud_trusted_domain | first }}' }
   - { name: 'memcache.local', value: '\OC\Memcache\APCu' }
   - { name: 'open_basedir', value: '/dev/urandom' }
