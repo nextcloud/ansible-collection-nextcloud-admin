@@ -201,8 +201,8 @@ UbuntuXenialNginx:
   after_script:
   - lxdock destroy -f
 
-# Ubuntu Trusty
-UbuntuTrustyMariadb:
+# Ubuntu Focal
+UbuntuFocalMariadb:
   stage: Role Test
   before_script:
   # Create ansible.cfg with correct roles_path
@@ -215,7 +215,7 @@ UbuntuTrustyMariadb:
 
     containers:
       - name: $lxc
-        image: ubuntu/trusty
+        image: ubuntu/focal
         hostnames:
           - $lxc
 
@@ -250,7 +250,7 @@ UbuntuTrustyMariadb:
   after_script:
   - lxdock destroy -f
 
-UbuntuTrustyMysql:
+UbuntuFocalMysql:
   stage: Role Test
   before_script:
   # Create ansible.cfg with correct roles_path
@@ -263,7 +263,7 @@ UbuntuTrustyMysql:
 
     containers:
       - name: $lxc
-        image: ubuntu/trusty
+        image: ubuntu/focal
         hostnames:
           - $lxc
 
@@ -298,7 +298,7 @@ UbuntuTrustyMysql:
   after_script:
   - lxdock destroy -f
 
-UbuntuTrustyPsql:
+UbuntuFocalPsql:
   stage: Role Test
   before_script:
   # Create ansible.cfg with correct roles_path
@@ -311,7 +311,7 @@ UbuntuTrustyPsql:
 
     containers:
       - name: $lxc
-        image: ubuntu/trusty
+        image: ubuntu/focal
         hostnames:
           - $lxc
 
