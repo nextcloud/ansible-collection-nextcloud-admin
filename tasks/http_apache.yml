@@ -22,6 +22,7 @@
     - { regexp: 'opcache.memory_consumption', line: 'opcache.memory_consumption=128' }
     - { regexp: 'opcache.save_comments', line: 'opcache.save_comments=1' }
     - { regexp: 'opcache.revalidate_freq', line: 'opcache.revalidate_freq=1' }
+    - { regexp: 'memory_limit', line: 'memory_limit={{ php_memory_limit }}'}
     # validate: "/usr/sbin/{{ php_bin }} -t #%s"
   notify: reload http
 
