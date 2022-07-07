@@ -1,3 +1,4 @@
+---
 galaxy_info:
   author: Aalaesar
   description: Add a new Nextcloud instance in your infrastructure. The role manages dependencies and initial configuration.
@@ -7,21 +8,21 @@ galaxy_info:
   min_ansible_version: 2.5
 
   platforms:
-  - name: Ubuntu
-    versions:
-    - xenial
-    - bionic
-    - focal
-  - name: Debian
-    versions:
-    - stretch
-    - buster
+    - name: Ubuntu
+      versions:
+        - xenial
+        - bionic
+        - focal
+    - name: Debian
+      versions:
+        - stretch
+        - buster
 
   galaxy_tags:
-   - nextcloud
-   - filesharing
-   - installation
-   - private
-   - cloud
+    - nextcloud
+    - filesharing
+    - installation
+    - private
+    - cloud
 
 dependencies: []
