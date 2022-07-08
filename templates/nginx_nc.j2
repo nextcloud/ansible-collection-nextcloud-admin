@@ -36,6 +36,10 @@ server {
 {% endif %}
     ssl_certificate {{ nextcloud_tls_cert_file }};
     ssl_certificate_key {{ nextcloud_tls_cert_key_file }};
+
+    # Prevent nginx HTTP Server Detection
+    server_tokens off;
+
     ssl_session_timeout 1d;
     ssl_session_cache shared:SSL:{{ nextcloud_tls_session_cache_size }};
     # ssl_session_tickets off;
