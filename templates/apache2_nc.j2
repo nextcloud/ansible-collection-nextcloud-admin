@@ -54,10 +54,8 @@
   SSLCertificateChainFile {{ nextcloud_tls_cert_chain_file }}
 {% endif %}
 
-{% if (nextcloud_computed_major_version|int) > 13 %}
   # enable HTTP/2, if available
   Protocols h2 http/1.1
-{% endif %}
 
 {% if nextcloud_hsts is string %}
   <IfModule mod_headers.c>
