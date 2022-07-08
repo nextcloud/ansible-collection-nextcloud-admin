@@ -1,0 +1,19 @@
+## Source: https://github.com/marketplace/actions/ansible-lint
+
+name: Ansible Lint # feel free to pick your own name
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Important: This sets up your GITHUB_WORKSPACE environment variable
+      - uses: actions/checkout@v2
+
+      - name: Run ansible-lint
+        # replace `main` with any valid ref, or tags like `v6`
+        uses: ansible-community/ansible-lint-action@v6.2.1
+        # optional:
+        # with:
+        #   path: "playbooks/"  # <-- only one value is allowed
