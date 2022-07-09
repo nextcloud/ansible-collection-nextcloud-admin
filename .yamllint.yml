@@ -1,0 +1,24 @@
+---
+extends: default
+
+rules:
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+  comments:
+    level: warning
+    require-starting-space: true
+  line-length:
+    level: warning
+    max: 180
+  indentation:
+    spaces: 2
+    indent-sequences: consistent
+  document-start:
+    level: error
+  truthy:
+    level: error
+    allowed-values: ['true', 'false']
