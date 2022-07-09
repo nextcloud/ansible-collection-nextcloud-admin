@@ -23,6 +23,7 @@
       ansible.builtin.command: php occ app:enable "{{ nc_app_name }}"
       args:
         chdir: "{{ nextcloud_webroot }}"
+      when: nc_app_cfg is not none
   when: nc_app_cfg is string
 
 - name: "Install Apps"
@@ -50,18 +51,17 @@
       ansible.builtin.command: php occ app:enable "{{ nc_app_name }}"
       args:
         chdir: "{{ nextcloud_webroot }}"
+      when: nc_app_cfg.source is not none
 
-    - name: "Configure Apps"
-      block:
-        - name: "[ App {{ nc_app_name }} ] - Configure the application "
-          become_user: "{{ nextcloud_websrv_user }}"
-          become_flags: "{{ ansible_become_flags | default(omit) }}"
-          become: true
-          ansible.builtin.command: php occ config:app:set {{ nc_app_name }} {{ item_cfg.key }} --value="{{ item_cfg.value }}"
-          args:
-            chdir: "{{ nextcloud_webroot }}"
-          with_dict: "{{ nc_app_cfg.conf | default({}) }}"
-          loop_control:
-            loop_var: item_cfg
+    - name: "[ App {{ nc_app_name }} ] - Configure the application "
+      become_user: "{{ nextcloud_websrv_user }}"
+      become_flags: "{{ ansible_become_flags | default(omit) }}"
+      become: true
+      ansible.builtin.command: php occ config:app:set {{ nc_app_name }} {{ item_cfg.key }} --value="{{ item_cfg.value }}"
+      args:
+        chdir: "{{ nextcloud_webroot }}"
+      with_dict: "{{ nc_app_cfg.conf | default({}) }}"
+      loop_control:
+        loop_var: item_cfg
       when: nc_app_cfg.conf is defined
   when: (nc_app_cfg is mapping)

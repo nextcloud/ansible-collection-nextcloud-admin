@@ -113,3 +113,4 @@
   become_user: "{{ nextcloud_websrv_user }}"
   become: true
   become_flags: "{{ ansible_become_flags | default(omit) }}"
+  when: nextcloud_install_db

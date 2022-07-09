@@ -2,9 +2,9 @@
 # vars file for nextcloud
 nextcloud_dl_file_name:
   latest: "{{ ['latest', nextcloud_version_major]|reject('undefined')|join('-') }}"
-  releases: "{{ ['nextcloud', nextcloud_version_full]|reject('undefined')|join('-')}}"
+  releases: "{{ ['nextcloud', nextcloud_version_full]|reject('undefined')|join('-') }}"
   prereleases: "nextcloud-{{ [nextcloud_version_full, nextcloud_version_special]|reject('undefined')|join() }}"
-  daily: "nextcloud-{{ nextcloud_version_major|d('') }}-daily-{{nextcloud_version_special|d('') }}"
+  daily: "nextcloud-{{ nextcloud_version_major|d('') }}-daily-{{ nextcloud_version_special|d('') }}"
 
 mysql_credential_file:
   debian: '/etc/mysql/debian.cnf'
