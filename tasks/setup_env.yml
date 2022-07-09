@@ -46,7 +46,8 @@
   failed_when: false
   when: ansible_distribution == "Debian"
 
-- block:
+- name: "[ENV] - Checking su"
+  block:
     - name: "[ENV] - rolling back to su."
       ansible.builtin.set_fact:
         ansible_become_method: "su"

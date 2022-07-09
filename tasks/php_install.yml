@@ -45,17 +45,3 @@
     name: "{{ php_pkg_apcu }}"
     state: present
   when: ansible_distribution_release not in [ "trusty" ]
-
-- block:
-  # load APCu from backports as the default version for trusty is obsolete.
-    - name: "[INSTALL] -  Configure trusty backports."
-      ansible.builtin.apt_repository:
-        repo: "deb http://fr.archive.ubuntu.com/ubuntu/ trusty-backports main restricted universe multiverse"
-        state: present
-        update_cache: true
-    - name: "[INSTALL] -  Install APCu from backports."
-      ansible.builtin.package:
-        name: "{{ php_pkg_apcu }}"
-        state: present
-        default_release: trusty-backports
-  when: ansible_distribution_release == "trusty"

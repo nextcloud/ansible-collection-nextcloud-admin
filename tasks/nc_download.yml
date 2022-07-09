@@ -31,21 +31,22 @@
     owner: "{{ nextcloud_websrv_user }}"
     group: "{{ nextcloud_websrv_group }}"
 
-- block:
-  - name: "Download & extract Nextcloud to /tmp."
-    ansible.builtin.unarchive:
-      copy: false
-      src: "{{ nextcloud_full_url | default(nextcloud_calculated_url) }}"
-      dest: "/tmp/"
-    vars:
-      nextcloud_calculated_url: "{{ nextcloud_repository }}/{{ nextcloud_version_channel }}/{{ nextcloud_calculated_file }}"
-      nextcloud_calculated_file: "{{ [nextcloud_dl_file_name[just_a_dict_key], nextcloud_archive_format]|join('.') }}"
-      just_a_dict_key: "{{ 'latest' if ((nextcloud_get_latest|bool) and (nextcloud_version_channel != 'prereleases')) else nextcloud_version_channel }}"
+- name: "Download and extract Nextcloud"
+  block:
+    - name: "Download & extract Nextcloud to /tmp."
+      ansible.builtin.unarchive:
+        copy: false
+        src: "{{ nextcloud_full_url | default(nextcloud_calculated_url) }}"
+        dest: "/tmp/"
+      vars:
+        nextcloud_calculated_url: "{{ nextcloud_repository }}/{{ nextcloud_version_channel }}/{{ nextcloud_calculated_file }}"
+        nextcloud_calculated_file: "{{ [nextcloud_dl_file_name[just_a_dict_key], nextcloud_archive_format]|join('.') }}"
+        just_a_dict_key: "{{ 'latest' if ((nextcloud_get_latest|bool) and (nextcloud_version_channel != 'prereleases')) else nextcloud_version_channel }}"
 
-  - name: "[NC-DL] - Move extracted files to {{ nextcloud_webroot }}."
-    ansible.builtin.command: "cp -r /tmp/nextcloud/. {{ nextcloud_webroot }}/"
+    - name: "[NC-DL] - Move extracted files to {{ nextcloud_webroot }}."
+      ansible.builtin.command: "cp -r /tmp/nextcloud/. {{ nextcloud_webroot }}/"
 
-  - name: "[NC-DL] - Remove nextcloud archive files"
-    ansible.builtin.file:
-      path: /tmp/nextcloud
-      state: absent
+    - name: "[NC-DL] - Remove nextcloud archive files"
+      ansible.builtin.file:
+        path: /tmp/nextcloud
+        state: absent

@@ -17,7 +17,8 @@
         name: ca-certificates
         state: present
 
-    - block:
+    - name: Configure databases
+      block:
         - name: Remove default travis databases
           ansible.builtin.package:
             name:

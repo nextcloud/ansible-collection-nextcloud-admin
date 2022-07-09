@@ -50,6 +50,7 @@
   ansible.builtin.template:
     dest: /etc/apache2/sites-available/nc_{{ nextcloud_instance_name }}.conf
     src: "{{ nextcloud_websrv_template }}"
+    mode: 0640
   notify: reload http
 
 - name: "[APACHE] -  Enable Nextcloud site in apache conf"

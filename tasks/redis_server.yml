@@ -12,4 +12,5 @@
   ansible.builtin.template:
     dest: /etc/redis/redis.conf
     src: templates/redis.conf.j2
+    mode: 0640
   notify: restart redis

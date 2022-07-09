@@ -8,7 +8,7 @@
   notify: reload php-fpm
 
 - name: "[NGINX] -  Add path variable to php-fpm"
-  blockinfile:
+  ansible.builtin.blockinfile:
     dest: "{{ php_dir }}/fpm/pool.d/www.conf"
     insertafter: '^; Default Value: clean env$'
     marker: "; {mark} ANSIBLE MANAGED BLOCK"
@@ -58,6 +58,7 @@
   ansible.builtin.template:
     dest: /etc/nginx/sites-available/php_handler.cnf
     src: templates/nginx_php_handler.j2
+    mode: 0640
   notify: reload http
 
 - name: "[NGINX] -  php handler is enabled"
@@ -71,6 +72,7 @@
   ansible.builtin.template:
     dest: /etc/nginx/sites-available/nc_{{ nextcloud_instance_name }}.cnf
     src: "{{ nextcloud_websrv_template }}"
+    mode: 0640
   notify: reload http
 
 - name: "[NGINX] -  Enable Nextcloud in nginx conf"

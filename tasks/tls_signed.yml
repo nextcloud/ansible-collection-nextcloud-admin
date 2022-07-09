@@ -10,11 +10,13 @@
   ansible.builtin.copy:
     dest: "{{ nextcloud_tls_cert_file }}"
     src: "{{ nextcloud_tls_src_cert }}"
+    mode: 0640
 
 - name: "[SIGNED TLS] - Key is on the host"
   ansible.builtin.copy:
     dest: "{{ nextcloud_tls_cert_key_file }}"
     src: "{{ nextcloud_tls_src_cert_key }}"
+    mode: 0640
 
 - name: "[SIGNED TLS] - check TLS certificate permissions"
   ansible.builtin.file:

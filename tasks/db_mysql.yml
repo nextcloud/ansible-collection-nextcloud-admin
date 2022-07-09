@@ -25,6 +25,7 @@
     section: client
     option: password
     value: "{{ nextcloud_mysql_root_pwd }}"
+    mode: 0640
   no_log: true
   when: mysql_credential_file[(ansible_os_family|lower)] is defined
 
@@ -63,6 +64,7 @@
   ansible.builtin.ansible.builtin.copy:
     dest: /etc/mysql/conf.d/nextcloud.cnf
     src: files/mysql_nextcloud.cnf
+    mode: 0640
   notify: restart mysql
 
 - name: "[mySQL] - Generate database user Password."

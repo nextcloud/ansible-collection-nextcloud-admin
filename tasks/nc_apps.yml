@@ -4,60 +4,64 @@
     nc_app_name: "{{ item.key }}"
     nc_app_cfg: "{{ item.value }}"
 
-- block:
-  - name: "[ App {{ nc_app_name }} ] - Download Archive in apps folder."
-    ansible.builtin.unarchive:
-      copy: false
-      src: "{{ nc_app_cfg }}"
-      dest: "{{ nextcloud_webroot }}/apps/"
-      owner: "{{ nextcloud_websrv_user }}"
-      group: "{{ nextcloud_websrv_group }}"
-      creates: "{{ nextcloud_webroot }}/apps/{{ nc_app_name }}"
-    when: nc_app_cfg is not none
+- name: "Install and enable Nextcloud Apps"
+  block:
+    - name: "[ App {{ nc_app_name }} ] - Download Archive in apps folder."
+      ansible.builtin.unarchive:
+        copy: false
+        src: "{{ nc_app_cfg }}"
+        dest: "{{ nextcloud_webroot }}/apps/"
+        owner: "{{ nextcloud_websrv_user }}"
+        group: "{{ nextcloud_websrv_group }}"
+        creates: "{{ nextcloud_webroot }}/apps/{{ nc_app_name }}"
+      when: nc_app_cfg is not none
 
-  - name: "[ App {{ nc_app_name }} ] - enable the application."
-    become_user: "{{ nextcloud_websrv_user }}"
-    become_flags: "{{ ansible_become_flags | default(omit) }}"
-    become: true
-    ansible.builtin.command: php occ app:enable "{{ nc_app_name }}"
-    args:
-      chdir: "{{ nextcloud_webroot }}"
-  when: nc_app_cfg is string
-
-- block:
-  - name: verify the app's yaml declaration
-    ansible.builtin.assert:
-      that:
-        - (nc_app_cfg.source is defined) and (nc_app_cfg.source is string)
-      msg: "{{ nc_app_name }} is not well declared."
-
-  - name: "[ App {{ nc_app_name }} ] - Download Archive in apps folder."
-    ansible.builtin.unarchive:
-      copy: false
-      src: "{{ nc_app_cfg.source }}"
-      dest: "{{ nextcloud_webroot }}/apps/"
-      owner: "{{ nextcloud_websrv_user }}"
-      group: "{{ nextcloud_websrv_group }}"
-      creates: "{{ nextcloud_webroot }}/apps/{{ nc_app_name }}"
-    when: nc_app_cfg.source is not none
-
-  - name: "[ App {{ nc_app_name }} ] - enable the application."
-    become_user: "{{ nextcloud_websrv_user }}"
-    become_flags: "{{ ansible_become_flags | default(omit) }}"
-    become: true
-    ansible.builtin.command: php occ app:enable "{{ nc_app_name }}"
-    args:
-      chdir: "{{ nextcloud_webroot }}"
-  - block:
-    - name: "[ App {{ nc_app_name }} ] - Configure the application "
+    - name: "[ App {{ nc_app_name }} ] - enable the application."
       become_user: "{{ nextcloud_websrv_user }}"
       become_flags: "{{ ansible_become_flags | default(omit) }}"
       become: true
-      ansible.builtin.command: php occ config:app:set {{ nc_app_name }} {{ item_cfg.key }} --value="{{ item_cfg.value }}"
+      ansible.builtin.command: php occ app:enable "{{ nc_app_name }}"
       args:
         chdir: "{{ nextcloud_webroot }}"
-      with_dict: "{{ nc_app_cfg.conf | default({}) }}"
-      loop_control:
-        loop_var: item_cfg
-    when: nc_app_cfg.conf is defined
+  when: nc_app_cfg is string
+
+- name: "Install Apps"
+  block:
+    - name: verify the app's yaml declaration
+      ansible.builtin.assert:
+        that:
+          - (nc_app_cfg.source is defined) and (nc_app_cfg.source is string)
+        msg: "{{ nc_app_name }} is not well declared."
+
+    - name: "[ App {{ nc_app_name }} ] - Download Archive in apps folder."
+      ansible.builtin.unarchive:
+        copy: false
+        src: "{{ nc_app_cfg.source }}"
+        dest: "{{ nextcloud_webroot }}/apps/"
+        owner: "{{ nextcloud_websrv_user }}"
+        group: "{{ nextcloud_websrv_group }}"
+        creates: "{{ nextcloud_webroot }}/apps/{{ nc_app_name }}"
+      when: nc_app_cfg.source is not none
+
+    - name: "[ App {{ nc_app_name }} ] - enable the application."
+      become_user: "{{ nextcloud_websrv_user }}"
+      become_flags: "{{ ansible_become_flags | default(omit) }}"
+      become: true
+      ansible.builtin.command: php occ app:enable "{{ nc_app_name }}"
+      args:
+        chdir: "{{ nextcloud_webroot }}"
+
+    - name: "Configure Apps"
+      block:
+        - name: "[ App {{ nc_app_name }} ] - Configure the application "
+          become_user: "{{ nextcloud_websrv_user }}"
+          become_flags: "{{ ansible_become_flags | default(omit) }}"
+          become: true
+          ansible.builtin.command: php occ config:app:set {{ nc_app_name }} {{ item_cfg.key }} --value="{{ item_cfg.value }}"
+          args:
+            chdir: "{{ nextcloud_webroot }}"
+          with_dict: "{{ nc_app_cfg.conf | default({}) }}"
+          loop_control:
+            loop_var: item_cfg
+      when: nc_app_cfg.conf is defined
   when: (nc_app_cfg is mapping)

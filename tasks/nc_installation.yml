@@ -27,53 +27,53 @@
     owner: "{{ nextcloud_websrv_user }}"
     group: "{{ nextcloud_websrv_group }}"
 
-- block:
-  - name: "[NC] - removing possibly old or incomplete config.php"
-    ansible.builtin.file:
-      path: "{{ nextcloud_webroot }}/config/config.php"
-      state: absent
+- name: "[NC] - Configuration"
+  block:
+    - name: "[NC] - removing possibly old or incomplete config.php"
+      ansible.builtin.file:
+        path: "{{ nextcloud_webroot }}/config/config.php"
+        state: absent
 
-  - name: "[NC] - Run occ installation command"
-    become_user: "{{ nextcloud_websrv_user }}"
-    become_flags: "{{ ansible_become_flags | default(omit) }}"
-    become: true
-    ansible.builtin.command: >
-        php occ maintenance:install
-        --database={{ nextcloud_tmp_backend }}
-        --database-host={{ nextcloud_db_host }}
-        --database-name={{ nextcloud_db_name }}
-        --database-user={{ nextcloud_db_admin }}
-        --database-pass={{ nextcloud_db_pwd }}
-        --admin-user={{ nextcloud_admin_name }}
-        --admin-pass={{ nextcloud_admin_pwd }}
-        --data-dir={{ nextcloud_data_dir }}
-    args:
-      chdir: "{{ nextcloud_webroot }}"
-      creates: "{{ nextcloud_webroot }}/config/config.php"
-    vars:
-      # mariadb is equal to mysql for occ
-      nextcloud_tmp_backend: "{{ 'mysql' if nextcloud_db_backend == 'mariadb' else nextcloud_db_backend }}"
-    notify: reload http
+    - name: "[NC] - Run occ installation command"
+      become_user: "{{ nextcloud_websrv_user }}"
+      become_flags: "{{ ansible_become_flags | default(omit) }}"
+      become: true
+      ansible.builtin.command: >
+          php occ maintenance:install
+          --database={{ nextcloud_tmp_backend }}
+          --database-host={{ nextcloud_db_host }}
+          --database-name={{ nextcloud_db_name }}
+          --database-user={{ nextcloud_db_admin }}
+          --database-pass={{ nextcloud_db_pwd }}
+          --admin-user={{ nextcloud_admin_name }}
+          --admin-pass={{ nextcloud_admin_pwd }}
+          --data-dir={{ nextcloud_data_dir }}
+      args:
+        chdir: "{{ nextcloud_webroot }}"
+        creates: "{{ nextcloud_webroot }}/config/config.php"
+      vars:
+        # mariadb is equal to mysql for occ
+        nextcloud_tmp_backend: "{{ 'mysql' if nextcloud_db_backend == 'mariadb' else nextcloud_db_backend }}"
+      notify: reload http
 
-  - name: "[NC] - Verify config.php - check filesize"
-    ansible.builtin.stat:
-      path: "{{ nextcloud_webroot }}/config/config.php"
-    register: nc_installation_confsize
-    failed_when: nc_installation_confsize.stat.size is undefined or nc_installation_confsize.stat.size <= 100
+    - name: "[NC] - Verify config.php - check filesize"
+      ansible.builtin.stat:
+        path: "{{ nextcloud_webroot }}/config/config.php"
+      register: nc_installation_confsize
+      failed_when: nc_installation_confsize.stat.size is undefined or nc_installation_confsize.stat.size <= 100
 
-  - name: "[NC] - Verify config.php - php syntax check"
-    ansible.builtin.command: "php -l {{ nextcloud_webroot }}/config/config.php"
-    register: nc_installation_confphp
-    changed_when: false
-    failed_when:
-      - nc_installation_confphp.rc is defined
-      - nc_installation_confphp.rc != 0
+    - name: "[NC] - Verify config.php - php syntax check"
+      ansible.builtin.command: "php -l {{ nextcloud_webroot }}/config/config.php"
+      register: nc_installation_confphp
+      changed_when: false
+      failed_when:
+        - nc_installation_confphp.rc is defined
+        - nc_installation_confphp.rc != 0
 
   rescue:
     # - name: Unfix su issue with occ
     #   include_tasks: tasks/unfix_su.yml
     #   when: ansible_become_method == "su"
-
     - name: "[NC] - removing config.php when occ fail"
       ansible.builtin.file:
         path: "{{ nextcloud_webroot }}/config/config.php"
@@ -144,6 +144,7 @@
   ansible.builtin.copy:
     dest: "{{ nextcloud_webroot }}/config/mimetypemapping.json"
     src: files/nextcloud_custom_mimetypemapping.json
+    mode: 0640
 
 - name: "[NC] - Ensure Nextcloud directories are 0750"
   ansible.builtin.command: find {{ nextcloud_data_dir }} -type d -exec chmod -c 0750 {} \;
