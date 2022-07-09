@@ -2,7 +2,7 @@
 ## Source: https://github.com/marketplace/actions/yaml-lint
 
 name: Yaml Lint
-on: [push, pull_request] # yamllint disable-line rule:truthy
+on: [push, pull_request]  # yamllint disable-line rule:truthy
 
 jobs:
   yaml-lint:
