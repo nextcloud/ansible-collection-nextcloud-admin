@@ -2,7 +2,9 @@
 ## Source: https://github.com/marketplace/actions/yaml-lint
 
 name: Yaml Lint
-on: [push, pull_request]
+on: 
+  - push
+  - pull_request
 
 jobs:
   yaml-lint:

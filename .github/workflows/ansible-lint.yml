@@ -2,7 +2,9 @@
 ## Source: https://github.com/marketplace/actions/ansible-lint
 
 name: Ansible Lint
-on: [push, pull_request]
+on: 
+  - push
+  - pull_request
 
 jobs:
   ansible-lint:
