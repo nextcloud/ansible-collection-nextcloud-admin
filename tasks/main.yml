@@ -48,7 +48,8 @@
   when: nextcloud_install_db
 
 - name: Check Nextcloud installed
-  stat: "path={{ nextcloud_webroot }}/index.php"
+  ansible.builtin.stat:
+    path: "{{ nextcloud_webroot }}/index.php"
   register: nc_nextcloud_installed
 
 - name: Downloading Nextcloud
@@ -56,13 +57,14 @@
   when: not nc_nextcloud_installed.stat.exists
 
 - name: Check Nextcloud configuration exists.
-  stat: path="{{ nextcloud_webroot }}/config/config.php"
+  ansible.builtin.stat:
+    path: "{{ nextcloud_webroot }}/config/config.php"
   register: nc_nextcloud_conf
 
 - name: Check Nextcloud is configured
-  command: grep -q "{{ nextcloud_trusted_domain| first }}" {{ nextcloud_webroot }}/config/config.php
-  failed_when: False
-  changed_when: False
+  ansible.builtin.command: grep -q "{{ nextcloud_trusted_domain| first }}" {{ nextcloud_webroot }}/config/config.php
+  failed_when: false
+  changed_when: false
   register: nc_nextcloud_configured
   when: nc_nextcloud_conf.stat.exists
 
@@ -74,18 +76,19 @@
 
 - block:
   - name: "[NC apps] - lists the number of apps available in the instance."
-    command: php occ app:list --output=json_pretty --no-warnings
+    ansible.builtin.command: php occ app:list --output=json_pretty --no-warnings
     args:
       chdir: "{{ nextcloud_webroot }}"
     become_user: "{{ nextcloud_websrv_user }}"
-    become: yes
+    become: true
     become_flags: "{{ ansible_become_flags | default(omit) }}"
     changed_when: false
     check_mode: false
     register: nc_apps_list
 
   - name: "[NC apps] - convert list to yaml."
-    set_fact: nc_available_apps="{{ nc_apps_list.stdout | from_json }}"
+    ansible.builtin.set_fact:
+      nc_available_apps: "{{ nc_apps_list.stdout | from_json }}"
 
   - name: "[NC apps] - installation."
     include_tasks: ./nc_apps.yml
@@ -100,9 +103,9 @@
   tags: install_apps
 
 - name: Add indices
-  command: php occ db:add-missing-indices
-  args: 
+  ansible.builtin.command: php occ db:add-missing-indices
+  args:
     chdir: "{{ nextcloud_webroot }}"
   become_user: "{{ nextcloud_websrv_user }}"
-  become: yes
+  become: true
   become_flags: "{{ ansible_become_flags | default(omit) }}"

@@ -1,10 +1,10 @@
 ---
 # vars file for nextcloud
 nextcloud_dl_file_name:
-  latest: "{{['latest', nextcloud_version_major]|reject('undefined')|join('-')}}"
-  releases: "{{['nextcloud', nextcloud_version_full]|reject('undefined')|join('-')}}"
-  prereleases: "nextcloud-{{[nextcloud_version_full, nextcloud_version_special]|reject('undefined')|join()}}"
-  daily: "nextcloud-{{nextcloud_version_major|d('')}}-daily-{{nextcloud_version_special|d('')}}"
+  latest: "{{ ['latest', nextcloud_version_major]|reject('undefined')|join('-') }}"
+  releases: "{{ ['nextcloud', nextcloud_version_full]|reject('undefined')|join('-')}}"
+  prereleases: "nextcloud-{{ [nextcloud_version_full, nextcloud_version_special]|reject('undefined')|join() }}"
+  daily: "nextcloud-{{ nextcloud_version_major|d('') }}-daily-{{nextcloud_version_special|d('') }}"
 
 mysql_credential_file:
   debian: '/etc/mysql/debian.cnf'
@@ -29,7 +29,7 @@ nextcloud_max_upload_size_in_bytes: "{{ nextcloud_max_upload_size | human_to_byt
 #   or nextcloud_get_latest is true which is the equivalent for us of using "master"
 nextcloud_computed_major_version: > # type string
   {%- if nextcloud_version_major is defined and nextcloud_version_channel not in ['prereleases'] -%}
-  {{99 if nextcloud_version_major == 'master' else (nextcloud_version_major|regex_replace('stable')) }}
+  {{ 99 if nextcloud_version_major == 'master' else (nextcloud_version_major|regex_replace('stable')) }}
   {%- elif nextcloud_version_full is defined -%}
   {{ (nextcloud_version_full.split('.'))[0] }}
   {%- else -%}99{%- endif -%}

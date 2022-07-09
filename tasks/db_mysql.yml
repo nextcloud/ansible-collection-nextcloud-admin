@@ -1,12 +1,12 @@
 ---
 - name: "[mySQL: Debian] - Service is installed."
-  package:
+  ansible.builtin.package:
     name: "{{ 'default-' if ((ansible_distribution|lower) == 'debian' and nextcloud_db_backend == 'mysql') else '' }}{{ nextcloud_db_backend }}-server"
     state: present
   register: nc_mysql_db_install
 
 - name: "[mySQL] - Packages are installed."
-  package:
+  ansible.builtin.package:
     name: "{{ nc_mysql_deps }}"
     state: present
   vars:
@@ -15,7 +15,7 @@
       - "python{{ '3' if ansible_python.version.major == 3 else '' }}-pymysql"
 
 - name: "[mySQL] - generate {{ nextcloud_db_backend }} root Password:"
-  set_fact:
+  ansible.builtin.set_fact:
     nextcloud_mysql_root_pwd: "{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/mysql_root.pwd' ) }}"
   when: nextcloud_mysql_root_pwd is not defined
 
@@ -35,10 +35,10 @@
 
     password: "{{ nextcloud_mysql_root_pwd }}"
     config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
-    check_implicit_admin: yes
+    check_implicit_admin: true
     priv: "*.*:ALL,GRANT"
     # Assuming the root user has only localhost access
-    host_all: yes
+    host_all: true
 
 
 - name: "[mySQL] - Delete the anonymous user."
@@ -48,7 +48,7 @@
     login_user: root
     login_password: "{{ nextcloud_mysql_root_pwd }}"
     config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: "[mySQL] - Removes the MySQL test database"
   mysql_db:
@@ -57,16 +57,16 @@
     login_user: root
     login_password: "{{ nextcloud_mysql_root_pwd }}"
     config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: "[mySQL] - Set mysql config option for nextcloud"
-  copy:
+  ansible.builtin.ansible.builtin.copy:
     dest: /etc/mysql/conf.d/nextcloud.cnf
     src: files/mysql_nextcloud.cnf
   notify: restart mysql
 
 - name: "[mySQL] - Generate database user Password."
-  set_fact:
+  ansible.builtin.set_fact:
     nextcloud_db_pwd: "{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/db_admin.pwd' ) }}"
   when: nextcloud_db_pwd is not defined
 

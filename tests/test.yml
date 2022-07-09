@@ -6,32 +6,32 @@
 
   pre_tasks:
     - name: Update apt cache.
-      apt: update_cache=yes cache_valid_time=600
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 600
       when: ansible_os_family == 'Debian'
       changed_when: false
 
     - name: update ca-certs
-      apt:
+      ansible.builtin.apt:
         name: ca-certificates
         state: present
 
-    - block: 
-      - name: Remove default travis databases
-        package:
-          name:
-            - postgresql*
-            - mysql*
-          state: absent
-
-      - name: pre-install the db backend
-        package:
-          name: "postgresql"
-          state: present
-
-      - name: pre-activate the db backend
-        service:
-          name: "postgresql"
-          state: started
+    - block:
+        - name: Remove default travis databases
+          ansible.builtin.package:
+            name:
+              - postgresql*
+              - mysql*
+            state: absent
+        - name: pre-install the db backend
+          ansible.builtin.package:
+            name: "postgresql"
+            state: present
+        - name: pre-activate the db backend
+          service:
+            name: "postgresql"
+            state: started
       when: nextcloud_db_backend == 'pgsql'
 
   vars:
@@ -42,5 +42,5 @@
       - localhost
       - 127.0.0.1
     #  nextcloud_apps:
-    #    files_external: "" #enable files_external which is already installed in nextcloud
+    #    files_external: "" # enable files_external which is already installed in nextcloud
     #    calendar: "https://github.com/nextcloud/calendar/releases/download/v1.5.0/calendar.tar.gz" # download and install calendar app

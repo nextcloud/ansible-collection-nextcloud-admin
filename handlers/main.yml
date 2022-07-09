@@ -1,41 +1,41 @@
 ---
 # handlers file for nextcloud
 - name: restart mysql
-  service:
+  ansible.builtin.service:
     name: mysql
     state: restarted
 
 - name: start http
-  service:
+  ansible.builtin.service:
     name: "{{ nextcloud_websrv }}"
     state: started
 
 - name: restart http
-  service:
+  ansible.builtin.service:
     name: "{{ nextcloud_websrv }}"
     state: restarted
 
 - name: reload http
-  service:
+  ansible.builtin.service:
     name: "{{ nextcloud_websrv }}"
     state: reloaded
 
 - name: start php-fpm
-  service:
+  ansible.builtin.service:
     name: php{{ php_ver }}-fpm
     state: started
 
 - name: reload php-fpm
-  service:
+  ansible.builtin.service:
     name: php{{ php_ver }}-fpm
     state: reloaded
 
 - name: start redis
-  service:
+  ansible.builtin.service:
     name: redis-server
     state: started
 
 - name: restart redis
-  service:
+  ansible.builtin.service:
     name: redis-server
     state: restarted

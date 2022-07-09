@@ -15,7 +15,7 @@ nextcloud_get_latest: true # mandatory # specify if the latest archive should be
 # nextcloud_version_special: "" #  For prereleases: "RCn|beta" | for daily "YYYY-MM-DD"
 nextcloud_repository: "https://download.nextcloud.com/server" # Domain URL where to download Nextcloud.
 nextcloud_archive_format: "zip" # zip | tar.bz2
-# nextcloud_full_url: "https://download.nextcloud.com/server/releases/nextcloud-23.0.0.zip" # specify directly a full URL to the archive if you don't like rules.
+# nextcloud_full_url: "https://download.nextcloud.com/server/releases/nextcloud-23.0.0.zip" # specify directly a full URL to the archive
 
 
 # [CONFIG]
@@ -32,7 +32,7 @@ nextcloud_instance_name: "{{ nextcloud_trusted_domain | first }}"
 nextcloud_install_websrv: true
 nextcloud_websrv: "apache2" # "apache2" | "nginx"
 nextcloud_disable_websrv_default_site: false
-nextcloud_websrv_template: "templates/{{nextcloud_websrv}}_nc.j2"
+nextcloud_websrv_template: "templates/{{ nextcloud_websrv }}_nc.j2"
 nextcloud_webroot: "/opt/nextcloud"
 nextcloud_data_dir: "/var/ncdata"
 nextcloud_admin_name: "admin"
@@ -47,7 +47,7 @@ nextcloud_redis_settings:
   - { name: 'redis port', value: "{{ nextcloud_redis_port }}" }
   - { name: 'memcache.locking', value: '\OC\Memcache\Redis' }
 
-nextcloud_background_cron: True
+nextcloud_background_cron: true
 
 ## Custom nextcloud settings
 ## https://docs.nextcloud.com/server/12/admin_manual/configuration_server/config_sample_php_parameters.html
@@ -87,7 +87,7 @@ nextcloud_tls_session_cache_size: 50m # in Byte or human readable size notation 
 nextcloud_apps: {}
 
 # [SYSTEM]
-#nextcloud_mysql_root_pwd: "secret"
+# nextcloud_mysql_root_pwd: "secret"
 
 php_custom: false
 php_memory_limit: 512M

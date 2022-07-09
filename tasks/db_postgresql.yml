@@ -1,6 +1,6 @@
 ---
 - name: "[PostgreSQL] - PostgreSQL packages are installed"
-  package:
+  ansible.builtin.package:
     name: "{{ pg_deps }}"
     state: "present"
   vars:
@@ -10,18 +10,19 @@
       - "python{{ '3' if ansible_python.version.major == 3 else '' }}-psycopg2"
 
 - name: "[PostgreSQL] - generate nextcloud role password."
-  set_fact: nextcloud_db_pwd="{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/pgsql_nc.pwd' ) }}"
+  ansible.builtin.set_fact:
+    nextcloud_db_pwd: "{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/pgsql_nc.pwd' ) }}"
   when: nextcloud_db_pwd is not defined
 
 - name: "[PostgreSQL] - nextcloud role is created."
   postgresql_user:
     name: "{{ nextcloud_db_admin }}"
     password: "{{ nextcloud_db_pwd }}"
-    encrypted: yes
+    encrypted: true
     state: present
     role_attr_flags: CREATEDB
   become_user: postgres
-  become: yes
+  become: true
 
 - name: "[PostgreSQL] - nextcloud database is created."
   postgresql_db:
@@ -29,4 +30,4 @@
     state: present
     owner: "{{ nextcloud_db_admin }}"
   become_user: postgres
-  become: yes
+  become: true

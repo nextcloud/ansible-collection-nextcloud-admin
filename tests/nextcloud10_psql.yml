@@ -4,12 +4,14 @@
 
   pre_tasks:
     - name: Update apt cache.
-      apt: update_cache=yes cache_valid_time=600
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 600
       when: ansible_os_family == 'Debian'
       changed_when: false
 
     - name: Install required testing packages
-      package:
+      ansible.builtin.package:
         name: "{{ item }}"
         state: present
       with_items:
@@ -19,8 +21,8 @@
     - ansible-nextcloud
 
   vars:
-     nextcloud_db_backend: "pgsql"
-     nextcloud_version_major: 10
-     nextcloud_apps:
-       files_external: "" #enable files_external which is already installed in nextcloud
-       calendar: "https://github.com/nextcloud/calendar/releases/download/v1.5.0/calendar.tar.gz" # download and install calendar app
+    nextcloud_db_backend: "pgsql"
+    nextcloud_version_major: 10
+    nextcloud_apps:
+      files_external: "" # enable files_external which is already installed in nextcloud
+      calendar: "https://github.com/nextcloud/calendar/releases/download/v1.5.0/calendar.tar.gz" # download and install calendar app

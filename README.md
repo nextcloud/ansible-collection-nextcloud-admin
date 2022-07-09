@@ -28,12 +28,12 @@ $ pip install netaddr
 ### Setup module:
 The role uses facts gathered by Ansible on the remote host. If you disable the Setup module in your playbook, the role will not work properly.
 ### Root access
-This role requires root access, so either configure it in your inventory files, run it in a playbook with a global `become: yes` or invoke the role in your playbook like:
+This role requires root access, so either configure it in your inventory files, run it in a playbook with a global `become: true` or invoke the role in your playbook like:
 > playbook.yml:
 
 ```YAML
 - hosts: dnsserver
-  become: yes
+  become: true
   roles:
     - role: aalaesar.install_nextcloud
 ```
@@ -233,7 +233,7 @@ Settings to use redis server with Nextcloud
 
 ### Nextcloud Background Jobs
 ```YAML
-nextcloud_background_cron: True
+nextcloud_background_cron: true
 ```
 Set operating system cron for executing Nextcloud regular tasks. This method enables the execution of scheduled jobs without the inherent limitations the Web server might have.
 
@@ -512,7 +512,7 @@ He can run the role with the following variables to install Nextcloud accordingl
      nextcloud_tls_cert_key: "/etc/nginx/certs/nextcloud.key"
      nextcloud_mysql_root_pwd: "42h2g2"
      nextcloud_apps:
-       files_external: "" #enable files_external which is already installed in nextcloud
+       files_external: "" # enable files_external which is already installed in nextcloud
        calendar: "https://github.com/nextcloud/calendar/releases/download/v1.5.0/calendar.tar.gz"
        contacts: "https://github.com/nextcloud/contacts/releases/download/v1.5.3/contacts.tar.gz"
        richdocuments-1.1.25: # the app name is equal to the extracted folder name from the archive
