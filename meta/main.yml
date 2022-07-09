@@ -1,3 +1,4 @@
+---
 galaxy_info:
   author: Aalaesar
   description: Add a new Nextcloud instance in your infrastructure. The role manages dependencies and initial configuration.
