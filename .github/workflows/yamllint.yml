@@ -13,3 +13,4 @@ jobs:
         uses: ibiqlik/action-yamllint@v3.1.0
         with:
           config_file: .yamllint.yml
+          format: github
