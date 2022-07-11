@@ -1,6 +1,9 @@
 [![Build Status](https://travis-ci.org/aalaesar/install_nextcloud.svg?branch=master)](https://travis-ci.org/aalaesar/install_nextcloud)
 [![pipeline status](https://gitlab.ninux.org/hispanico/ansible-nextcloud/badges/master/pipeline.svg)](https://gitlab.ninux.org/hispanico/ansible-nextcloud/pipelines?scope=branches)
 
+[![Ansible-lint status](https://github.com/aalaesar/install_nextcloud/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/aalaesar/install_nextcloud/actions?workflow=Ansible%20Lint)
+[![YAML-lint status](https://github.com/aalaesar/install_nextcloud/actions/workflows/yamllint.yml/badge.svg)](https://github.com/aalaesar/install_nextcloud/actions?workflow=Yaml%20Lint)
+
 # install_nextcloud
 
 This role installs and configures an Nextcloud instance for a Debian/Ubuntu server.
