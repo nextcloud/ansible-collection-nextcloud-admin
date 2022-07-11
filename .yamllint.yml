@@ -20,8 +20,9 @@ rules:
   # trailing-spaces: disable
   # truthy: disable
 
-  ## Additional rules warnings
+  ## Additional rules with warnings
   document-start: {level: warning}
   indentation: {level: warning, spaces: 2, indent-sequences: consistent}
   line-length: {level: warning, max: 180}
+  trailing-spaces: {level: warning}
   truthy: { level: warning, allowed-values: ['true', 'false']}
