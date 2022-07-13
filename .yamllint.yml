@@ -25,4 +25,5 @@ rules:
   indentation: {level: warning, spaces: 2, indent-sequences: consistent}
   line-length: {level: warning, max: 180}
   trailing-spaces: {level: warning}
-  truthy: { level: warning, allowed-values: ['true', 'false']}
+  truthy: { level: warning, allowed-values: ['true', 'false'] }
+  
