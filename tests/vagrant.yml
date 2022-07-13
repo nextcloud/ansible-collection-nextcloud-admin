@@ -6,7 +6,7 @@
     - ubuntu-xenial
     - ubuntu-bionic
     - centos7
-  become: True
+  become: true
   remote_user: root
 
   vars:
@@ -17,7 +17,7 @@
     nextcloud_db_backend: "mysql"
     nextcloud_install_redis_server: true
     nextcloud_apps:
-       files_external: ""
+      files_external: ""
 
   roles:
     - ../../aalaesar.install_nextcloud
