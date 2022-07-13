@@ -42,7 +42,7 @@
     host_all: true
 
 
-- name: "[mySQL] - Delete the anonymous user."
+- name: "[mySQL] - Delete the anonymous user."  # noqa ignore-errors
   mysql_user:
     user: ""
     state: "absent"
@@ -51,7 +51,7 @@
     config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
   ignore_errors: true
 
-- name: "[mySQL] - Removes the MySQL test database"
+- name: "[mySQL] - Removes the MySQL test database"  # noqa ignore-errors
   mysql_db:
     name: test
     state: absent
