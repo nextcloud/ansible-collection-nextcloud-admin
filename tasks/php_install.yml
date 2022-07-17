@@ -1,6 +1,6 @@
 ---
 - name: "[INSTALL] -  Required and recommended packages are installed."
-  package:
+  ansible.builtin.package:
     name: "{{ item }}"
     state: present
   with_items:
@@ -17,7 +17,7 @@
     - start http
 
 - name: "[INSTALL] -  Apache Required package is installed."
-  package:
+  ansible.builtin.package:
     name: "libapache2-mod-php{{ php_ver }}"
     state: present
   when: nextcloud_websrv == "apache2"
@@ -25,7 +25,7 @@
     - start http
 
 - name: "[INSTALL] -  NGINX Required package is installed."
-  package:
+  ansible.builtin.package:
     name: "php{{ php_ver }}-fpm"
     state: present
   when: nextcloud_websrv == "nginx"
@@ -34,13 +34,13 @@
     - start php-fpm
 
 - name: "[INSTALL] -  PHP extra Packages are installed."
-  package:
+  ansible.builtin.package:
     name: "{{ item }}"
     state: present
   with_items:
     - "{{ php_pkg_spe }}"
 
 - name: "[INSTALL] -  APCu is installed."
-  package:
+  ansible.builtin.package:
     name: "{{ php_pkg_apcu }}"
     state: present

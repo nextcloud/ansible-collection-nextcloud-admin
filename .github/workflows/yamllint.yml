@@ -1,0 +1,16 @@
+---
+## Source: https://github.com/marketplace/actions/yaml-lint
+
+name: Yaml Lint
+on: [push, pull_request]  # yamllint disable-line rule:truthy
+
+jobs:
+  yaml-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run yaml-lint
+        uses: ibiqlik/action-yamllint@v3.1.0
+        with:
+          config_file: .yamllint.yml
+          format: github

@@ -1,6 +1,6 @@
 ---
 - name: "[NGINX] -  remove some commented line in php-fpm conf"
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: "{{ php_dir }}/fpm/pool.d/www.conf"
     regexp: '^\;env'
     state: absent
@@ -8,7 +8,7 @@
   notify: reload php-fpm
 
 - name: "[NGINX] -  Add path variable to php-fpm"
-  blockinfile:
+  ansible.builtin.blockinfile:
     dest: "{{ php_dir }}/fpm/pool.d/www.conf"
     insertafter: '^; Default Value: clean env$'
     marker: "; {mark} ANSIBLE MANAGED BLOCK"
@@ -21,7 +21,7 @@
   notify: reload php-fpm
 
 - name: "[NGINX] -  enable APC for php CLI"
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: "{{ php_dir }}/cli/php.ini"
     line: "apc.enable_cli = 1"
     insertbefore: "^; End:$"
@@ -30,12 +30,12 @@
   notify: reload php-fpm
 
 - name: "[NGINX] -  enable PHP OPcache for php.ini"
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: "{{ php_dir }}/fpm/php.ini"
     state: present
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
-    backrefs: yes
+    backrefs: true
   with_items:
     - { regexp: 'opcache.enable=0', line: 'opcache.enable=1' }
     - { regexp: 'opcache.enable_cli', line: 'opcache.enable_cli=1' }
@@ -50,38 +50,40 @@
 
 
 - name: "[NGINX] -  Public Diffie-Hellman Parameter are generated. This might take a while."
-  command: "openssl dhparam -out {{ nextcloud_tls_dhparam }} 2048"
+  ansible.builtin.command: "openssl dhparam -out {{ nextcloud_tls_dhparam }} 2048"
   args:
     creates: "{{ nextcloud_tls_dhparam }}"
 
 - name: "[NGINX] -  php handler configuration is present."
-  template:
+  ansible.builtin.template:
     dest: /etc/nginx/sites-available/php_handler.cnf
     src: templates/nginx_php_handler.j2
+    mode: 0640
   notify: reload http
 
 - name: "[NGINX] -  php handler is enabled"
-  file:
+  ansible.builtin.file:
     path: /etc/nginx/sites-enabled/php_handler
     src: /etc/nginx/sites-available/php_handler.cnf
     state: link
   notify: reload http
 
 - name: "[NGINX] -  generate Nextcloud configuration for nginx"
-  template:
+  ansible.builtin.template:
     dest: /etc/nginx/sites-available/nc_{{ nextcloud_instance_name }}.cnf
     src: "{{ nextcloud_websrv_template }}"
+    mode: 0640
   notify: reload http
 
 - name: "[NGINX] -  Enable Nextcloud in nginx conf"
-  file:
+  ansible.builtin.file:
     path: /etc/nginx/sites-enabled/nc_{{ nextcloud_instance_name }}
     src: /etc/nginx/sites-available/nc_{{ nextcloud_instance_name }}.cnf
     state: link
   notify: reload http
 
 - name: "[NGINX] -  Disable nginx default site"
-  file:
+  ansible.builtin.file:
     path: /etc/nginx/sites-enabled/default
     state: absent
   when: nextcloud_disable_websrv_default_site | bool
