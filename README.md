@@ -1,6 +1,3 @@
-[![Build Status](https://travis-ci.org/aalaesar/install_nextcloud.svg?branch=master)](https://travis-ci.org/aalaesar/install_nextcloud)
-[![pipeline status](https://gitlab.ninux.org/hispanico/ansible-nextcloud/badges/master/pipeline.svg)](https://gitlab.ninux.org/hispanico/ansible-nextcloud/pipelines?scope=branches)
-
 [![Ansible-lint status](https://github.com/aalaesar/install_nextcloud/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/aalaesar/install_nextcloud/actions?workflow=Ansible%20Lint)
 [![YAML-lint status](https://github.com/aalaesar/install_nextcloud/actions/workflows/yamllint.yml/badge.svg)](https://github.com/aalaesar/install_nextcloud/actions?workflow=Yaml%20Lint)
 
@@ -45,8 +42,6 @@ Role's variables (and their default values):
 ### Choose the version
 
 **_WARNING: Since Nexcloud 11 requires php v5.6 or later, command line installation will fail on old OS without php v5.6+ support._**
-
-_Known issue while installing Nextcloud 11 on an Ubuntu 14.04 system:_ [#27](https://github.com/aalaesar/install_nextcloud/issues/27)
 
 An URL will be generated following naming rules used in the nextcloud repository
 _Not following this rules correctly may make the role unable to download nextcloud._
@@ -484,7 +479,7 @@ Here 2 examples for apache and nginx (because they have slightly different confi
       nextcloud_tls_cert_key: "/etc/letsencrypt/live/example2.com/privkey.pem"
 ```
 ### Case 3: integration to an existing system.
--   An Ansible master want to install a new Nextcloud instance on an existing Ubuntu 14.04 server with nginx & mariadb installed.
+-   An Ansible master want to install a new Nextcloud instance on an existing Ubuntu 20.04 server with nginx & mariadb installed.
 -   As is server do not meet the php requirements for Nextcloud 11, he chooses to use the lastest Nextcloud 10 release.
 -   He wants it to be accessible from internet at _cloud.example.tld_ and from his intranet at _dbox.intra.net_.
 -   He already have a valid certificate for the intranet domain in /etc/nginx/certs/ installed

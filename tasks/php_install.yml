@@ -44,4 +44,3 @@
   ansible.builtin.package:
     name: "{{ php_pkg_apcu }}"
     state: present
-  when: ansible_distribution_release not in [ "trusty" ]

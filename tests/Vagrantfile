@@ -6,19 +6,8 @@ Vagrant.configure(2) do |config|
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
 
-  config.vm.define "ubuntu-trusty" do |vagrant1|
-    vagrant1.vm.box = "ubuntu/trusty64"
-    vagrant1.vm.synced_folder ".", "/vagrant", disabled: true
-    vagrant1.ssh.forward_agent = true
-    vagrant1.vm.network "forwarded_port", guest: 80, host: 18080
-
-    vagrant1.vm.provision "ansible" do |ansible|
-      ansible.playbook = "vagrant.yml"
-    end
-  end
-
- config.vm.define "debian-jessie" do |vagrant1|
-    vagrant1.vm.box = "debian/jessie64"
+ config.vm.define "debian-buster" do |vagrant1|
+    vagrant1.vm.box = "debian/buster64"
     vagrant1.vm.synced_folder ".", "/vagrant", disabled: true
     vagrant1.ssh.forward_agent = true
     vagrant1.vm.network "forwarded_port", guest: 80, host: 18080
@@ -61,6 +50,17 @@ Vagrant.configure(2) do |config|
 
     vagrant1.vm.provision "shell",
       inline: "apt install -y python-minimal"
+
+    vagrant1.vm.provision "ansible" do |ansible|
+      ansible.playbook = "vagrant.yml"
+    end
+  end
+
+  config.vm.define "ubuntu-focal" do |vagrant1|
+    vagrant1.vm.box = "ubuntu/focal64"
+    vagrant1.vm.synced_folder ".", "/vagrant", disabled: true
+    vagrant1.ssh.forward_agent = true
+    vagrant1.vm.network "forwarded_port", guest: 80, host: 18080
 
     vagrant1.vm.provision "ansible" do |ansible|
       ansible.playbook = "vagrant.yml"

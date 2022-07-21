@@ -1,7 +1,6 @@
 ---
 - hosts:
-    - debian-jessie
-    - ubuntu-trusty
+    - debian-buster
     - debian-stretch
     - ubuntu-xenial
     - ubuntu-bionic
