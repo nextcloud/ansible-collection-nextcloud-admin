@@ -16,12 +16,6 @@
     that: nextcloud_version_major is defined
   when: nextcloud_full_url is defined
 
-# - name: "[NC-DL] - Create webroot folder"
-#   ansible.builtin.file:
-#     path: "{{ nextcloud_webroot }}"
-#     recurse: true
-#     state: directory
-
 - name: "[NC-DL] - Create and set directory ownership & permissions for the webroot folder"
   ansible.builtin.file:
     path: "{{ nextcloud_webroot }}"
