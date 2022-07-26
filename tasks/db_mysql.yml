@@ -61,7 +61,7 @@
   ignore_errors: true
 
 - name: "[mySQL] - Set mysql config option for nextcloud"
-  ansible.builtin.ansible.builtin.copy:
+  ansible.builtin.copy:
     dest: /etc/mysql/conf.d/nextcloud.cnf
     src: files/mysql_nextcloud.cnf
     mode: 0640
