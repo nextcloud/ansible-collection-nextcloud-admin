@@ -5,7 +5,7 @@ galaxy_info:
 
   license: BSD
 
-  min_ansible_version: "2.5"
+  min_ansible_version: "2.10"
 
   platforms:
     - name: Ubuntu
@@ -17,6 +17,7 @@ galaxy_info:
       versions:
         - stretch
         - buster
+        - bullseye
 
   galaxy_tags:
     - nextcloud

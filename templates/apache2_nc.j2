@@ -7,7 +7,7 @@
 {% for domain in nextcloud_trusted_domain %}
 <VirtualHost *:80>
   ServerName {{ domain }}
-  Redirect permanent / https://{{ domain | ipwrap }}/
+  Redirect permanent / https://{{ domain | ansible.utils.ipwrap }}/
 </VirtualHost>
 {% endfor %}
 {% else %}
