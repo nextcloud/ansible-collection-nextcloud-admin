@@ -16,7 +16,7 @@
 
 - name: "[NC] - generate {{ nextcloud_admin_name }} password:"
   ansible.builtin.set_fact:
-    nextcloud_admin_pwd: "{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/web_admin.pwd length=10' ) }}"
+    nextcloud_admin_pwd: "{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/web_admin.pwd' ) }}"
   when: nextcloud_admin_pwd is not defined
 
 - name: "[NC] - Set temporary permissions for command line installation."
