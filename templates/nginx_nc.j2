@@ -9,7 +9,7 @@ server {
 {% if nextcloud_ipv6 %}
     listen [::]:80;
 {% endif %}
-    server_name {{ nextcloud_trusted_domain | ipwrap | join(' ') }};
+    server_name {{ nextcloud_trusted_domain | ansible.utils.ipwrap | join(' ') }};
 
     # Prevent nginx HTTP Server Detection
     server_tokens off;
@@ -20,7 +20,7 @@ server {
 {% endif %}
 
 server {
-    server_name {{ nextcloud_trusted_domain | ipwrap | join(' ') }};
+    server_name {{ nextcloud_trusted_domain | ansible.utils.ipwrap | join(' ') }};
 
 {% if not nextcloud_install_tls or not nextcloud_tls_enforce %}
     listen 80;
