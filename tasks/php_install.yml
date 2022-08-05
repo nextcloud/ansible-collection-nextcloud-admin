@@ -10,11 +10,16 @@
     - "php{{ php_ver }}-gd"
     - "php{{ php_ver }}-ldap"
     - "php{{ php_ver }}-imap"
-    - "php{{ php_ver }}-json"
     - "php{{ php_ver }}-curl"
     - "php{{ php_ver }}-intl"
   notify:
     - start http
+
+- name: "[INSTALL] - php-json is installed (PHP < 8)"
+  ansible.builtin.package:
+    name: "php{{ php_ver }}-json"
+    state: present
+  when: php_ver is version("8", "<")
 
 - name: "[INSTALL] -  Apache Required package is installed."
   ansible.builtin.package:
