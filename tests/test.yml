@@ -38,7 +38,7 @@
   vars:
     nextcloud_db_backend: "{{ lookup( 'env', 'NC_DB' ) }}"
     nextcloud_websrv: "{{ lookup( 'env', 'NC_WEB' ) }}"
-    nextcloud_version_major: 15
+    nextcloud_version_major: 24
     nextcloud_trusted_domain:
       - localhost
       - 127.0.0.1
