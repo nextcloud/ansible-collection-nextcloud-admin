@@ -1,0 +1,54 @@
+---
+name: Tests
+
+"on":
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+  schedule:
+    - cron: "0 7 * * 0"
+
+defaults:
+  run:
+    working-directory: "aalaesar.install_nextcloud"
+
+jobs:
+  molecule:
+    name: Molecule
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        distro:
+          - debian11
+          - debian10
+          - ubuntu2204
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3
+        with:
+          path: "aalaesar.install_nextcloud"
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Upgrade pip
+        run: |
+          python3 -m pip install --constraint=.github/workflows/constraints.txt pip
+          python3 -m pip --version
+
+      - name: Install test dependencies
+        run: |
+          python3 -m pip install --constraint=.github/workflows/constraints.txt ansible molecule[docker] docker
+
+      - name: Run Molecule tests
+        run: molecule test
+        env:
+          PY_COLORS: "1"
+          ANSIBLE_FORCE_COLOR: "1"
+          MOLECULE_DISTRO: ${{ matrix.distro }}
