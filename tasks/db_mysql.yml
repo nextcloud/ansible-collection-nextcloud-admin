@@ -55,6 +55,16 @@
   no_log: true
   when: mysql_credential_file[(ansible_os_family|lower)] is defined and nextcloud_mysql_root_pwd_update
 
+# Has to be after the root password assignment, for idempotency.
+- name: "[mySQL] - Copy .my.cnf file with root password credentials."
+  ansible.builtin.template:
+    src: "root-my.cnf.j2"
+    dest: "/root/.my.cnf"
+    owner: root
+    group: root
+    mode: 0600
+  when: nextcloud_mysql_root_pwd_update
+
 - name: "[mySQL] - Get list of hosts for the anonymous user."
   ansible.builtin.command: mysql -NBe 'SELECT Host FROM mysql.user WHERE User = ""'
   register: mysql_anonymous_hosts
@@ -80,7 +90,7 @@
     mode: 0600
   notify: restart mysql
 
-- name: "[mySQL] - Generate database user Password."
+- name: "[mySQL] - Generate database user password."
   ansible.builtin.set_fact:
     nextcloud_db_pwd: "{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/db_admin.pwd' ) }}"
   when: nextcloud_db_pwd is not defined
