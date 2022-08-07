@@ -21,26 +21,15 @@
     enabled: "{{ nextcloud_db_enabled_on_startup }}"
   register: mysql_service_configuration
 
-- name: "[mySQL] - generate {{ nextcloud_db_backend }} root Password:"
+- name: "[mySQL] - Generate {{ nextcloud_db_backend }} root Password:"
   ansible.builtin.set_fact:
     nextcloud_mysql_root_pwd: "{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/mysql_root.pwd' ) }}"
   when: nextcloud_mysql_root_pwd is not defined
-
-- name: "[mySQL] - save {{ nextcloud_db_backend }} root password in config file"
-  ini_file:
-    path: "{{ mysql_credential_file[(ansible_os_family|lower)] }}"
-    section: client
-    option: password
-    value: "{{ nextcloud_mysql_root_pwd }}"
-    mode: 0640
-  no_log: true
-  when: mysql_credential_file[(ansible_os_family|lower)] is defined
 
 # use debian default credentials to work on user root password
 - name: "[mySQL] - Update {{ nextcloud_db_backend }} root password"
   mysql_user:
     name: root
-
     password: "{{ nextcloud_mysql_root_pwd }}"
     config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
     check_implicit_admin: true
@@ -48,6 +37,15 @@
     # Assuming the root user has only localhost access
     host_all: true
 
+- name: "[mySQL] - Save {{ nextcloud_db_backend }} root password in config file"
+  ini_file:
+    path: "{{ mysql_credential_file[(ansible_os_family|lower)] }}"
+    section: client
+    option: password
+    value: "{{ nextcloud_mysql_root_pwd }}"
+    mode: 0600
+  no_log: true
+  when: mysql_credential_file[(ansible_os_family|lower)] is defined
 
 - name: "[mySQL] - Delete the anonymous user."  # noqa ignore-errors
   mysql_user:
