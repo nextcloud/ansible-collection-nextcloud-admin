@@ -21,21 +21,29 @@
     enabled: "{{ nextcloud_db_enabled_on_startup }}"
   register: mysql_service_configuration
 
-- name: "[mySQL] - Generate {{ nextcloud_db_backend }} root Password:"
+- name: "[mySQL] - Generate {{ nextcloud_db_backend }} root password."
   ansible.builtin.set_fact:
     nextcloud_mysql_root_pwd: "{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/mysql_root.pwd' ) }}"
-  when: nextcloud_mysql_root_pwd is not defined
+  when: nextcloud_mysql_root_pwd is not defined and nextcloud_mysql_root_pwd_update
 
-# use debian default credentials to work on user root password
-- name: "[mySQL] - Update {{ nextcloud_db_backend }} root password"
-  mysql_user:
-    name: root
-    password: "{{ nextcloud_mysql_root_pwd }}"
-    config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
-    check_implicit_admin: true
-    priv: "*.*:ALL,GRANT"
-    # Assuming the root user has only localhost access
-    host_all: true
+- name: "[mySQL] - Get list of hosts for the root user."
+  command: mysql -NBe
+    "SELECT Host
+    FROM mysql.user
+    WHERE User = 'root'
+    ORDER BY (Host='localhost') ASC"
+  register: mysql_root_hosts
+  changed_when: false
+  check_mode: false
+  when: nextcloud_mysql_root_pwd_update
+
+- name: "[mySQL] - Update MySQL root password for localhost root account."
+  ansible.builtin.shell: >
+    mysql -u root -NBe
+    'ALTER USER "root"@"{{ item }}"
+    IDENTIFIED WITH mysql_native_password BY "{{ mysql_root_password }}"; FLUSH PRIVILEGES;'
+  with_items: "{{ mysql_root_hosts.stdout_lines|default([]) }}"
+  when: nextcloud_mysql_root_pwd_update
 
 - name: "[mySQL] - Save {{ nextcloud_db_backend }} root password in config file"
   ini_file:
@@ -45,7 +53,7 @@
     value: "{{ nextcloud_mysql_root_pwd }}"
     mode: 0600
   no_log: true
-  when: mysql_credential_file[(ansible_os_family|lower)] is defined
+  when: mysql_credential_file[(ansible_os_family|lower)] is defined and nextcloud_mysql_root_pwd_update
 
 - name: "[mySQL] - Delete the anonymous user."  # noqa ignore-errors
   mysql_user:
@@ -69,7 +77,7 @@
   ansible.builtin.copy:
     dest: /etc/mysql/conf.d/nextcloud.cnf
     src: files/mysql_nextcloud.cnf
-    mode: 0640
+    mode: 0600
   notify: restart mysql
 
 - name: "[mySQL] - Generate database user Password."
