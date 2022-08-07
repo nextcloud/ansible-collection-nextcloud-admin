@@ -12,7 +12,11 @@
   vars:
     nc_mysql_deps:
       - "php{{ php_ver }}-mysql"
-      - "python{{ '3' if ansible_python.version.major == 3 else '' }}-pymysql"
+      - "python3-pymysql"
+
+- name: Ensure MySQL is started and enabled on boot.
+  service: "name={{ mysql_daemon }} state=started enabled={{ nextcloud_db_enabled_on_startup }}"
+  register: mysql_service_configuration
 
 - name: "[mySQL] - generate {{ nextcloud_db_backend }} root Password:"
   ansible.builtin.set_fact:

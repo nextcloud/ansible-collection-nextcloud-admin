@@ -63,6 +63,7 @@ nextcloud_config_settings:
 nextcloud_install_db: true
 nextcloud_db_host: "127.0.0.1"
 nextcloud_db_backend: "mysql"  # "mysql"/"mariadb" | "pgsql"
+nextcloud_db_enabled_on_startup: true
 nextcloud_db_name: "nextcloud"
 nextcloud_db_admin: "ncadmin"
 # nextcloud_db_pwd: "secret"
