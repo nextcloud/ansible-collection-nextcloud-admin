@@ -27,7 +27,7 @@
   when: nextcloud_mysql_root_pwd is not defined and nextcloud_mysql_root_pwd_update
 
 - name: "[mySQL] - Get list of hosts for the root user."
-  command: mysql -NBe
+  ansible.builtin.command: mysql -NBe
     "SELECT Host
     FROM mysql.user
     WHERE User = 'root'
@@ -55,25 +55,25 @@
   no_log: true
   when: mysql_credential_file[(ansible_os_family|lower)] is defined and nextcloud_mysql_root_pwd_update
 
-- name: "[mySQL] - Delete the anonymous user."  # noqa ignore-errors
+- name: "[mySQL] - Get list of hosts for the anonymous user."
+  ansible.builtin.command: mysql -NBe 'SELECT Host FROM mysql.user WHERE User = ""'
+  register: mysql_anonymous_hosts
+  changed_when: false
+  check_mode: false
+
+- name: "[mySQL] - Remove anonymous MySQL users."
   mysql_user:
-    user: ""
-    state: "absent"
-    login_user: root
-    login_password: "{{ nextcloud_mysql_root_pwd }}"
-    config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
-  ignore_errors: true
-
-- name: "[mySQL] - Removes the MySQL test database"  # noqa ignore-errors
-  mysql_db:
-    name: test
+    name: ""
+    host: "{{ item }}"
     state: absent
-    login_user: root
-    login_password: "{{ nextcloud_mysql_root_pwd }}"
-    config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
-  ignore_errors: true
+  with_items: "{{ mysql_anonymous_hosts.stdout_lines|default([]) }}"
 
-- name: "[mySQL] - Set mysql config option for nextcloud"
+- name: "[mySQL] - Remove MySQL test database."
+  mysql_db:
+    name: 'test'
+    state: absent
+
+- name: "[mySQL] - Set mysql config option for Nextcloud"
   ansible.builtin.copy:
     dest: /etc/mysql/conf.d/nextcloud.cnf
     src: files/mysql_nextcloud.cnf
