@@ -1,5 +1,5 @@
 ---
-- name: "[mySQL: Debian] - Service is installed."
+- name: "[mySQL] - Service is installed."
   ansible.builtin.package:
     name: "{{ 'default-' if ((ansible_distribution|lower) == 'debian' and nextcloud_db_backend == 'mysql') else '' }}{{ nextcloud_db_backend }}-server"
     state: present
@@ -14,8 +14,11 @@
       - "php{{ php_ver }}-mysql"
       - "python3-pymysql"
 
-- name: Ensure MySQL is started and enabled on boot.
-  service: "name={{ mysql_daemon }} state=started enabled={{ nextcloud_db_enabled_on_startup }}"
+- name: "[mySQL] - Ensure MySQL is started and enabled on boot."
+  ansible.builtin.service:
+    name: "{{ mysql_daemon }}"
+    state: started
+    enabled: "{{ nextcloud_db_enabled_on_startup }}"
   register: mysql_service_configuration
 
 - name: "[mySQL] - generate {{ nextcloud_db_backend }} root Password:"
