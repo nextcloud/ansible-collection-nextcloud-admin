@@ -59,6 +59,6 @@
     - nc_sudo_installed_result.rc != 0
 
 - name: "[ENV] - Define mysql_daemon."
-  set_fact:
+  ansible.builtin.set_fact:
     mysql_daemon: "{{ __mysql_daemon }}"
   when: mysql_daemon is not defined
