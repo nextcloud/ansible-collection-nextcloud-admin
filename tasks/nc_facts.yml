@@ -29,7 +29,7 @@
     changed_when: false
   - name: set missing fact
     ansible.builtin.set_fact:
-      nextcloud_data_dir: nc_data_dir.stdout
+      nextcloud_data_dir: " {{ nc_data_dir.stdout }} "
   when:
     - nextcloud_backup_app_data or nextcloud_backup_user
     - nextcloud_data_dir|d('') == ''
