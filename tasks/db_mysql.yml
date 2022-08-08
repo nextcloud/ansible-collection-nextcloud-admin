@@ -1,10 +1,4 @@
 ---
-- name: Get MySQL version.
-  ansible.builtin.command: 'mysql --version'
-  register: mysql_cli_version
-  changed_when: false
-  check_mode: false
-
 - name: "[mySQL] - Service is installed."
   ansible.builtin.package:
     name: "{{ 'default-' if ((ansible_distribution|lower) == 'debian' and nextcloud_db_backend == 'mysql') else '' }}{{ nextcloud_db_backend }}-server"
@@ -14,6 +8,12 @@
 - name: "[mySQL] - Check if MySQL packages were installed."
   ansible.builtin.set_fact:
     mysql_install_packages: "{{ nc_mysql_db_install is defined and nc_mysql_db_install.changed }}"
+
+- name: "[mySQL] - Get MySQL version."
+  ansible.builtin.command: 'mysql --version'
+  register: mysql_cli_version
+  changed_when: false
+  check_mode: false
 
 - name: "[mySQL] - Packages are installed."
   ansible.builtin.package:
@@ -54,7 +54,7 @@
     ((mysql_install_packages | bool) or nextcloud_mysql_root_pwd_update)
     and ('5.7.' in mysql_cli_version.stdout or '8.0.' in mysql_cli_version.stdout)
 
-- name: Update MySQL root password for localhost root account (< 5.7.x).
+- name: "[mySQL] - Update MySQL root password for localhost root account (< 5.7.x)."
   ansible.builtin.shell: >
     mysql -NBe
     'SET PASSWORD FOR "{{ mysql_root_username }}"@"{{ item }}" = PASSWORD("{{ mysql_root_password }}"); FLUSH PRIVILEGES;'
