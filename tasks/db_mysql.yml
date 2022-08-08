@@ -1,9 +1,19 @@
 ---
+- name: Get MySQL version.
+  ansible.builtin.command: 'mysql --version'
+  register: mysql_cli_version
+  changed_when: false
+  check_mode: false
+
 - name: "[mySQL] - Service is installed."
   ansible.builtin.package:
     name: "{{ 'default-' if ((ansible_distribution|lower) == 'debian' and nextcloud_db_backend == 'mysql') else '' }}{{ nextcloud_db_backend }}-server"
     state: present
   register: nc_mysql_db_install
+
+- name: "[mySQL] - Check if MySQL packages were installed."
+  ansible.builtin.set_fact:
+    mysql_install_packages: "{{ nc_mysql_db_install is defined and nc_mysql_db_install.changed }}"
 
 - name: "[mySQL] - Packages are installed."
   ansible.builtin.package:
@@ -21,11 +31,6 @@
     enabled: "{{ nextcloud_db_enabled_on_startup }}"
   register: mysql_service_configuration
 
-- name: "[mySQL] - Generate {{ nextcloud_db_backend }} root password."
-  ansible.builtin.set_fact:
-    nextcloud_mysql_root_pwd: "{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/mysql_root.pwd' ) }}"
-  when: nextcloud_mysql_root_pwd is not defined and nextcloud_mysql_root_pwd_update
-
 - name: "[mySQL] - Get list of hosts for the root user."
   ansible.builtin.command: mysql -NBe
     "SELECT Host
@@ -35,27 +40,29 @@
   register: mysql_root_hosts
   changed_when: false
   check_mode: false
-  when: nextcloud_mysql_root_pwd_update
+  when: mysql_install_packages | bool or nextcloud_mysql_root_pwd_update
 
-- name: "[mySQL] - Update MySQL root password for localhost root account."
+# Note: We do not use mysql_user for this operation, as it doesn't always update
+# the root password correctly. See: https://goo.gl/MSOejW
+- name: "[mySQL] - Update MySQL root password for localhost root account (5.7.x)."
   ansible.builtin.shell: >
     mysql -u root -NBe
     'ALTER USER "root"@"{{ item }}"
     IDENTIFIED WITH mysql_native_password BY "{{ mysql_root_password }}"; FLUSH PRIVILEGES;'
   with_items: "{{ mysql_root_hosts.stdout_lines|default([]) }}"
-  when: nextcloud_mysql_root_pwd_update
+  when: >
+    ((mysql_install_packages | bool) or nextcloud_mysql_root_pwd_update)
+    and ('5.7.' in mysql_cli_version.stdout or '8.0.' in mysql_cli_version.stdout)
 
-- name: "[mySQL] - Save {{ nextcloud_db_backend }} root password in config file"
-  ini_file:
-    path: "{{ mysql_credential_file[(ansible_os_family|lower)] }}"
-    section: client
-    option: password
-    value: "{{ nextcloud_mysql_root_pwd }}"
-    mode: 0600
-  no_log: true
-  when: mysql_credential_file[(ansible_os_family|lower)] is defined and nextcloud_mysql_root_pwd_update
+- name: Update MySQL root password for localhost root account (< 5.7.x).
+  ansible.builtin.shell: >
+    mysql -NBe
+    'SET PASSWORD FOR "{{ mysql_root_username }}"@"{{ item }}" = PASSWORD("{{ mysql_root_password }}"); FLUSH PRIVILEGES;'
+  with_items: "{{ mysql_root_hosts.stdout_lines|default([]) }}"
+  when: >
+    ((mysql_install_packages | bool) or mysql_root_password_update)
+    and ('5.7.' not in mysql_cli_version.stdout and '8.0.' not in mysql_cli_version.stdout)
 
-# Has to be after the root password assignment, for idempotency.
 - name: "[mySQL] - Copy .my.cnf file with root password credentials."
   ansible.builtin.template:
     src: "root-my.cnf.j2"
@@ -89,11 +96,6 @@
     src: files/mysql_nextcloud.cnf
     mode: 0600
   notify: restart mysql
-
-- name: "[mySQL] - Generate database user password."
-  ansible.builtin.set_fact:
-    nextcloud_db_pwd: "{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/db_admin.pwd' ) }}"
-  when: nextcloud_db_pwd is not defined
 
 - name: "[mySQL] - Add Database {{ nextcloud_db_name }}."
   mysql_db:
