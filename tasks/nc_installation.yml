@@ -122,13 +122,20 @@
     - "{{ nextcloud_redis_settings }}"
   when: (nextcloud_install_redis_server | bool)
 
-- name: "[NC] - Install Cronjob"
-  ansible.builtin.cron:
-    name: "Nextcloud Cronjob"
-    minute: "*/15"
-    user: "{{ nextcloud_websrv_user }}"
-    job: "php {{ nextcloud_webroot }}/cron.php"
-    cron_file: "nextcloud"
+- name: "[NC] - Configure Cron"
+  block:
+    - name: "[NC] - Check Cron package"
+      ansible.builtin.package:
+        name: "cron"
+        state: present
+
+    - name: "[NC] - Install Cronjob"
+      ansible.builtin.cron:
+        name: "Nextcloud Cronjob"
+        minute: "*/15"
+        user: "{{ nextcloud_websrv_user }}"
+        job: "php {{ nextcloud_webroot }}/cron.php"
+        cron_file: "nextcloud"
   when: (nextcloud_background_cron | bool)
 
 - name: "[NC] - Set Cron method to Crontab"
