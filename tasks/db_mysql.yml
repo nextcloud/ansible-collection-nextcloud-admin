@@ -70,7 +70,7 @@
     owner: root
     group: root
     mode: 0600
-  when: nextcloud_mysql_root_pwd_update
+  when: mysql_install_packages | bool or nextcloud_mysql_root_pwd_update
 
 - name: "[mySQL] - Get list of hosts for the anonymous user."
   ansible.builtin.command: mysql -NBe 'SELECT Host FROM mysql.user WHERE User = ""'
