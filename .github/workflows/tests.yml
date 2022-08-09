@@ -12,7 +12,7 @@ name: Tests
 
 defaults:
   run:
-    working-directory: "aalaesar.nextcloud"
+    working-directory: "aalaesar.install_nextcloud"
 
 jobs:
   molecule:
@@ -30,7 +30,7 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v3
         with:
-          path: "aalaesar.nextcloud"
+          path: "aalaesar.install_nextcloud"
 
       - name: Set up Python
         uses: actions/setup-python@v4
