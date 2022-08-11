@@ -1,7 +1,7 @@
 [![Ansible-lint status](https://github.com/aalaesar/install_nextcloud/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/aalaesar/install_nextcloud/actions?workflow=Ansible%20Lint)
 [![YAML-lint status](https://github.com/aalaesar/install_nextcloud/actions/workflows/yamllint.yml/badge.svg)](https://github.com/aalaesar/install_nextcloud/actions?workflow=Yaml%20Lint)
 
-# Ansible role: Nextcloud
+# Ansible role: install_nextcloud
 
 This role installs and configures an Nextcloud instance for a Debian/Ubuntu server.
 
