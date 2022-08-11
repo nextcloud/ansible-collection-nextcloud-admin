@@ -1,7 +1,7 @@
 [![Ansible-lint status](https://github.com/aalaesar/install_nextcloud/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/aalaesar/install_nextcloud/actions?workflow=Ansible%20Lint)
 [![YAML-lint status](https://github.com/aalaesar/install_nextcloud/actions/workflows/yamllint.yml/badge.svg)](https://github.com/aalaesar/install_nextcloud/actions?workflow=Yaml%20Lint)
 
-# install_nextcloud
+# Ansible role: install_nextcloud
 
 This role installs and configures an Nextcloud instance for a Debian/Ubuntu server.
 
@@ -103,7 +103,7 @@ Specify directly a full URL to the archive. The role will skip the url generatio
 - Download your own archive:
   (_you **must** specify the nextcloud major version along_)
 ```YAML
-nextcloud_full_url: https://download.nextcloud.com/server/releases/nextcloud-23.0.0.zip
+nextcloud_full_url: https://download.nextcloud.com/server/releases/nextcloud-24.0.0.zip
 nextcloud_version_major: 42
 ```
 -   Choose the latest release (default):
@@ -111,34 +111,34 @@ nextcloud_version_major: 42
 nextcloud_version_channel: "releases"
 nextcloud_get_latest: true
 ```
--   Choose the latest v23 release:
+-   Choose the latest v24 release:
 ```YAML
 nextcloud_version_channel: "releases"
 nextcloud_get_latest: true
-nextcloud_version_major: 23
+nextcloud_version_major: 24
 ```
 -   Choose a specific release:
 ```YAML
 nextcloud_version_channel: "releases"
 nextcloud_get_latest: false
-nextcloud_version_full: "23.0.0"
+nextcloud_version_full: "24.0.0"
 ```
--   Get the nextcloud 24.0.1 prerelease 1:
+-   Get the nextcloud 25.0.1 prerelease 1:
 ```YAML
 nextcloud_version_channel: "prereleases"
-nextcloud_version_full: "23.0.0"
-nextcloud_version_special: "RC3"
+nextcloud_version_full: "24.0.0"
+nextcloud_version_special:"RC3"
 ```
 -   Get the latest daily:
 ```YAML
 nextcloud_version_channel: "daily"
 nextcloud_get_latest: true
 ```
--   Get the latest daily for stable 10:
+-   Get the latest daily for stable 24:
 ```YAML
 nextcloud_version_channel: "daily"
 nextcloud_get_latest: true
-nextcloud_version_major: "stable23"
+nextcloud_version_major: "stable24"
 ```
 -   Get the daily for master at january 1rst 2022:
 ```YAML
@@ -493,7 +493,7 @@ He can run the role with the following variables to install Nextcloud accordingl
 - hosts: server
   roles:
    - role: aalaesar.install_nextcloud
-     nextcloud_version_major: 23
+     nextcloud_version_major: 24
      nextcloud_trusted_domain:
        - "cloud.example.tld"
        - "dbox.intra.net"
