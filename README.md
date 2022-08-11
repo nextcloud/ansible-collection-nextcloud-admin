@@ -1,7 +1,7 @@
 [![Ansible-lint status](https://github.com/aalaesar/install_nextcloud/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/aalaesar/install_nextcloud/actions?workflow=Ansible%20Lint)
 [![YAML-lint status](https://github.com/aalaesar/install_nextcloud/actions/workflows/yamllint.yml/badge.svg)](https://github.com/aalaesar/install_nextcloud/actions?workflow=Yaml%20Lint)
 
-# Ansible role: Nextcloud
+# Ansible role: install_nextcloud
 
 This role installs and configures an Nextcloud instance for a Debian/Ubuntu server.
 
@@ -32,7 +32,7 @@ This role requires root access, so either configure it in your inventory files, 
 - hosts: dnsserver
   become: true
   roles:
-    - role: aalaesar.nextcloud
+    - role: aalaesar.install_nextcloud
 ```
 
 ## Role Variables
@@ -444,7 +444,7 @@ You can choose the version channel to download a specific version of nextcloud. 
 ---
 - hosts: server
   roles:
-   - role: aalaesar.nextcloud
+   - role: aalaesar.install_nextcloud
      nextcloud_version_channel: "daily"
      nextcloud_version_major: "master"
 ```
@@ -461,7 +461,7 @@ Here 2 examples for apache and nginx (because they have slightly different confi
 ---
 - hosts: apache_server
   roles:
-   - role: aalaesar.nextcloud
+   - role: aalaesar.install_nextcloud
      nextcloud_trusted_domain:
        - "example.com"
      nextcloud_tls_cert_method: "installed"
@@ -471,7 +471,7 @@ Here 2 examples for apache and nginx (because they have slightly different confi
 
 - hosts: nginx_server
   roles:
-    - role: aalaesar.nextcloud
+    - role: aalaesar.install_nextcloud
       nextcloud_trusted_domain:
         - "example2.com"
       nextcloud_tls_cert_method: "installed"
@@ -492,7 +492,7 @@ He can run the role with the following variables to install Nextcloud accordingl
 ---
 - hosts: server
   roles:
-   - role: aalaesar.nextcloud
+   - role: aalaesar.install_nextcloud
      nextcloud_version_major: 24
      nextcloud_trusted_domain:
        - "cloud.example.tld"

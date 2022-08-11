@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: aalaesar
-  role_name: nextcloud
+  role_name: install_nextcloud
   description: Add a new Nextcloud instance in your infrastructure. The role manages dependencies and initial configuration.
 
   license: BSD
