@@ -13,8 +13,8 @@
 - name: "[ENV] include OS static vars"
   ansible.builtin.include_vars: '{{ item }}'
   loop:
-    - '{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml'
     - '{{ ansible_os_family }}.yml'
+    - '{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml'
 
 - name: "[ENV] Overwrite OS php_ver with custom php version if defined"
   ansible.builtin.set_fact:
