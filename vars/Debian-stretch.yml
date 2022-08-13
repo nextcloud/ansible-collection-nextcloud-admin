@@ -1,2 +1,3 @@
 ---
+__mysql_daemon: mysql
 php_ver: 7.0

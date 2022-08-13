@@ -1,9 +1,19 @@
 ---
-- name: "[mySQL: Debian] - Service is installed."
+- name: "[mySQL] - Service is installed."
   ansible.builtin.package:
     name: "{{ 'default-' if ((ansible_distribution|lower) == 'debian' and nextcloud_db_backend == 'mysql') else '' }}{{ nextcloud_db_backend }}-server"
     state: present
   register: nc_mysql_db_install
+
+- name: "[mySQL] - Check if MySQL packages were installed."
+  ansible.builtin.set_fact:
+    mysql_install_packages: "{{ nc_mysql_db_install is defined and nc_mysql_db_install.changed }}"
+
+- name: "[mySQL] - Get MySQL version."
+  ansible.builtin.command: 'mysql --version'
+  register: mysql_cli_version
+  changed_when: false
+  check_mode: false
 
 - name: "[mySQL] - Packages are installed."
   ansible.builtin.package:
@@ -12,65 +22,80 @@
   vars:
     nc_mysql_deps:
       - "php{{ php_ver }}-mysql"
-      - "python{{ '3' if ansible_python.version.major == 3 else '' }}-pymysql"
+      - "python3-pymysql"
 
-- name: "[mySQL] - generate {{ nextcloud_db_backend }} root Password:"
-  ansible.builtin.set_fact:
-    nextcloud_mysql_root_pwd: "{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/mysql_root.pwd' ) }}"
-  when: nextcloud_mysql_root_pwd is not defined
+- name: "[mySQL] - Ensure MySQL is started and enabled on boot."
+  ansible.builtin.service:
+    name: "{{ mysql_daemon }}"
+    state: started
+    enabled: "{{ nextcloud_db_enabled_on_startup }}"
+  register: mysql_service_configuration
 
-- name: "[mySQL] - save {{ nextcloud_db_backend }} root password in config file"
-  ini_file:
-    path: "{{ mysql_credential_file[(ansible_os_family|lower)] }}"
-    section: client
-    option: password
-    value: "{{ nextcloud_mysql_root_pwd }}"
-    mode: 0640
-  no_log: true
-  when: mysql_credential_file[(ansible_os_family|lower)] is defined
+- name: "[mySQL] - Get list of hosts for the root user."
+  ansible.builtin.command: mysql -NBe
+    "SELECT Host
+    FROM mysql.user
+    WHERE User = 'root'
+    ORDER BY (Host='localhost') ASC"
+  register: mysql_root_hosts
+  changed_when: false
+  check_mode: false
+  when: mysql_install_packages | bool or nextcloud_mysql_root_pwd_update
 
-# use debian default credentials to work on user root password
-- name: "[mySQL] - Update {{ nextcloud_db_backend }} root password"
+# Note: We do not use mysql_user for this operation, as it doesn't always update
+# the root password correctly. See: https://goo.gl/MSOejW
+- name: "[mySQL] - Update MySQL root password for localhost root account (5.7.x)."
+  ansible.builtin.shell: >
+    mysql -u root -NBe
+    'ALTER USER "root"@"{{ item }}"
+    IDENTIFIED WITH mysql_native_password BY "{{ nextcloud_mysql_root_pwd }}"; FLUSH PRIVILEGES;'
+  with_items: "{{ mysql_root_hosts.stdout_lines|default([]) }}"
+  when: >
+    ((mysql_install_packages | bool) or nextcloud_mysql_root_pwd_update)
+    and ('5.7.' in mysql_cli_version.stdout or '8.0.' in mysql_cli_version.stdout)
+
+- name: "[mySQL] - Update MySQL root password for localhost root account (< 5.7.x)."
+  ansible.builtin.shell: >
+    mysql -NBe
+    'SET PASSWORD FOR "root"@"{{ item }}" = PASSWORD("{{ nextcloud_mysql_root_pwd }}"); FLUSH PRIVILEGES;'
+  with_items: "{{ mysql_root_hosts.stdout_lines|default([]) }}"
+  when: >
+    ((mysql_install_packages | bool) or nextcloud_mysql_root_pwd_update)
+    and ('5.7.' not in mysql_cli_version.stdout and '8.0.' not in mysql_cli_version.stdout)
+
+- name: "[mySQL] - Copy .my.cnf file with root password credentials."
+  ansible.builtin.template:
+    src: "root-my.cnf.j2"
+    dest: "/root/.my.cnf"
+    owner: root
+    group: root
+    mode: 0600
+  when: mysql_install_packages | bool or nextcloud_mysql_root_pwd_update
+
+- name: "[mySQL] - Get list of hosts for the anonymous user."
+  ansible.builtin.command: mysql -NBe 'SELECT Host FROM mysql.user WHERE User = ""'
+  register: mysql_anonymous_hosts
+  changed_when: false
+  check_mode: false
+
+- name: "[mySQL] - Remove anonymous MySQL users."
   mysql_user:
-    name: root
-
-    password: "{{ nextcloud_mysql_root_pwd }}"
-    config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
-    check_implicit_admin: true
-    priv: "*.*:ALL,GRANT"
-    # Assuming the root user has only localhost access
-    host_all: true
-
-
-- name: "[mySQL] - Delete the anonymous user."  # noqa ignore-errors
-  mysql_user:
-    user: ""
-    state: "absent"
-    login_user: root
-    login_password: "{{ nextcloud_mysql_root_pwd }}"
-    config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
-  ignore_errors: true
-
-- name: "[mySQL] - Removes the MySQL test database"  # noqa ignore-errors
-  mysql_db:
-    name: test
+    name: ""
+    host: "{{ item }}"
     state: absent
-    login_user: root
-    login_password: "{{ nextcloud_mysql_root_pwd }}"
-    config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
-  ignore_errors: true
+  with_items: "{{ mysql_anonymous_hosts.stdout_lines|default([]) }}"
 
-- name: "[mySQL] - Set mysql config option for nextcloud"
+- name: "[mySQL] - Remove MySQL test database."
+  mysql_db:
+    name: 'test'
+    state: absent
+
+- name: "[mySQL] - Set mysql config option for Nextcloud"
   ansible.builtin.copy:
     dest: /etc/mysql/conf.d/nextcloud.cnf
     src: files/mysql_nextcloud.cnf
-    mode: 0640
+    mode: 0600
   notify: restart mysql
-
-- name: "[mySQL] - Generate database user Password."
-  ansible.builtin.set_fact:
-    nextcloud_db_pwd: "{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/db_admin.pwd' ) }}"
-  when: nextcloud_db_pwd is not defined
 
 - name: "[mySQL] - Add Database {{ nextcloud_db_name }}."
   mysql_db:

@@ -1,2 +1,3 @@
 ---
+__mysql_daemon: mariadb
 php_ver: 7.3

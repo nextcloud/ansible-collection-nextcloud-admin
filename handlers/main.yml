@@ -2,7 +2,7 @@
 # handlers file for nextcloud
 - name: restart mysql
   ansible.builtin.service:
-    name: mysql
+    name: "{{ mysql_daemon }}"
     state: restarted
 
 - name: start http

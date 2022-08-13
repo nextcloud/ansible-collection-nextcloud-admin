@@ -13,8 +13,8 @@
 - name: "[ENV] include OS static vars"
   ansible.builtin.include_vars: '{{ item }}'
   loop:
-    - '{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml'
     - '{{ ansible_os_family }}.yml'
+    - '{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml'
 
 - name: "[ENV] Overwrite OS php_ver with custom php version if defined"
   ansible.builtin.set_fact:
@@ -57,3 +57,21 @@
   when:
     - nc_sudo_installed_result.rc is defined
     - nc_sudo_installed_result.rc != 0
+
+- name: "[ENV] - Generate database user password."
+  ansible.builtin.set_fact:
+    nextcloud_db_pwd: "{{ lookup( 'ansible.builtin.password', 'nextcloud_instances/'+ nextcloud_instance_name +'/db_admin.pwd' ) }}"
+  when: nextcloud_db_pwd is not defined
+
+- name: "[ENV] - MySql / Maria vars"
+  block:
+    - name: "[ENV] - Define mysql daemon."
+      ansible.builtin.set_fact:
+        mysql_daemon: "{{ __mysql_daemon }}"
+      when: mysql_daemon is not defined
+
+    - name: "[ENV] - Generate database root password."
+      ansible.builtin.set_fact:
+        nextcloud_mysql_root_pwd: "{{ lookup( 'ansible.builtin.password', 'nextcloud_instances/'+ nextcloud_instance_name +'/db_root.pwd' ) }}"
+      when: nextcloud_mysql_root_pwd is not defined
+  when: nextcloud_db_backend in ["mysql", "mariadb"]

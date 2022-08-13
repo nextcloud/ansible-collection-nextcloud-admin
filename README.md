@@ -69,12 +69,12 @@ nextcloud_get_latest: true
 Specify if the "latest" archive should be downloaded.
 
 ```YAML
-# nextcloud_version_major: 10
+# nextcloud_version_major: 24
 ```
 Specify what major version you desire.
 
 ```YAML
-# nextcloud_version_full: "10.0.3"
+# nextcloud_version_full: "24.0.3"
 ```
 The full version of the desired nextcloud instance. type **M.F.P** _(Major.Feature.Patch)_
 
