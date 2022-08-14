@@ -113,4 +113,6 @@
   become_user: "{{ nextcloud_websrv_user }}"
   become: true
   become_flags: "{{ ansible_become_flags | default(omit) }}"
+  register: nc_indices_cmd
+  changed_when: '"Done" not in nc_indices_cmd.stdout'
   when: nextcloud_install_db
