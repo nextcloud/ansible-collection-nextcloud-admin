@@ -1,15 +1,15 @@
 ---
 - name: "[APACHE] -  enable APC for php CLI"
   ansible.builtin.lineinfile:
-    dest: "{{ php_dir }}/cli/php.ini"
+    dest: "{{ nc_php.php_dir }}/cli/php.ini"
     line: "apc.enable_cli = 1"
     insertbefore: "^; End:$"
     state: present
-    # validate: "/usr/sbin/{{ php_bin }} -t #%s"
+    # validate: "/usr/sbin/{{ nc_php.php_bin }} -t #%s"
 
 - name: "[APACHE] -  enable PHP OPcache for php.ini"
   ansible.builtin.lineinfile:
-    dest: "{{ php_dir }}/apache2/php.ini"
+    dest: "{{ nc_php.php_dir }}/apache2/php.ini"
     state: present
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
@@ -23,7 +23,7 @@
     - {regexp: 'opcache.save_comments', line: 'opcache.save_comments=1'}
     - {regexp: 'opcache.revalidate_freq', line: 'opcache.revalidate_freq=1'}
     - {regexp: 'memory_limit', line: 'memory_limit={{ php_memory_limit }}'}
-    # validate: "/usr/sbin/{{ php_bin }} -t #%s"
+    # validate: "/usr/sbin/{{ nc_php.php_bin }} -t #%s"
   notify: reload http
 
 - name: "[APACHE] -  Required Apache2 modules are enabled"

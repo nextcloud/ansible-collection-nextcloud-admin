@@ -1,7 +1,7 @@
 ---
 - name: "[REDIS] -  Required packages are installed."
   ansible.builtin.package:
-    name: "{{ redix_deps + php_pkg_spe }}"
+    name: "{{ redix_deps + nc_php.php_pkg_spe }}"
     state: present
   vars:
     redix_deps:
