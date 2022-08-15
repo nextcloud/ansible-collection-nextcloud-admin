@@ -10,3 +10,104 @@ mysql_credential_file:
   debian: '/etc/mysql/debian.cnf'
 
 nextcloud_max_upload_size_in_bytes: "{{ nextcloud_max_upload_size | human_to_bytes }}"
+
+## PHP configuration
+php_ver: "{{ php_ver | d(nextcloud_os_config[ansible_distribution|lower][ansible_distribution_release|lower].php_ver) }}"
+php_dir: "{{ php_dir | d(__nc_php.php_dir) }}"
+php_bin: "{{ php_bin | d(__nc_php.php_bin) }}"
+php_pkg_apcu: "{{ php_pkg_apcu | d(__nc_php.php_pkg_apcu) }}"
+php_pkg_spe: "{{ php_pkg_spe | d(__nc_php.php_pkg_spe) }}"
+php_socket: "{{ php_socket | d(__nc_php.php_socket) }}"
+
+# php config computed from references
+__nc_php:
+  php_dir: "{{ php_config_ref[php_ver].php_dir | d(php_config_ref.defaults.php_dir) }}"
+  php_bin: "{{ php_config_ref[php_ver].php_bin | d(php_config_ref.defaults.php_bin) }}"
+  php_pkg_apcu: "{{ php_config_ref[php_ver].php_pkg_apcu | d(php_config_ref.defaults.php_pkg_apcu) }}"
+  php_pkg_spe: "{{ php_config_ref[php_ver].php_pkg_spe | d(php_config_ref.defaults.php_pkg_spe) }}"
+  php_socket: "{{ php_config_ref[php_ver].php_socket | d(php_config_ref.defaults.php_socket) }}"
+
+# configuration reference for php
+nextcloud_os_config:
+  ubuntu:
+    bionic:
+      php_ver: 7.2
+    focal:
+      php_ver: 7.4
+    jammy:
+      php_ver: 8.1
+    xenial:
+      php_ver: 7.0
+  debian:
+    testing: &debian-testing
+      php_ver: 8.1
+    sid: *debian-testing
+    stretch:
+      php_ver: 7.0
+    buster:
+      php_ver: 7.3
+    bullseye:
+      php_ver: 7.4
+
+php_config_ref:
+  defaults:
+    php_dir: "/etc/php/{{ php_ver }}"
+    php_bin: "php-fpm{{ php_ver }}"
+    php_pkg_apcu: "php-apcu"
+    php_pkg_spe: []
+    php_socket: "/run/php/php{{ php_ver }}-fpm.sock"
+  "8.1":
+    php_pkg_apcu: "php8.1-apcu"
+    php_pkg_spe:
+      - "php8.1-bcmath"
+      - "php8.1-gmp"
+      - "php8.1-imagick"
+      - "php8.1-mbstring"
+      - "php8.1-redis"
+      - "php8.1-xml"
+      - "php8.1-zip"
+
+  "7.4":
+    php_pkg_apcu: "php7.4-apcu"
+    php_pkg_spe:
+      - "php7.4-bcmath"
+      - "php7.4-gmp"
+      - "php7.4-imagick"
+      - "php7.4-mbstring"
+      - "php7.4-redis"
+      - "php7.4-xml"
+      - "php7.4-zip"
+  "7.3":
+    php_pkg_spe:
+      - "php-imap"
+      - "php-imagick"
+      - "php-redis"
+      - "php7.3-xml"
+      - "php7.3-zip"
+      - "php7.3-mbstring"
+  "7.2":
+    php_pkg_spe:
+      - "php-imap"
+      - "php-imagick"
+      - "php-redis"
+      - "php7.2-xml"
+      - "php7.2-zip"
+      - "php7.2-mbstring"
+  "7.0":
+    php_pkg_spe:
+      - "php-imap"
+      - "php-imagick"
+      - "php-redis"
+      - "php7.0-mcrypt"
+      - "php7.0-xml"
+      - "php7.0-zip"
+      - "php7.0-mbstring"
+  "5":
+    php_dir: "/etc/php5"
+    php_bin: "php5-fpm"
+    php_pkg_apcu: "php5-apcu"
+    php_pkg_spe:
+      - "php5-imap"
+      - "php5-imagick"
+      - "php5-redis"
+      - "php5-mcrypt"
