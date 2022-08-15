@@ -1,8 +1,9 @@
 php_config_ref:
-  default:
+  defaults:
     php_dir: "/etc/php/{{ php_ver }}"
     php_bin: "php-fpm{{ php_ver }}"
     php_pkg_apcu: "php-apcu"
+    php_pkg_spe: []
     php_socket: "/run/php/php{{ php_ver }}-fpm.sock"
   "8.1":
     php_pkg_apcu: "php8.1-apcu"

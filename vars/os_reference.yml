@@ -1,7 +1,5 @@
 nextcloud_os_config:
   ubuntu:
-    default:
-      __mysql_daemon: mysql
     bionic:
       php_ver: 7.2
     focal:
@@ -11,15 +9,10 @@ nextcloud_os_config:
     xenial:
       php_ver: 7.0
   debian:
-    defaults:
-      __mysql_daemon: mariadb
-      nextcloud_websrv_user: "www-data"
-      nextcloud_websrv_group: "www-data"
     testing: &debian-testing
       php_ver: 8.1
     sid: *debian-testing
     stretch:
-      __mysql_daemon: mysql
       php_ver: 7.0
     buster:
       php_ver: 7.3
