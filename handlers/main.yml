@@ -22,12 +22,12 @@
 
 - name: start php-fpm
   ansible.builtin.service:
-    name: php{{ nc_php.php_ver }}-fpm
+    name: php{{ nc_php_ver }}-fpm
     state: started
 
 - name: reload php-fpm
   ansible.builtin.service:
-    name: php{{ nc_php.php_ver }}-fpm
+    name: php{{ nc_php_ver }}-fpm
     state: reloaded
 
 - name: start redis

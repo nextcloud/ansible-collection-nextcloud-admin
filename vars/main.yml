@@ -12,8 +12,8 @@ mysql_credential_file:
 nextcloud_max_upload_size_in_bytes: "{{ nextcloud_max_upload_size | human_to_bytes }}"
 
 ## PHP configuration
+nc_php_ver: "{{ php_ver | d(nextcloud_os_config[ansible_distribution|lower][ansible_distribution_release|lower].php_ver) }}"
 nc_php:
-  php_ver: "{{ php_ver | d(nextcloud_os_config[ansible_distribution|lower][ansible_distribution_release|lower].php_ver) }}"
   php_dir: "{{ php_dir | d(__nc_php.php_dir) }}"
   php_bin: "{{ php_bin | d(__nc_php.php_bin) }}"
   php_pkg_apcu: "{{ php_pkg_apcu | d(__nc_php.php_pkg_apcu) }}"
@@ -22,11 +22,11 @@ nc_php:
 
 # php config computed from references
 __nc_php:
-  php_dir: "{{ php_config_ref[nc_php.php_ver].php_dir | d(php_config_ref.defaults.php_dir) }}"
-  php_bin: "{{ php_config_ref[nc_php.php_ver].php_bin | d(php_config_ref.defaults.php_bin) }}"
-  php_pkg_apcu: "{{ php_config_ref[nc_php.php_ver].php_pkg_apcu | d(php_config_ref.defaults.php_pkg_apcu) }}"
-  php_pkg_spe: "{{ php_config_ref[nc_php.php_ver].php_pkg_spe | d(php_config_ref.defaults.php_pkg_spe) }}"
-  php_socket: "{{ php_config_ref[nc_php.php_ver].php_socket | d(php_config_ref.defaults.php_socket) }}"
+  php_dir: "{{ php_config_ref[nc_php_ver].php_dir | d(php_config_ref.defaults.php_dir) }}"
+  php_bin: "{{ php_config_ref[nc_php_ver].php_bin | d(php_config_ref.defaults.php_bin) }}"
+  php_pkg_apcu: "{{ php_config_ref[nc_php_ver].php_pkg_apcu | d(php_config_ref.defaults.php_pkg_apcu) }}"
+  php_pkg_spe: "{{ php_config_ref[nc_php_ver].php_pkg_spe | d(php_config_ref.defaults.php_pkg_spe) }}"
+  php_socket: "{{ php_config_ref[nc_php_ver].php_socket | d(php_config_ref.defaults.php_socket) }}"
 
 # configuration reference for php
 nextcloud_os_config:
@@ -52,11 +52,11 @@ nextcloud_os_config:
 
 php_config_ref:
   defaults:
-    php_dir: "/etc/php/{{ nc_php.php_ver }}"
-    php_bin: "php-fpm{{ nc_php.php_ver }}"
+    php_dir: "/etc/php/{{ nc_php_ver }}"
+    php_bin: "php-fpm{{ nc_php_ver }}"
     php_pkg_apcu: "php-apcu"
     php_pkg_spe: []
-    php_socket: "/run/php/php{{ nc_php.php_ver }}-fpm.sock"
+    php_socket: "/run/php/php{{ nc_php_ver }}-fpm.sock"
   "8.1":
     php_pkg_apcu: "php8.1-apcu"
     php_pkg_spe:
