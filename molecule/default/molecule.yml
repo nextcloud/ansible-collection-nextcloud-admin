@@ -15,4 +15,4 @@ platforms:
 provisioner:
   name: ansible
   playbooks:
-    converge: "${MOLECULE_NC:-"latest"}-converge.yml"
+    converge: "${MOLECULE_NC:-latest}-converge.yml"
