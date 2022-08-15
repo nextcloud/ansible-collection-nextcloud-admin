@@ -21,11 +21,11 @@ jobs:
 
     strategy:
       matrix:
-        distro:
-          - debian11
-          - debian10
-          - ubuntu2204
-          - ubuntu2004
+        include:
+          - { distro: "debian11" }
+          - { distro: "debian10", nc_version: "nc23" }
+          - { distro: "ubuntu2204" }
+          - { distro: "ubuntu2004" }
 
     steps:
       - name: Check out the repository
@@ -62,3 +62,4 @@ jobs:
           PY_COLORS: "1"
           ANSIBLE_FORCE_COLOR: "1"
           MOLECULE_DISTRO: ${{ matrix.distro }}
+          MOLECULE_NC: ${{ matrix.nc_version }}
