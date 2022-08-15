@@ -250,15 +250,15 @@ Defines the Nextcloud admin's login.
 nextcloud_admin_pwd: "secret"
 ```
 
-Defines the Nextcloud admin's password.  
-**Not defined by default**  
+Defines the Nextcloud admin's password.
+**Not defined by default**
 If not defined by the user, a random password will be generated.
 
 ```yaml
 nextcloud_max_upload_size: "512m"
 ```
 
-Defines the max size allowed to be uploaded on the server.  
+Defines the max size allowed to be uploaded on the server.
 Use 0 to __disable__.
 
 ### Redis Server configuration
@@ -430,7 +430,7 @@ Defines various method for retrieving a TLS certificate.
 ```
 
 ```yaml
-nextcloud_tls_session_cache_size: 50m 
+nextcloud_tls_session_cache_size: 50m
 ```
 
 Set the size of the shared nginx TLS session cache to 50 MB.
@@ -441,8 +441,6 @@ Install and use a custom version for PHP instead of the default one:
 
 ```yaml
 php_ver: '7.1'
-php_custom: yes
-php_ver: "{{ php_ver }}"
 php_dir: "/etc/php/{{ php_ver }}"
 php_bin: "php-fpm{{ php_ver }}"
 php_pkg_apcu: "php-apcu"

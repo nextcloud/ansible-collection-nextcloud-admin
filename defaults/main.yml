@@ -91,5 +91,4 @@ nextcloud_apps: {}
 # [SYSTEM]
 # nextcloud_mysql_root_pwd: "secret"
 
-php_custom: false
 php_memory_limit: 512M
