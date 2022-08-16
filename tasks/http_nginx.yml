@@ -1,15 +1,15 @@
 ---
 - name: "[NGINX] -  remove some commented line in php-fpm conf"
   ansible.builtin.lineinfile:
-    dest: "{{ nc_php.php_dir }}/fpm/pool.d/www.conf"
+    dest: "{{ php_dir }}/fpm/pool.d/www.conf"
     regexp: '^\;env'
     state: absent
-    # validate: "/usr/sbin/{{ nc_php.php_bin }} -t #%s"
+    # validate: "/usr/sbin/{{ php_bin }} -t #%s"
   notify: reload php-fpm
 
 - name: "[NGINX] -  Add path variable to php-fpm"
   ansible.builtin.blockinfile:
-    dest: "{{ nc_php.php_dir }}/fpm/pool.d/www.conf"
+    dest: "{{ php_dir }}/fpm/pool.d/www.conf"
     insertafter: '^; Default Value: clean env$'
     marker: "; {mark} ANSIBLE MANAGED BLOCK"
     block: |
@@ -22,16 +22,16 @@
 
 - name: "[NGINX] -  enable APC for php CLI"
   ansible.builtin.lineinfile:
-    dest: "{{ nc_php.php_dir }}/cli/php.ini"
+    dest: "{{ php_dir }}/cli/php.ini"
     line: "apc.enable_cli = 1"
     insertbefore: "^; End:$"
     state: present
-    # validate: "/usr/sbin/{{ nc_php.php_bin }} -t #%s"
+    # validate: "/usr/sbin/{{ php_bin }} -t #%s"
   notify: reload php-fpm
 
 - name: "[NGINX] -  enable PHP OPcache for php.ini"
   ansible.builtin.lineinfile:
-    dest: "{{ nc_php.php_dir }}/fpm/php.ini"
+    dest: "{{ php_dir }}/fpm/php.ini"
     state: present
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
@@ -45,7 +45,7 @@
     - { regexp: 'opcache.save_comments', line: 'opcache.save_comments=1' }
     - { regexp: 'opcache.revalidate_freq', line: 'opcache.revalidate_freq=1' }
     - { regexp: 'memory_limit', line: 'memory_limit={{ php_memory_limit }}'}
-    # validate: "/usr/sbin/{{ nc_php.php_bin }} -t #%s"
+    # validate: "/usr/sbin/{{ php_bin }} -t #%s"
   notify: reload php-fpm
 
 

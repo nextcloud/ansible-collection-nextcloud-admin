@@ -6,7 +6,7 @@
   vars:
     pg_deps:
       - "postgresql"
-      - "php{{ nc_php_ver }}-pgsql"
+      - "php{{ php_ver }}-pgsql"
       - "python3-psycopg2"
 
 - name: "[PostgreSQL] - nextcloud role is created."

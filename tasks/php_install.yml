@@ -7,23 +7,23 @@
     - "{{ nextcloud_websrv }}"
     - imagemagick
     - smbclient
-    - "php{{ nc_php_ver }}-gd"
-    - "php{{ nc_php_ver }}-ldap"
-    - "php{{ nc_php_ver }}-imap"
-    - "php{{ nc_php_ver }}-curl"
-    - "php{{ nc_php_ver }}-intl"
+    - "php{{ php_ver }}-gd"
+    - "php{{ php_ver }}-ldap"
+    - "php{{ php_ver }}-imap"
+    - "php{{ php_ver }}-curl"
+    - "php{{ php_ver }}-intl"
   notify:
     - start http
 
 - name: "[INSTALL] - php-json is installed (PHP < 8)"
   ansible.builtin.package:
-    name: "php{{ nc_php_ver }}-json"
+    name: "php{{ php_ver }}-json"
     state: present
-  when: nc_php_ver is version("8", "<")
+  when: php_ver is version("8", "<")
 
 - name: "[INSTALL] -  Apache Required package is installed."
   ansible.builtin.package:
-    name: "libapache2-mod-php{{ nc_php_ver }}"
+    name: "libapache2-mod-php{{ php_ver }}"
     state: present
   when: nextcloud_websrv == "apache2"
   notify:
@@ -31,7 +31,7 @@
 
 - name: "[INSTALL] -  NGINX Required package is installed."
   ansible.builtin.package:
-    name: "php{{ nc_php_ver }}-fpm"
+    name: "php{{ php_ver }}-fpm"
     state: present
   when: nextcloud_websrv == "nginx"
   notify:
@@ -43,9 +43,9 @@
     name: "{{ item }}"
     state: present
   with_items:
-    - "{{ nc_php.php_pkg_spe }}"
+    - "{{ php_pkg_spe }}"
 
 - name: "[INSTALL] -  APCu is installed."
   ansible.builtin.package:
-    name: "{{ nc_php.php_pkg_apcu }}"
+    name: "{{ php_pkg_apcu }}"
     state: present
