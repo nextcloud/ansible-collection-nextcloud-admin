@@ -1,3 +1,4 @@
+---
 # facts specific for each distributions and versions
 # defaults keys are global for each family/distribution
 debian:
