@@ -10,3 +10,7 @@ mysql_credential_file:
   debian: '/etc/mysql/debian.cnf'
 
 nextcloud_max_upload_size_in_bytes: "{{ nextcloud_max_upload_size | human_to_bytes }}"
+
+# load configurations references
+os_config_ref: "{{ lookup('ansible.builtin.template', [role_path,'defaults','os_config_ref.yml']|join('/')) | from_yaml }}"
+php_config_ref: "{{ lookup('ansible.builtin.template', [role_path,'defaults','php_config_ref.yml']|join('/')) | from_yaml }}"

@@ -17,7 +17,18 @@ nextcloud_repository: "https://download.nextcloud.com/server"  # Domain URL wher
 nextcloud_archive_format: "zip"  # zip | tar.bz2
 # nextcloud_full_url: "https://download.nextcloud.com/server/releases/nextcloud-23.0.0.zip"  # specify directly a full URL to the archive
 
-# [CONFIG]
+
+# [PHP CONFIG AND EXTENSIONS]
+# by default, use references stored in defaults/php_configs.yml
+php_ver: "{{ os_config_ref[ansible_distribution|lower][ansible_distribution_release|lower].php_ver }}"
+php_dir: "{{ php_config_ref[php_ver|replace('.','_')].php_dir | d(php_config_ref.defaults.php_dir) }}"
+php_bin: "{{ php_config_ref[php_ver|replace('.','_')].php_bin | d(php_config_ref.defaults.php_bin) }}"
+php_pkg_apcu: "{{ php_config_ref[php_ver|replace('.','_')].php_pkg_apcu | d(php_config_ref.defaults.php_pkg_apcu) }}"
+php_pkg_spe: "{{ php_config_ref[php_ver|replace('.','_')].php_pkg_spe | d(php_config_ref.defaults.php_pkg_spe) }}"
+php_socket: "{{ php_config_ref[php_ver|replace('.','_')].php_socket | d(php_config_ref.defaults.php_socket) }}"
+php_memory_limit: 512M
+
+# [NEXTCLOUD CONFIG]
 nextcloud_trusted_domain:
   - "{{ ansible_fqdn }}"
   - "{{ ansible_default_ipv4.address }}"
@@ -30,6 +41,8 @@ nextcloud_instance_name: "{{ nextcloud_trusted_domain | first }}"
 
 nextcloud_install_websrv: true
 nextcloud_websrv: "apache2"  # "apache2" | "nginx"
+nextcloud_websrv_user: "{{ os_config_ref[ansible_os_family|lower].defaults.nextcloud_websrv_user }}"
+nextcloud_websrv_group: "{{ os_config_ref[ansible_os_family|lower].defaults.nextcloud_websrv_group }}"
 nextcloud_disable_websrv_default_site: false
 nextcloud_websrv_template: "templates/{{ nextcloud_websrv }}_nc.j2"
 nextcloud_webroot: "/opt/nextcloud"
@@ -62,6 +75,11 @@ nextcloud_config_settings:
 nextcloud_install_db: true
 nextcloud_db_host: "127.0.0.1"
 nextcloud_db_backend: "mysql"  # "mysql"/"mariadb" | "pgsql"
+mysql_daemon: >-
+  {{
+  os_config_ref[ansible_distribution|lower][ansible_distribution_release|lower].mysql_daemon |
+  default(os_config_ref[ansible_distribution|lower].defaults.mysql_daemon)
+  }}
 nextcloud_db_enabled_on_startup: true
 nextcloud_db_name: "nextcloud"
 nextcloud_db_admin: "ncadmin"
@@ -90,6 +108,3 @@ nextcloud_apps: {}
 
 # [SYSTEM]
 # nextcloud_mysql_root_pwd: "secret"
-
-php_custom: false
-php_memory_limit: 512M
