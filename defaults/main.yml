@@ -45,6 +45,7 @@ nextcloud_websrv_user: "{{ os_config_ref[ansible_os_family|lower].defaults.nextc
 nextcloud_websrv_group: "{{ os_config_ref[ansible_os_family|lower].defaults.nextcloud_websrv_group }}"
 nextcloud_disable_websrv_default_site: false
 nextcloud_websrv_template: "templates/{{ nextcloud_websrv }}_nc.j2"
+nextcloud_websrv_security_template: "templates/{{ nextcloud_websrv }}_security.conf.j2"
 nextcloud_webroot: "/opt/nextcloud"
 nextcloud_data_dir: "/var/ncdata"
 nextcloud_admin_name: "admin"
@@ -105,6 +106,7 @@ nextcloud_tls_session_cache_size: 50m  # in Byte or human readable size notation
 
 # [APPS]
 nextcloud_apps: {}
+nextcloud_disable_apps: {}
 
 # [SYSTEM]
 # nextcloud_mysql_root_pwd: "secret"
