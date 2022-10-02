@@ -47,11 +47,31 @@
   when: (nextcloud_install_tls | bool)
   notify: restart http
 
+# - name: "[APACHE] -  Public Diffie-Hellman Parameter are generated. This might take a while."
+#   ansible.builtin.command: "openssl dhparam -out {{ nextcloud_tls_dhparam }} 4096"
+#   args:
+#     creates: "{{ nextcloud_tls_dhparam }}"
+#   when: (nextcloud_install_tls | bool)
+
+- name: "[APACHE] -  generate security config for apache"
+  ansible.builtin.template:
+    dest: /etc/apache2/conf-available/security.conf
+    src: "{{ nextcloud_websrv_security_template }}"
+    mode: 0640
+  notify: reload http
+
 - name: "[APACHE] -  generate Nextcloud configuration for apache"
   ansible.builtin.template:
     dest: /etc/apache2/sites-available/nc_{{ nextcloud_instance_name }}.conf
     src: "{{ nextcloud_websrv_template }}"
     mode: 0640
+  notify: reload http
+
+- name: "[APACHE] -  Enable security in apache conf"
+  ansible.builtin.file:
+    path: /etc/apache2/conf-enabled/security.conf
+    src: /etc/apache2/conf-available/security.conf
+    state: link
   notify: reload http
 
 - name: "[APACHE] -  Enable Nextcloud site in apache conf"
