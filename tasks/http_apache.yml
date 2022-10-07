@@ -36,6 +36,7 @@
     - env
     - dir
     - mime
+    - http2
   notify: restart http
 
 - name: "[APACHE] -  Ssl Apache2 module is enabled"
