@@ -132,7 +132,7 @@
     - name: "[NC] - Install Cronjob"
       ansible.builtin.cron:
         name: "Nextcloud Cronjob"
-        minute: "*/15"
+        minute: "*/10"
         user: "{{ nextcloud_websrv_user }}"
         job: "php {{ nextcloud_webroot }}/cron.php"
         cron_file: "nextcloud"
