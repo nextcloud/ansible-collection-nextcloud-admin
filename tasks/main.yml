@@ -106,6 +106,33 @@
     - nextcloud_apps is mapping
   tags: install_apps
 
+- name: Disable Nextcloud Apps
+  block:
+    - name: "[NC apps] - lists the number of apps available in the instance."
+      ansible.builtin.command: php occ app:list --output=json_pretty --no-warnings
+      args:
+        chdir: "{{ nextcloud_webroot }}"
+      become_user: "{{ nextcloud_websrv_user }}"
+      become: true
+      become_flags: "{{ ansible_become_flags | default(omit) }}"
+      changed_when: false
+      check_mode: false
+      register: nc_apps_list
+
+    - name: "[NC apps] - convert list to yaml."
+      ansible.builtin.set_fact:
+        nc_available_apps: "{{ nc_apps_list.stdout | from_json }}"
+
+    - name: "[NC apps] - Disable apps"
+      include_tasks: ./nc_disable_apps.yml
+      # do if the app is  enabled and ( (archive path is not "") or (app is disabled) )
+      when:
+        - item in nc_available_apps.enabled
+      with_items: "{{ nextcloud_disable_apps }}"
+  when:
+    - nextcloud_disable_apps is defined
+  tags: disable_apps
+
 - name: Add indices
   ansible.builtin.command: php occ db:add-missing-indices
   args:
