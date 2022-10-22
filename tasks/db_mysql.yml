@@ -21,7 +21,6 @@
     state: present
   vars:
     nc_mysql_deps:
-      - "php{{ php_ver }}-mysql"
       - "python3-pymysql"
 
 - name: "[mySQL] - Ensure MySQL is started and enabled on boot."
