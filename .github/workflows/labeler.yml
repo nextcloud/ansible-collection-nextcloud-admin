@@ -5,7 +5,6 @@ name: Labeler
   push:
     branches:
       - main
-      - master
 
 jobs:
   labeler:
