@@ -1,0 +1,31 @@
+---
+# facts specific for each distributions and versions
+# defaults keys are global for each family/distribution
+debian:
+  defaults:
+    mysql_daemon: mariadb
+    # thoses 2 are globals for debian family:
+    nextcloud_websrv_user: "www-data"
+    nextcloud_websrv_group: "www-data"
+  stretch:
+    php_ver: 7.0
+    mysql_daemon: mysql
+  buster:
+    php_ver: 7.3
+  bullseye:
+    php_ver: 7.4
+  testing: &debian-testing
+    php_ver: 8.1
+  sid: *debian-testing
+
+ubuntu:
+  defaults:
+    mysql_daemon: mysql
+  xenial:
+    php_ver: 7.0
+  bionic:
+    php_ver: 7.2
+  focal:
+    php_ver: 7.4
+  jammy:
+    php_ver: 8.1
