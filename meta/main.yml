@@ -11,16 +11,14 @@ galaxy_info:
   platforms:
     - name: Ubuntu
       versions:
-        - xenial
-        - bionic
-        - focal
         - jammy
+        - focal
+        - bionic
 
     - name: Debian
       versions:
-        - stretch
-        - buster
         - bullseye
+        - buster
 
   galaxy_tags:
     - nextcloud
