@@ -1,0 +1,10 @@
+[tool.poetry]
+name = "install_nextcloud"
+version = "1.6.0"
+description = "Ansible role for installing a Nextcloud server."
+authors = ["aalaesar"]
+readme = "README.md"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
