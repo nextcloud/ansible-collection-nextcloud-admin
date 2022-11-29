@@ -1,23 +1,13 @@
 ---
-- name: define certificate path
+- name: "[INSTALLED TLS] - Define certificate path"
   ansible.builtin.set_fact:
     nextcloud_tls_cert_file: "{{ nextcloud_tls_cert }}"
-- name: define key path
+
+- name: "[INSTALLED TLS] - Define key path"
   ansible.builtin.set_fact:
     nextcloud_tls_cert_key_file: "{{ nextcloud_tls_cert_key }}"
-- name: define certificate chain  path
+
+- name: "[INSTALLED TLS] - Define certificate chain  path"
   ansible.builtin.set_fact:
     nextcloud_tls_cert_chain_file: "{{ nextcloud_tls_cert_chain }}"
   when: nextcloud_tls_cert_chain is defined
-
-# - name: "[INSTALLED TLS] - check TLS certificate permissions"
-#   ansible.builtin.file:
-#     path: "{{ nextcloud_tls_cert_file }}"
-#     mode: 0644
-#     group: "{{ nextcloud_websrv_group }}"
-
-# - name: "[INSTALLED TLS] - check TLS key permissions"
-#   ansible.builtin.file:
-#     path: "{{ nextcloud_tls_cert_key_file }}"
-#     mode: 0640
-#     group: "{{ nextcloud_websrv_group }}"

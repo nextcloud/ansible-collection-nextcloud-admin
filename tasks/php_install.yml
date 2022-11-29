@@ -13,7 +13,7 @@
     - "php{{ php_ver }}-curl"
     - "php{{ php_ver }}-intl"
   notify:
-    - start http
+    - Start http
 
 - name: "[INSTALL] - php-json is installed (PHP < 8)"
   ansible.builtin.package:
@@ -27,7 +27,7 @@
     state: present
   when: nextcloud_websrv == "apache2"
   notify:
-    - start http
+    - Start http
 
 - name: "[INSTALL] -  NGINX Required package is installed."
   ansible.builtin.package:
@@ -35,8 +35,8 @@
     state: present
   when: nextcloud_websrv == "nginx"
   notify:
-    - start http
-    - start php-fpm
+    - Start http
+    - Start php-fpm
 
 - name: "[INSTALL] -  PHP extra Packages are installed."
   ansible.builtin.package:

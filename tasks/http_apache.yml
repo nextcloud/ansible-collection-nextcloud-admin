@@ -24,7 +24,7 @@
     - {regexp: 'opcache.revalidate_freq', line: 'opcache.revalidate_freq=1'}
     - {regexp: 'memory_limit', line: 'memory_limit={{ php_memory_limit }}'}
     # validate: "/usr/sbin/{{ php_bin }} -t #%s"
-  notify: reload http
+  notify: Reload http
 
 - name: "[APACHE] -  Required Apache2 modules are enabled"
   apache2_module:
@@ -36,7 +36,7 @@
     - env
     - dir
     - mime
-  notify: restart http
+  notify: Restart http
 
 - name: "[APACHE] -  Ssl Apache2 module is enabled"
   apache2_module:
@@ -45,25 +45,25 @@
   with_items:
     - ssl
   when: (nextcloud_install_tls | bool)
-  notify: restart http
+  notify: Restart http
 
 - name: "[APACHE] -  generate Nextcloud configuration for apache"
   ansible.builtin.template:
     dest: /etc/apache2/sites-available/nc_{{ nextcloud_instance_name }}.conf
     src: "{{ nextcloud_websrv_template }}"
     mode: 0640
-  notify: reload http
+  notify: Reload http
 
 - name: "[APACHE] -  Enable Nextcloud site in apache conf"
   ansible.builtin.file:
     path: /etc/apache2/sites-enabled/nc_{{ nextcloud_instance_name }}.conf
     src: /etc/apache2/sites-available/nc_{{ nextcloud_instance_name }}.conf
     state: link
-  notify: reload http
+  notify: Reload http
 
 - name: "[APACHE] -  Disable apache default site"
   ansible.builtin.file:
     path: /etc/apache2/sites-enabled/000-default.conf
     state: absent
   when: nextcloud_disable_websrv_default_site | bool
-  notify: reload http
+  notify: Reload http

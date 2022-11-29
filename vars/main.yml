@@ -1,10 +1,10 @@
 ---
 # vars file for nextcloud
 nextcloud_dl_file_name:
-  latest: "{{ ['latest', nextcloud_version_major]|reject('undefined')|join('-') }}"
-  releases: "{{ ['nextcloud', nextcloud_version_full]|reject('undefined')|join('-') }}"
-  prereleases: "nextcloud-{{ [nextcloud_version_full, nextcloud_version_special]|reject('undefined')|join() }}"
-  daily: "nextcloud-{{ nextcloud_version_major|d('') }}-daily-{{ nextcloud_version_special|d('') }}"
+  latest: "{{ ['latest', nextcloud_version_major] | reject('undefined') | join('-') }}"
+  releases: "{{ ['nextcloud', nextcloud_version_full] | reject('undefined') | join('-') }}"
+  prereleases: "nextcloud-{{ [nextcloud_version_full, nextcloud_version_special] | reject('undefined') | join() }}"
+  daily: "nextcloud-{{ nextcloud_version_major | d('') }}-daily-{{ nextcloud_version_special | d('') }}"
 
 mysql_credential_file:
   debian: '/etc/mysql/debian.cnf'
@@ -12,5 +12,5 @@ mysql_credential_file:
 nextcloud_max_upload_size_in_bytes: "{{ nextcloud_max_upload_size | human_to_bytes }}"
 
 # load configurations references
-os_config_ref: "{{ lookup('ansible.builtin.template', [role_path,'defaults','os_config_ref.yml']|join('/')) | from_yaml }}"
-php_config_ref: "{{ lookup('ansible.builtin.template', [role_path,'defaults','php_config_ref.yml']|join('/')) | from_yaml }}"
+os_config_ref: "{{ lookup('ansible.builtin.template', [role_path, 'defaults', 'os_config_ref.yml'] | join('/')) | from_yaml }}"
+php_config_ref: "{{ lookup('ansible.builtin.template', [role_path, 'defaults', 'php_config_ref.yml'] | join('/')) | from_yaml }}"
