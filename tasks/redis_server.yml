@@ -6,11 +6,11 @@
   vars:
     redix_deps:
       - redis-server
-  notify: start redis
+  notify: Start redis
 
 - name: "[REDIS] -  Redis configuration is present."
   ansible.builtin.template:
     dest: /etc/redis/redis.conf
     src: templates/redis.conf.j2
     mode: 0640
-  notify: restart redis
+  notify: Restart redis

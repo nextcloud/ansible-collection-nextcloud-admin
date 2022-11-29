@@ -11,7 +11,7 @@
     state: present
   when: nextcloud_archive_format == "tar.bz2"
 
-- name: you must specify the major version
+- name: "[NC-DL] - You must specify the major version"
   ansible.builtin.assert:
     that: nextcloud_version_major is defined
   when: nextcloud_full_url is defined
@@ -27,17 +27,17 @@
 
 - name: "Download and extract Nextcloud"
   block:
-    - name: "Download & extract Nextcloud to /tmp."
+    - name: "[NC-DL] - Download & extract Nextcloud to /tmp."
       ansible.builtin.unarchive:
         copy: false
         src: "{{ nextcloud_full_url | default(nextcloud_calculated_url) }}"
         dest: "/tmp/"
       vars:
         nextcloud_calculated_url: "{{ nextcloud_repository }}/{{ nextcloud_version_channel }}/{{ nextcloud_calculated_file }}"
-        nextcloud_calculated_file: "{{ [nextcloud_dl_file_name[just_a_dict_key], nextcloud_archive_format]|join('.') }}"
-        just_a_dict_key: "{{ 'latest' if ((nextcloud_get_latest|bool) and (nextcloud_version_channel != 'prereleases')) else nextcloud_version_channel }}"
+        nextcloud_calculated_file: "{{ [nextcloud_dl_file_name[just_a_dict_key], nextcloud_archive_format] | join('.') }}"
+        just_a_dict_key: "{{ 'latest' if ((nextcloud_get_latest | bool) and (nextcloud_version_channel != 'prereleases')) else nextcloud_version_channel }}"
 
-    - name: "[NC-DL] - Move extracted files to {{ nextcloud_webroot }}."
+    - name: "[NC-DL] - Move extracted files to {{ nextcloud_webroot }}"
       ansible.builtin.command: "cp -r /tmp/nextcloud/. {{ nextcloud_webroot }}/"
       when: nextcloud_webroot is not none
 

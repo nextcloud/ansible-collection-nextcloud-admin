@@ -94,9 +94,9 @@
     dest: /etc/mysql/conf.d/nextcloud.cnf
     src: files/mysql_nextcloud.cnf
     mode: 0600
-  notify: restart mysql
+  notify: Restart mysql
 
-- name: "[mySQL] - Add Database {{ nextcloud_db_name }}."
+- name: "[mySQL] - Add Database {{ nextcloud_db_name }}"
   mysql_db:
     name: "{{ nextcloud_db_name }}"
     login_user: root

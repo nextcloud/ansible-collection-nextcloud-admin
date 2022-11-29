@@ -1,12 +1,13 @@
 ---
-- name: parse the item values
+- name: "[App] - Parse the item values"
   ansible.builtin.set_fact:
     nc_app_name: "{{ item.key }}"
     nc_app_cfg: "{{ item.value }}"
 
 - name: "Install and enable Nextcloud Apps"
+  when: nc_app_cfg is string
   block:
-    - name: "[ App {{ nc_app_name }} ] - Download Archive in apps folder."
+    - name: "[App] - Download Archive in apps folder {{ nc_app_name }}"
       ansible.builtin.unarchive:
         copy: false
         src: "{{ nc_app_cfg }}"
@@ -16,7 +17,7 @@
         creates: "{{ nextcloud_webroot }}/apps/{{ nc_app_name }}"
       when: nc_app_cfg is not none
 
-    - name: "[ App {{ nc_app_name }} ] - enable the application."
+    - name: "[App] - Enable the application {{ nc_app_name }}"
       become_user: "{{ nextcloud_websrv_user }}"
       become_flags: "{{ ansible_become_flags | default(omit) }}"
       become: true
@@ -24,17 +25,17 @@
       args:
         chdir: "{{ nextcloud_webroot }}"
       when: nc_app_cfg is not none
-  when: nc_app_cfg is string
 
-- name: "Install Apps"
+- name: "[App] - Install Apps"
+  when: nc_app_cfg is mapping
   block:
-    - name: verify the app's yaml declaration
+    - name: "[App] - Verify the app's yaml declaration"
       ansible.builtin.assert:
         that:
           - (nc_app_cfg.source is defined) and (nc_app_cfg.source is string)
         msg: "{{ nc_app_name }} is not well declared."
 
-    - name: "[ App {{ nc_app_name }} ] - Download Archive in apps folder."
+    - name: "[App] - Download Archive in apps folder {{ nc_app_name }}"
       ansible.builtin.unarchive:
         copy: false
         src: "{{ nc_app_cfg.source }}"
@@ -44,7 +45,7 @@
         creates: "{{ nextcloud_webroot }}/apps/{{ nc_app_name }}"
       when: nc_app_cfg.source is not none
 
-    - name: "[ App {{ nc_app_name }} ] - enable the application."
+    - name: "[App] - Enable the application {{ nc_app_name }}"
       become_user: "{{ nextcloud_websrv_user }}"
       become_flags: "{{ ansible_become_flags | default(omit) }}"
       become: true
@@ -53,7 +54,7 @@
         chdir: "{{ nextcloud_webroot }}"
       when: nc_app_cfg.source is not none
 
-    - name: "[ App {{ nc_app_name }} ] - Configure the application "
+    - name: "[App] - Configure the application {{ nc_app_name }}"
       become_user: "{{ nextcloud_websrv_user }}"
       become_flags: "{{ ansible_become_flags | default(omit) }}"
       become: true
@@ -64,4 +65,3 @@
       loop_control:
         loop_var: item_cfg
       when: nc_app_cfg.conf is defined
-  when: (nc_app_cfg is mapping)

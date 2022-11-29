@@ -5,7 +5,7 @@
     regexp: '^\;env'
     state: absent
     # validate: "/usr/sbin/{{ php_bin }} -t #%s"
-  notify: reload php-fpm
+  notify: Reload php-fpm
 
 - name: "[NGINX] -  Add path variable to php-fpm"
   ansible.builtin.blockinfile:
@@ -18,7 +18,7 @@
       env[TMP] = /tmp
       env[TMPDIR] = /tmp
       env[TEMP] = /tmp
-  notify: reload php-fpm
+  notify: Reload php-fpm
 
 - name: "[NGINX] -  enable APC for php CLI"
   ansible.builtin.lineinfile:
@@ -27,7 +27,7 @@
     insertbefore: "^; End:$"
     state: present
     # validate: "/usr/sbin/{{ php_bin }} -t #%s"
-  notify: reload php-fpm
+  notify: Reload php-fpm
 
 - name: "[NGINX] -  enable PHP OPcache for php.ini"
   ansible.builtin.lineinfile:
@@ -46,7 +46,7 @@
     - { regexp: 'opcache.revalidate_freq', line: 'opcache.revalidate_freq=1' }
     - { regexp: 'memory_limit', line: 'memory_limit={{ php_memory_limit }}'}
     # validate: "/usr/sbin/{{ php_bin }} -t #%s"
-  notify: reload php-fpm
+  notify: Reload php-fpm
 
 
 - name: "[NGINX] -  Public Diffie-Hellman Parameter are generated. This might take a while."
@@ -59,32 +59,32 @@
     dest: /etc/nginx/sites-available/php_handler.cnf
     src: templates/nginx_php_handler.j2
     mode: 0640
-  notify: reload http
+  notify: Reload http
 
 - name: "[NGINX] -  php handler is enabled"
   ansible.builtin.file:
     path: /etc/nginx/sites-enabled/php_handler
     src: /etc/nginx/sites-available/php_handler.cnf
     state: link
-  notify: reload http
+  notify: Reload http
 
 - name: "[NGINX] -  generate Nextcloud configuration for nginx"
   ansible.builtin.template:
     dest: /etc/nginx/sites-available/nc_{{ nextcloud_instance_name }}.cnf
     src: "{{ nextcloud_websrv_template }}"
     mode: 0640
-  notify: reload http
+  notify: Reload http
 
 - name: "[NGINX] -  Enable Nextcloud in nginx conf"
   ansible.builtin.file:
     path: /etc/nginx/sites-enabled/nc_{{ nextcloud_instance_name }}
     src: /etc/nginx/sites-available/nc_{{ nextcloud_instance_name }}.cnf
     state: link
-  notify: reload http
+  notify: Reload http
 
 - name: "[NGINX] -  Disable nginx default site"
   ansible.builtin.file:
     path: /etc/nginx/sites-enabled/default
     state: absent
   when: nextcloud_disable_websrv_default_site | bool
-  notify: reload http
+  notify: Reload http
