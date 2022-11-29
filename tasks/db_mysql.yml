@@ -96,7 +96,7 @@
     mode: 0600
   notify: restart mysql
 
-- name: "[mySQL] - Add Database {{ nextcloud_db_name }}."
+- name: "[mySQL] - Add Database {{ nextcloud_db_name }}"
   mysql_db:
     name: "{{ nextcloud_db_name }}"
     login_user: root

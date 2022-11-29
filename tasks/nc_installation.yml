@@ -14,9 +14,9 @@
     owner: "{{ nextcloud_websrv_user }}"
     group: "{{ nextcloud_websrv_group }}"
 
-- name: "[NC] - generate {{ nextcloud_admin_name }} password:"
+- name: "[NC] - Generate password {{ nextcloud_admin_name }}"
   ansible.builtin.set_fact:
-    nextcloud_admin_pwd: "{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/web_admin.pwd' ) }}"
+    nextcloud_admin_pwd: "{{ lookup('password', 'nextcloud_instances/' + nextcloud_instance_name + '/web_admin.pwd') }}"
   when: nextcloud_admin_pwd is not defined
 
 - name: "[NC] - Set temporary permissions for command line installation."
@@ -123,6 +123,7 @@
   when: (nextcloud_install_redis_server | bool)
 
 - name: "[NC] - Configure Cron"
+  when: (nextcloud_background_cron | bool)
   block:
     - name: "[NC] - Check Cron package"
       ansible.builtin.package:
@@ -136,7 +137,6 @@
         user: "{{ nextcloud_websrv_user }}"
         job: "php {{ nextcloud_webroot }}/cron.php"
         cron_file: "nextcloud"
-  when: (nextcloud_background_cron | bool)
 
 - name: "[NC] - Set Cron method to Crontab"
   become_user: "{{ nextcloud_websrv_user }}"

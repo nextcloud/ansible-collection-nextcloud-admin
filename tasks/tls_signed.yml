@@ -1,8 +1,9 @@
 ---
-- name: define signed certificate path
+- name: "[SIGNED TLS] - Define signed certificate path"
   ansible.builtin.set_fact:
     nextcloud_tls_cert_file: "{{ nextcloud_tls_cert | default(\"/etc/ssl/\" + nextcloud_instance_name + \".crt\") }}"
-- name: define signed certificate's key path
+
+- name: "[SIGNED TLS] - Define signed certificate's key path"
   ansible.builtin.set_fact:
     nextcloud_tls_cert_key_file: "{{ nextcloud_tls_cert_key | default(\"/etc/ssl/\" + nextcloud_instance_name + \".key\") }}"
 
@@ -18,13 +19,13 @@
     src: "{{ nextcloud_tls_src_cert_key }}"
     mode: 0640
 
-- name: "[SIGNED TLS] - check TLS certificate permissions"
+- name: "[SIGNED TLS] - Check TLS certificate permissions"
   ansible.builtin.file:
     path: "{{ nextcloud_tls_cert_file }}"
     mode: 0644
     group: "{{ nextcloud_websrv_group }}"
 
-- name: "[SIGNED TLS] - check TLS key permissions"
+- name: "[SIGNED TLS] - Check TLS key permissions"
   ansible.builtin.file:
     path: "{{ nextcloud_tls_cert_key_file }}"
     mode: 0640
