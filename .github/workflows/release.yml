@@ -37,7 +37,7 @@ jobs:
         uses: salsify/action-detect-and-tag-new-version@v2
         with:
           tag-template: "{VERSION}"
-          version-command: version-command: |
+          version-command: |
             cat current-version.txt
 
       - name: Install Ansible
