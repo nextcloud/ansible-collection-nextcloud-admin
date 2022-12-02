@@ -12,6 +12,7 @@ nextcloud_backup_suffix: ""
 nextcloud_backup_owner: "{{ nextcloud_websrv_user }}"
 nextcloud_backup_group: "{{ nextcloud_websrv_user }}"
 nextcloud_backup_mode: "0640"
+nextcloud_backup_format: "tgz"
 
 ### APPS BACKUPS ###
 nextcloud_backup_app_data: true

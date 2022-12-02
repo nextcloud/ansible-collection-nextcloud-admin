@@ -29,7 +29,8 @@ The backup name can be adjusted with
 
 ```yaml
 nextcloud_instance_name: "nextcloud" # a human identifier for the server
-nextcloud_backup_suffix: "" # some artitrary information at the end of the archive name
+nextcloud_backup_suffix: "" # some arbitrary information at the end of the archive name
+nextcloud_backup_format: "tgz" # extension of the archive. use a supported format used by the archive module (Choices: bz2, gz, tar, xz, zip)
 ```
 
 Or you can change it completely by redefining

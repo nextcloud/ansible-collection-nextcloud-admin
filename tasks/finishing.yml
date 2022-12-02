@@ -2,10 +2,11 @@
   community.general.archive:
     path:
       - "{{ nc_archive_path }}/*"
-    dest: "{{ nc_archive_path }}.tgz"
+    dest: "{{ nc_archive_path }}.{{ nextcloud_backup_format }}"
     owner: "{{ nextcloud_backup_owner }}"
     group: "{{ nextcloud_backup_group }}"
     mode: "{{ nextcloud_backup_mode }}"
+    format: "{{ nextcloud_backup_format | regex_replace('tgz', 'gz' ) }}"
   tags:
     - always
 
