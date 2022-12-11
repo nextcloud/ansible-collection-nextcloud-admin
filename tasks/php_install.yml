@@ -1,10 +1,9 @@
 ---
-- name: "[INSTALL] -  Required and recommended packages are installed."
+- name: "[INSTALL] - Required and recommended packages are installed."
   ansible.builtin.package:
     name: "{{ item }}"
     state: present
   with_items:
-    - "{{ nextcloud_websrv }}"
     - imagemagick
     - smbclient
     - "php{{ php_ver }}-gd"
@@ -13,30 +12,13 @@
     - "php{{ php_ver }}-curl"
     - "php{{ php_ver }}-intl"
   notify:
-    - Start http
+    - Start php-fpm
 
 - name: "[INSTALL] - php-json is installed (PHP < 8)"
   ansible.builtin.package:
     name: "php{{ php_ver }}-json"
     state: present
   when: php_ver is version("8", "<")
-
-- name: "[INSTALL] -  Apache Required package is installed."
-  ansible.builtin.package:
-    name: "libapache2-mod-php{{ php_ver }}"
-    state: present
-  when: nextcloud_websrv == "apache2"
-  notify:
-    - Start http
-
-- name: "[INSTALL] -  NGINX Required package is installed."
-  ansible.builtin.package:
-    name: "php{{ php_ver }}-fpm"
-    state: present
-  when: nextcloud_websrv == "nginx"
-  notify:
-    - Start http
-    - Start php-fpm
 
 - name: "[INSTALL] -  PHP extra Packages are installed."
   ansible.builtin.package:

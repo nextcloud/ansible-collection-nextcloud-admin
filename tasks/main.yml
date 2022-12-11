@@ -5,9 +5,13 @@
   ansible.builtin.include_tasks: ./setup_env.yml
   tags: always
 
-- name: "Install required packages"
+- name: "Install PHP packages"
   ansible.builtin.include_tasks: php_install.yml
   tags: always
+
+- name: Install web server packages
+  when: nextcloud_install_websrv
+  ansible.builtin.include_tasks: ./websrv_install.yml
 
 - name: Install certificates
   when: nextcloud_install_tls
