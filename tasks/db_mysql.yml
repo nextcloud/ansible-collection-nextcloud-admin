@@ -78,14 +78,14 @@
   check_mode: false
 
 - name: "[mySQL] - Remove anonymous MySQL users."
-  mysql_user:
+  community.mysql.mysql_user:
     name: ""
     host: "{{ item }}"
     state: absent
   with_items: "{{ mysql_anonymous_hosts.stdout_lines|default([]) }}"
 
 - name: "[mySQL] - Remove MySQL test database."
-  mysql_db:
+  community.mysql.mysql_db:
     name: 'test'
     state: absent
 
@@ -97,7 +97,7 @@
   notify: Restart mysql
 
 - name: "[mySQL] - Add Database {{ nextcloud_db_name }}"
-  mysql_db:
+  community.mysql.mysql_db:
     name: "{{ nextcloud_db_name }}"
     login_user: root
     login_password: "{{ nextcloud_mysql_root_pwd }}"
@@ -105,7 +105,7 @@
     state: present
 
 - name: "[mySQL] - Configure the database user."
-  mysql_user:
+  community.mysql.mysql_user:
     name: "{{ nextcloud_db_admin }}"
     password: "{{ nextcloud_db_pwd }}"
     priv: "{{ nextcloud_db_name }}.*:ALL"
