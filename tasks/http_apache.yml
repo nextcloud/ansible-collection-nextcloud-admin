@@ -27,7 +27,7 @@
   notify: Reload http
 
 - name: "[APACHE] -  Required Apache2 modules are enabled"
-  apache2_module:
+  community.general.apache2_module:
     name: "{{ item }}"
     state: present
   with_items:
@@ -39,7 +39,7 @@
   notify: Restart http
 
 - name: "[APACHE] -  Ssl Apache2 module is enabled"
-  apache2_module:
+  community.general.apache2_module:
     state: present
     name: "{{ item }}"
   with_items:

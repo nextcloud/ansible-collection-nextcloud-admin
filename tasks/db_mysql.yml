@@ -1,7 +1,7 @@
 ---
 - name: "[mySQL] - Service is installed."
   ansible.builtin.package:
-    name: "{{ 'default-' if ((ansible_distribution|lower) == 'debian' and nextcloud_db_backend == 'mysql') else '' }}{{ nextcloud_db_backend }}-server"
+    name: "{{ 'default-' if ((ansible_distribution | lower) == 'debian' and nextcloud_db_backend == 'mysql') else '' }}{{ nextcloud_db_backend }}-server"
     state: present
   register: nc_mysql_db_install
 
@@ -48,7 +48,7 @@
     mysql -u root -NBe
     'ALTER USER "root"@"{{ item }}"
     IDENTIFIED WITH mysql_native_password BY "{{ nextcloud_mysql_root_pwd }}"; FLUSH PRIVILEGES;'
-  with_items: "{{ mysql_root_hosts.stdout_lines|default([]) }}"
+  with_items: "{{ mysql_root_hosts.stdout_lines | default([]) }}"
   when: >
     ((mysql_install_packages | bool) or nextcloud_mysql_root_pwd_update)
     and ('5.7.' in mysql_cli_version.stdout or '8.0.' in mysql_cli_version.stdout)
@@ -57,7 +57,7 @@
   ansible.builtin.shell: >
     mysql -NBe
     'SET PASSWORD FOR "root"@"{{ item }}" = PASSWORD("{{ nextcloud_mysql_root_pwd }}"); FLUSH PRIVILEGES;'
-  with_items: "{{ mysql_root_hosts.stdout_lines|default([]) }}"
+  with_items: "{{ mysql_root_hosts.stdout_lines | default([]) }}"
   when: >
     ((mysql_install_packages | bool) or nextcloud_mysql_root_pwd_update)
     and ('5.7.' not in mysql_cli_version.stdout and '8.0.' not in mysql_cli_version.stdout)
@@ -82,7 +82,7 @@
     name: ""
     host: "{{ item }}"
     state: absent
-  with_items: "{{ mysql_anonymous_hosts.stdout_lines|default([]) }}"
+  with_items: "{{ mysql_anonymous_hosts.stdout_lines | default([]) }}"
 
 - name: "[mySQL] - Remove MySQL test database."
   community.mysql.mysql_db:
@@ -101,7 +101,7 @@
     name: "{{ nextcloud_db_name }}"
     login_user: root
     login_password: "{{ nextcloud_mysql_root_pwd }}"
-    config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
+    config_file: "{{ mysql_credential_file[(ansible_os_family | lower)] | default(omit) }}"
     state: present
 
 - name: "[mySQL] - Configure the database user."
@@ -111,5 +111,5 @@
     priv: "{{ nextcloud_db_name }}.*:ALL"
     login_user: root
     login_password: "{{ nextcloud_mysql_root_pwd }}"
-    config_file: "{{ mysql_credential_file[(ansible_os_family|lower)] | default(omit) }}"
+    config_file: "{{ mysql_credential_file[(ansible_os_family | lower)] | default(omit) }}"
     state: present

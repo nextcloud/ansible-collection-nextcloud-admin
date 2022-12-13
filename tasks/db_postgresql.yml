@@ -9,7 +9,7 @@
       - "python3-psycopg2"
 
 - name: "[PostgreSQL] - nextcloud role is created."
-  postgresql_user:
+  community.postgresql.postgresql_user:
     name: "{{ nextcloud_db_admin }}"
     password: "{{ nextcloud_db_pwd }}"
     encrypted: true
@@ -19,7 +19,7 @@
   become: true
 
 - name: "[PostgreSQL] - nextcloud database is created."
-  postgresql_db:
+  community.postgresql.postgresql_db:
     name: "{{ nextcloud_db_name }}"
     state: present
     owner: "{{ nextcloud_db_admin }}"
