@@ -26,7 +26,7 @@ php_bin: "{{ php_config_ref[php_ver | replace('.', '_')].php_bin | d(php_config_
 php_pkg_apcu: "{{ php_config_ref[php_ver | replace('.', '_')].php_pkg_apcu | d(php_config_ref.defaults.php_pkg_apcu) }}"
 php_pkg_spe: "{{ php_config_ref[php_ver | replace('.', '_')].php_pkg_spe | d(php_config_ref.defaults.php_pkg_spe) }}"
 php_socket: "{{ php_config_ref[php_ver | replace('.', '_')].php_socket | d(php_config_ref.defaults.php_socket) }}"
-php_memory_limit: 512M
+php_memory_limit: 768M
 
 # [NEXTCLOUD CONFIG]
 nextcloud_trusted_domain:
