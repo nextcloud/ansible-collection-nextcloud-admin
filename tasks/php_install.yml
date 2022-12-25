@@ -12,6 +12,7 @@
     - "php{{ php_ver }}-imap"
     - "php{{ php_ver }}-curl"
     - "php{{ php_ver }}-intl"
+    - "php{{ php_ver }}-bz2"
   notify:
     - Start php-fpm
 
