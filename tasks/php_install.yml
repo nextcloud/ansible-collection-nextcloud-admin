@@ -6,7 +6,7 @@
   with_items:
     - imagemagick
     - smbclient
-    - "php-fpm"
+    - "php{{ php_ver }}-fpm"
     - "php{{ php_ver }}-gd"
     - "php{{ php_ver }}-ldap"
     - "php{{ php_ver }}-imap"

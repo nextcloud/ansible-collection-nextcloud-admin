@@ -6,7 +6,7 @@
   with_items:
     - "{{ nextcloud_websrv }}"
 
-- name: "[INSTALL] - Apache Required package is installed."
+- name: "[INSTALL] - Apache required package is installed."
   ansible.builtin.package:
     name: "libapache2-mod-php{{ php_ver }}"
     state: present
@@ -15,7 +15,7 @@
     - Start http
     - Reload php-fpm
 
-- name: "[INSTALL] - NGINX Required package is installed."
+- name: "[INSTALL] - NGINX required package is installed."
   ansible.builtin.package:
     name: "php{{ php_ver }}-fpm"
     state: present
