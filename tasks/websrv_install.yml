@@ -1,0 +1,25 @@
+---
+- name: "[INSTALL] - Web server is installed."
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ nextcloud_websrv }}"
+
+- name: "[INSTALL] - Apache required package is installed."
+  ansible.builtin.package:
+    name: "libapache2-mod-php{{ php_ver }}"
+    state: present
+  when: nextcloud_websrv == "apache2"
+  notify:
+    - Start http
+    - Reload php-fpm
+
+- name: "[INSTALL] - NGINX required package is installed."
+  ansible.builtin.package:
+    name: "php{{ php_ver }}-fpm"
+    state: present
+  when: nextcloud_websrv == "nginx"
+  notify:
+    - Start http
+    - Reload php-fpm
