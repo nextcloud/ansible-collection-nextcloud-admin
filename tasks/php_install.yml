@@ -1,7 +1,7 @@
 ---
 - name: "[INSTALL] - Debian 11 only - repository for php 8.0"
   ansible.builtin.apt_repository:
-    repo: deb https://packages.sury.org/php/ bullseye
+    repo: deb https://packages.sury.org/php/ bullseye main
     state: present
   when: (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] == "11")
 
