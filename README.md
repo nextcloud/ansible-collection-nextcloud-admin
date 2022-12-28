@@ -57,9 +57,9 @@ This table summarize the possible cases.
 
 |channel|latest|major&latest|major|full|special|
 |---|---|---|---|---|---|
-|**releases**|yes/no|_null_ \|23\|24\|...|_null_|"24.0.3"|_null_|
-|**prereleases**|_null_|_null_|_null_|"25.0.0"|_null_ \|"RC(n)\|beta(n)"|
-|**daily**|yes/no|_null_ \|master\|stable9\|...|master\|23\|24\|...|_null_|_null_ \|"YYYY-MM-DD"|
+|**releases**|yes/no|_null_ \|24\|25\|...|_null_|"25.0.2"|_null_|
+|**prereleases**|_null_|_null_|_null_|"25.0.3"|_null_ \|"RC(n)\|beta(n)"|
+|**daily**|yes/no|_null_ \|master\|stable9\|...|master\|24\|25\|...|_null_|_null_ \|"YYYY-MM-DD"|
 
 **major&latest** = major value when latest is true
 _null_ = "not used"
@@ -78,13 +78,13 @@ nextcloud_get_latest: true
 Specify if the "latest" archive should be downloaded.
 
 ```yaml
-# nextcloud_version_major: 24
+# nextcloud_version_major: 25
 ```
 
 Specify what major version you desire.
 
 ```yaml
-# nextcloud_version_full: "24.0.3"
+# nextcloud_version_full: "25.0.3"
 ```
 
 The full version of the desired nextcloud instance. type **M.F.P** _(Major.Feature.Patch)_
@@ -120,7 +120,7 @@ Specify directly a full URL to the archive. The role will skip the url generatio
   (_you **must** specify the nextcloud major version along_)
 
 ```yaml
-nextcloud_full_url: https://download.nextcloud.com/server/releases/nextcloud-24.0.0.zip
+nextcloud_full_url: https://download.nextcloud.com/server/releases/nextcloud-25.0.0.zip
 nextcloud_version_major: 42
 ```
 
@@ -131,12 +131,12 @@ nextcloud_version_channel: "releases"
 nextcloud_get_latest: true
 ```
 
--   Choose the latest v24 release:
+-   Choose the latest v25 release:
 
 ```yaml
 nextcloud_version_channel: "releases"
 nextcloud_get_latest: true
-nextcloud_version_major: 24
+nextcloud_version_major: 25
 ```
 
 -   Choose a specific release:
@@ -144,14 +144,14 @@ nextcloud_version_major: 24
 ```yaml
 nextcloud_version_channel: "releases"
 nextcloud_get_latest: false
-nextcloud_version_full: "24.0.0"
+nextcloud_version_full: "25.0.0"
 ```
 
--   Get the nextcloud 25.0.1 prerelease 1:
+-   Get the nextcloud 25.0.3 prerelease 1:
 
 ```yaml
 nextcloud_version_channel: "prereleases"
-nextcloud_version_full: "24.0.0"
+nextcloud_version_full: "25.0.3"
 nextcloud_version_special: "RC3"
 ```
 
@@ -162,12 +162,12 @@ nextcloud_version_channel: "daily"
 nextcloud_get_latest: true
 ```
 
--   Get the latest daily for stable 24:
+-   Get the latest daily for stable 25:
 
 ```yaml
 nextcloud_version_channel: "daily"
 nextcloud_get_latest: true
-nextcloud_version_major: "stable24"
+nextcloud_version_major: "stable25"
 ```
 
 -   Get the daily for master at january 1rst 2022:
@@ -598,7 +598,7 @@ He can run the role with the following variables to install Nextcloud accordingl
 - hosts: server
   roles:
    - role: aalaesar.install_nextcloud
-     nextcloud_version_major: 24
+     nextcloud_version_major: 25
      nextcloud_trusted_domain:
        - "cloud.example.tld"
        - "dbox.intra.net"

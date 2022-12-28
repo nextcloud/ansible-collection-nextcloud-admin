@@ -10,12 +10,12 @@ nextcloud_version_channel: "releases"  # mandatory # (releases/prereleases/daily
 nextcloud_get_latest: true  # mandatory # specify if the latest archive should be downloaded.
 # Override generated file name for channels: releases/daily.
 # optional : version_major.
-# nextcloud_version_major: 25 # (23/24/25/26) for releases or for daily (master/stable25/stable26...)
-# nextcloud_version_full: "24.0.3" # full version string
+# nextcloud_version_major: 25 # (24/25/26) for releases or for daily (master/stable25/stable26...)
+# nextcloud_version_full: "25.0.3" # full version string
 # nextcloud_version_special: "" #  For prereleases: "RCn/beta" or for daily "YYYY-MM-DD"
 nextcloud_repository: "https://download.nextcloud.com/server"  # Domain URL where to download Nextcloud.
 nextcloud_archive_format: "zip"  # zip/tar.bz2
-# nextcloud_full_url: "https://download.nextcloud.com/server/releases/nextcloud-23.0.0.zip"  # specify directly a full URL to the archive
+# nextcloud_full_url: "https://download.nextcloud.com/server/releases/nextcloud-25.0.0.zip"  # specify directly a full URL to the archive
 
 
 # [PHP CONFIG AND EXTENSIONS]
