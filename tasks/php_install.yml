@@ -14,7 +14,7 @@
       ansible.builtin.apt_repository:
         repo: deb https://packages.sury.org/php/ {{ ansible_distribution_release }} main
         state: present
-    - name: Run the equivalent of "apt-get update" to update cache
+    - name: Debian php repository - APT cache update
       ansible.builtin.apt:
         update_cache: true
 
