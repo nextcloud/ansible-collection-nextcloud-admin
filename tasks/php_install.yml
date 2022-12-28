@@ -1,6 +1,10 @@
 ---
 - name: "[INSTALL] - Debian 11 only - repository for php 8.0"
   block:
+    - name: Install required packages
+      ansible.builtin.package:
+        name: gpg
+        state: present
     - name: Debian 11 - php8 repo - GPG key
       ansible.builtin.apt_key:
         url: https://packages.sury.org/php/apt.gpg
