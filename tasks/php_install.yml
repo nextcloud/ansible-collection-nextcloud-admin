@@ -15,7 +15,7 @@
         state: present
     - name: Run the equivalent of "apt-get update" to update cache
       ansible.builtin.apt:
-        update_cache: yes
+        update_cache: true
   when: (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] == "11")
 
 - name: "[INSTALL] - Required and recommended packages are installed."
