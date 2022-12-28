@@ -1,7 +1,7 @@
 ---
 - name: "[INSTALL] - Debian 11 only - repository for php 8.0"
   block:
-    - name: Install required packages
+    - name: Debian 11 - php8 repo - install required packages
       ansible.builtin.package:
         name: gpg
         state: present
@@ -13,6 +13,9 @@
       ansible.builtin.apt_repository:
         repo: deb https://packages.sury.org/php/ bullseye main
         state: present
+    - name: Run the equivalent of "apt-get update" to update cache
+      ansible.builtin.apt:
+        update_cache: yes
   when: (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] == "11")
 
 - name: "[INSTALL] - Required and recommended packages are installed."
