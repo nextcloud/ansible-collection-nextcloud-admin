@@ -8,15 +8,12 @@
         state: present
     - name: Debian php repository - GPG key
       ansible.builtin.apt_key:
-        url: https://packages.sury.org/php/apt.gpg
+        url: "{{ php_repo_debian_gpg }}"
         state: present
     - name: Debian php repository - APT source
       ansible.builtin.apt_repository:
-        repo: deb https://packages.sury.org/php/ {{ ansible_distribution_release }} main
+        repo: "{{ php_repo_debian_apt_source }}"
         state: present
-    - name: Debian php repository - APT cache update
-      ansible.builtin.apt:
-        update_cache: true
 
 - name: "[INSTALL] - Required and recommended packages are installed."
   ansible.builtin.package:

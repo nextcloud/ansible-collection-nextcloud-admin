@@ -20,6 +20,8 @@ nextcloud_archive_format: "zip"  # zip/tar.bz2
 
 # [PHP CONFIG AND EXTENSIONS]
 # by default, use references stored in defaults/php_configs.yml
+php_repo_debian_gpg: "https://packages.sury.org/php/apt.gpg"
+php_repo_debian_apt_source: "deb https://packages.sury.org/php/ {{ ansible_distribution_release }} main"
 php_ver: "{{ os_config_ref[ansible_distribution | lower][ansible_distribution_release | lower].php_ver }}"
 php_dir: "{{ php_config_ref[php_ver | replace('.', '_')].php_dir | d(php_config_ref.defaults.php_dir) }}"
 php_bin: "{{ php_config_ref[php_ver | replace('.', '_')].php_bin | d(php_config_ref.defaults.php_bin) }}"
