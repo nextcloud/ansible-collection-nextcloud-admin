@@ -1,7 +1,7 @@
 ---
 # define parameters depending for the php version installed
 # for any new version, only specify keys with values different from defaults
-# defaults should work for php > 7.3
+# should work for php >= 7.4
 defaults:
   php_dir: "/etc/php/{{ php_ver }}"
   php_bin: "php-fpm{{ php_ver }}"
@@ -15,34 +15,3 @@ defaults:
     - "php{{ php_ver }}-xml"
     - "php{{ php_ver }}-zip"
   php_socket: "/run/php/php{{ php_ver }}-fpm.sock"
-
-7_3:
-  php_pkg_apcu: "php-apcu"
-  php_pkg_spe:
-    - "php-imap"
-    - "php-imagick"
-    - "php-redis"
-    - "php7.3-xml"
-    - "php7.3-zip"
-    - "php7.3-mbstring"
-
-7_2:
-  php_pkg_apcu: "php-apcu"
-  php_pkg_spe:
-    - "php-imap"
-    - "php-imagick"
-    - "php-redis"
-    - "php7.2-xml"
-    - "php7.2-zip"
-    - "php7.2-mbstring"
-
-7_0:
-  php_pkg_apcu: "php-apcu"
-  php_pkg_spe:
-    - "php-imap"
-    - "php-imagick"
-    - "php-redis"
-    - "php7.0-mcrypt"
-    - "php7.0-xml"
-    - "php7.0-zip"
-    - "php7.0-mbstring"
