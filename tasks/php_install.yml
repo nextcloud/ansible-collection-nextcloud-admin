@@ -1,4 +1,20 @@
 ---
+- name: "[DEBIAN REPO] Debian - repository for php"
+  when: (ansible_facts['distribution'] == "Debian")
+  block:
+    - name: Debian php repository - install required packages
+      ansible.builtin.package:
+        name: gpg
+        state: present
+    - name: Debian php repository - GPG key
+      ansible.builtin.apt_key:
+        url: "{{ php_repo_debian_gpg }}"
+        state: present
+    - name: Debian php repository - APT source
+      ansible.builtin.apt_repository:
+        repo: "{{ php_repo_debian_apt_source }}"
+        state: present
+
 - name: "[INSTALL] - Required and recommended packages are installed."
   ansible.builtin.package:
     name: "{{ item }}"
@@ -29,13 +45,13 @@
   with_items:
     - "{{ php_pkg_spe }}"
 
-- name: "[INSTALL - PHP Database client - MySQL."
+- name: "[INSTALL] - PHP Database client - MySQL."
   ansible.builtin.package:
     name: "php{{ php_ver }}-mysql"
     state: present
   when: (nextcloud_db_backend == "mysql") or (nextcloud_db_backend == "mariadb")
 
-- name: "[INSTALL - PHP Database client - PostgreSQL."
+- name: "[INSTALL] - PHP Database client - PostgreSQL."
   ansible.builtin.package:
     name: "php{{ php_ver }}-pgsql"
     state: present

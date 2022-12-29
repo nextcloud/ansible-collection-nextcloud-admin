@@ -10,15 +10,16 @@ nextcloud_version_channel: "releases"  # mandatory # (releases/prereleases/daily
 nextcloud_get_latest: true  # mandatory # specify if the latest archive should be downloaded.
 # Override generated file name for channels: releases/daily.
 # optional : version_major.
-# nextcloud_version_major: 25 # (23/24/25/26) for releases or for daily (master/stable25/stable26...)
-# nextcloud_version_full: "24.0.3" # full version string
+# nextcloud_version_major: 25 # (24/25/26) for releases or for daily (master/stable25/stable26...)
+# nextcloud_version_full: "25.0.3" # full version string
 # nextcloud_version_special: "" #  For prereleases: "RCn/beta" or for daily "YYYY-MM-DD"
 nextcloud_repository: "https://download.nextcloud.com/server"  # Domain URL where to download Nextcloud.
 nextcloud_archive_format: "zip"  # zip/tar.bz2
-# nextcloud_full_url: "https://download.nextcloud.com/server/releases/nextcloud-23.0.0.zip"  # specify directly a full URL to the archive
+# nextcloud_full_url: "https://download.nextcloud.com/server/releases/nextcloud-25.0.0.zip"  # specify directly a full URL to the archive
 
 
 # [PHP CONFIG AND EXTENSIONS]
+# PHP configs
 # by default, use references stored in defaults/php_configs.yml
 php_ver: "{{ os_config_ref[ansible_distribution | lower][ansible_distribution_release | lower].php_ver }}"
 php_dir: "{{ php_config_ref[php_ver | replace('.', '_')].php_dir | d(php_config_ref.defaults.php_dir) }}"
@@ -27,6 +28,10 @@ php_pkg_apcu: "{{ php_config_ref[php_ver | replace('.', '_')].php_pkg_apcu | d(p
 php_pkg_spe: "{{ php_config_ref[php_ver | replace('.', '_')].php_pkg_spe | d(php_config_ref.defaults.php_pkg_spe) }}"
 php_socket: "{{ php_config_ref[php_ver | replace('.', '_')].php_socket | d(php_config_ref.defaults.php_socket) }}"
 php_memory_limit: 512M
+# Debian 10 and 11 does not have support for php7.4+ which is required for newer versions 24+ of Nextcloud
+# so custom repository is added for Debian distributions.
+php_repo_debian_gpg: "https://packages.sury.org/php/apt.gpg"
+php_repo_debian_apt_source: "deb https://packages.sury.org/php/ {{ ansible_distribution_release }} main"
 
 # [NEXTCLOUD CONFIG]
 nextcloud_trusted_domain:

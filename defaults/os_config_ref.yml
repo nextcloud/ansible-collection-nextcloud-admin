@@ -11,9 +11,9 @@ debian:
     php_ver: 7.0
     mysql_daemon: mysql
   buster:
-    php_ver: 7.3
+    php_ver: 8.1
   bullseye:
-    php_ver: 7.4
+    php_ver: 8.1
   testing: &debian-testing
     php_ver: 8.1
   sid: *debian-testing
