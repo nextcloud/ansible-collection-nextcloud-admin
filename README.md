@@ -440,7 +440,7 @@ Set the size of the shared nginx TLS session cache to 50 MB.
 Install and use a custom version for PHP instead of the default one:
 
 ```yaml
-php_ver: '7.1'
+php_ver: '8.1'
 php_dir: "/etc/php/{{ php_ver }}"
 php_bin: "php-fpm{{ php_ver }}"
 php_pkg_apcu: "php-apcu"

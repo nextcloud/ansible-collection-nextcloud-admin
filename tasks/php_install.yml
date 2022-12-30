@@ -32,12 +32,6 @@
   notify:
     - Start php-fpm
 
-- name: "[INSTALL] - php-json is installed (PHP < 8)"
-  ansible.builtin.package:
-    name: "php{{ php_ver }}-json"
-    state: present
-  when: php_ver is version("8", "<")
-
 - name: "[INSTALL] -  PHP extra Packages are installed."
   ansible.builtin.package:
     name: "{{ item }}"
