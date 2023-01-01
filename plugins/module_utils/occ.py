@@ -8,8 +8,8 @@ import os
 
 
 def run_occ(module, command, ):
-  cli_full_path = module.params.get('path') + '/occ'
-  php_exec = module.params.get('php')
+  cli_full_path = module.params.get('nextcloud_path') + '/occ'
+  php_exec = module.params.get('php_runtime')
   cli_stats = os.stat(cli_full_path)
   
   if os.getuid() != cli_stats.st_uid:
