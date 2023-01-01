@@ -17,11 +17,10 @@ description:
   - Pass only arguments understood by the occ tool.
   - Check https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/occ_command.html
     for more details about the available commands.
-  - Because occ requires to be run as its owner,
-    this module can requires to be run with privileges to be able to switch user,
-    unless `become_user` is used to run the task directly as the proper user.
   - Don't support check mode.
   - Always returns state as 'changed'.
+  - This module requires to be run with advanced privileges
+    unless it is run as the user that own the occ tool.
 
 extends_documentation_fragment:
   - aalaesar.nextcloud.occ_common_options
@@ -90,10 +89,10 @@ def args_spec():
   arg_spec = copy.deepcopy(OCC_ARGS_SPEC)
   arg_spec.update(
     dict(
-    command=dict(
-      type='str',
-      required=True,
-    ),
+      command=dict(
+        type='str',
+        required=True,
+      ),
     ),
   )
   return arg_spec
