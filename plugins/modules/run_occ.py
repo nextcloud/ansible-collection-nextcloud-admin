@@ -81,27 +81,22 @@ stderr_lines:
   type: list
   elements: str
 """
-
+import copy
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.aalaesar.nextcloud.plugins.module_utils.occ import run_occ
+from ansible_collections.aalaesar.nextcloud.plugins.module_utils.occ_args_common import OCC_ARGS_SPEC
 
 def args_spec():
-  args=dict(
-    path=dict(
-      type='str',
-      required=True,
-    ),
+  arg_spec = copy.deepcopy(OCC_ARGS_SPEC)
+  arg_spec.update(
+    dict(
     command=dict(
       type='str',
       required=True,
     ),
-    php=dict(
-      type='str',
-      required=False,
-      default='php',
     ),
   )
-  return args
+  return arg_spec
 
 def main():
   global module
