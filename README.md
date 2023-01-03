@@ -41,6 +41,10 @@ This role requires root access, so either configure it in your inventory files, 
     - role: aalaesar.install_nextcloud
 ```
 
+## Dependencies
+
+- [geerlingguy.php-versions](https://github.com/geerlingguy/ansible-role-php-versions)
+
 ## Role Variables
 
 Role's variables (and their default values):
@@ -66,7 +70,7 @@ This table summarize the possible cases.
 **major&latest** = major value when latest is true
 _null_ = "not used"
 
-#### version variables
+#### Version variables
 
 ```yaml
 nextcloud_version_channel: "releases" # releases | prereleases | daily
@@ -529,10 +533,6 @@ The name may not be canon some times. (like **appName-x.y.z** instead of **appNa
 -   The configuration is applied only when the app in enabled the first time:
 Changing a parameter, then running the role again while the app is already enabled will **not** update its configuration.
 -   this post_install process is tagged and can be called directly using the `--tags install_apps` option.
-
-## Dependencies
-
-none
 
 ## Example Playbook
 ### Case 1: Installing a quick Nextcloud demo
