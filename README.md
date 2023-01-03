@@ -51,8 +51,6 @@ Role's variables (and their default values):
 
 ### Choose the version
 
-**_WARNING: Since Nexcloud 24 requires php v7.4 or later, command line installation will fail on old OS without php v7.4+ support._**
-
 An URL will be generated following naming rules used in the nextcloud repository
 _Not following this rules correctly may make the role unable to download nextcloud._
 
@@ -443,6 +441,8 @@ nextcloud_tls_session_cache_size: 50m
 Set the size of the shared nginx TLS session cache to 50 MB.
 
 ### System configuration
+
+**_WARNING: Current Nextcloud requires php v8.0 or later. This role is tested and installs by default the recommended version through third party repos. See more details below._**
 
 Nextcloud's [supported version of php](https://docs.nextcloud.com/server/25/admin_manual/installation/system_requirements.html#server) can often not be available in your distro official repository. `php_install_external_repos` will use [geerlingguy.php-versions](https://github.com/geerlingguy/ansible-role-php-versions) role to add the appropriate third party for your distribution version.
 
