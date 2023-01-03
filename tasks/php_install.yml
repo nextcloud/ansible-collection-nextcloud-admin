@@ -1,12 +1,12 @@
 ---
-- name: "[PHP REPO] - Repository for php is installed."
+- name: "[PHP] - External repository is installed."
   ansible.builtin.import_role:
     name: geerlingguy.php-versions
   vars:
     php_version: "{{ php_ver }}"
   when: php_install_external_repos
 
-- name: "[INSTALL] - Required and recommended packages are installed."
+- name: "[PHP] - Required and recommended packages are installed."
   ansible.builtin.package:
     name: "{{ item }}"
     state: present
@@ -23,26 +23,26 @@
   notify:
     - Start php-fpm
 
-- name: "[INSTALL] - PHP extra Packages are installed."
+- name: "[PHP] - Extra packages are installed."
   ansible.builtin.package:
     name: "{{ item }}"
     state: present
   with_items:
     - "{{ php_pkg_spe }}"
 
-- name: "[INSTALL] - PHP Database client - MySQL."
+- name: "[PHP] - Database client - MySQL."
   ansible.builtin.package:
     name: "php{{ php_ver }}-mysql"
     state: present
   when: (nextcloud_db_backend == "mysql") or (nextcloud_db_backend == "mariadb")
 
-- name: "[INSTALL] - PHP Database client - PostgreSQL."
+- name: "[PHP] - Database client - PostgreSQL."
   ansible.builtin.package:
     name: "php{{ php_ver }}-pgsql"
     state: present
   when: (nextcloud_db_backend == "pgsql")
 
-- name: "[INSTALL] -  APCu is installed."
+- name: "[PHP] - APCu is installed."
   ansible.builtin.package:
     name: "{{ php_pkg_apcu }}"
     state: present
