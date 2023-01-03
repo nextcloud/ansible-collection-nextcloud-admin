@@ -4,7 +4,7 @@
     name: geerlingguy.php-versions
   vars:
     php_version: "{{ php_ver }}"
-  when: pyenv_python_versions
+  when: php_install_external_repos
 
 - name: "[INSTALL] - Required and recommended packages are installed."
   ansible.builtin.package:
