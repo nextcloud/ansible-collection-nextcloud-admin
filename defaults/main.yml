@@ -21,6 +21,7 @@ nextcloud_archive_format: "zip"  # zip/tar.bz2
 # [PHP CONFIG AND EXTENSIONS]
 # PHP configs
 # by default, use references stored in defaults/php_configs.yml
+php_install_external_repos: true
 php_ver: "8.1"
 php_dir: "{{ php_config_ref[php_ver | replace('.', '_')].php_dir | d(php_config_ref.defaults.php_dir) }}"
 php_bin: "{{ php_config_ref[php_ver | replace('.', '_')].php_bin | d(php_config_ref.defaults.php_bin) }}"

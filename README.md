@@ -16,6 +16,7 @@ The role's main actions are:
 -   [x] Post installation of Nextcloud applications
 
 ## Requirements
+
 ### Ansible version
 
 Ansible >= 2.10
@@ -51,7 +52,8 @@ Role's variables (and their default values):
 An URL will be generated following naming rules used in the nextcloud repository
 _Not following this rules correctly may make the role unable to download nextcloud._
 
-#### Repository naming rules:
+#### Repository naming rules
+
 Some variables changes depending on the channel used and if get_latest is true.
 This table summarize the possible cases.
 
@@ -63,7 +65,8 @@ This table summarize the possible cases.
 
 **major&latest** = major value when latest is true
 _null_ = "not used"
-#### version variables:
+
+#### version variables
 
 ```yaml
 nextcloud_version_channel: "releases" # releases | prereleases | daily
@@ -436,6 +439,12 @@ nextcloud_tls_session_cache_size: 50m
 Set the size of the shared nginx TLS session cache to 50 MB.
 
 ### System configuration
+
+Nextcloud's [supported version of php](https://docs.nextcloud.com/server/25/admin_manual/installation/system_requirements.html#server) can often not be available in your distro official repository. `php_install_external_repos` will use [geerlingguy.php-versions](https://github.com/geerlingguy/ansible-role-php-versions) role to add the appropriate third party for your distribution version.
+
+```yaml
+php_install_external_repos: true
+```
 
 Install and use a custom version for PHP instead of the default one:
 

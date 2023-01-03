@@ -1,19 +1,10 @@
 ---
-- name: "[DEBIAN REPO] Debian - repository for php"
-  when: (ansible_facts['distribution'] == "Debian")
-  block:
-    - name: Debian php repository - install required packages
-      ansible.builtin.package:
-        name: gpg
-        state: present
-    - name: Debian php repository - GPG key
-      ansible.builtin.apt_key:
-        url: "{{ php_repo_debian_gpg }}"
-        state: present
-    - name: Debian php repository - APT source
-      ansible.builtin.apt_repository:
-        repo: "{{ php_repo_debian_apt_source }}"
-        state: present
+- name: "[PHP REPO] - Repository for php is installed."
+  ansible.builtin.import_role:
+    name: geerlingguy.php-versions
+  vars:
+    php_version: "{{ php_ver }}"
+  when: pyenv_python_versions
 
 - name: "[INSTALL] - Required and recommended packages are installed."
   ansible.builtin.package:
@@ -32,7 +23,7 @@
   notify:
     - Start php-fpm
 
-- name: "[INSTALL] -  PHP extra Packages are installed."
+- name: "[INSTALL] - PHP extra Packages are installed."
   ansible.builtin.package:
     name: "{{ item }}"
     state: present
