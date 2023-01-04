@@ -27,6 +27,4 @@ galaxy_info:
     - private
     - cloud
 
-dependencies:
-  - name: geerlingguy.php-versions
-    version: 5.0.1
+dependencies: []
