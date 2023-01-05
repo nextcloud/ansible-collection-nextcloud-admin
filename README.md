@@ -45,6 +45,8 @@ This role requires root access, so either configure it in your inventory files, 
 
 - [geerlingguy.php-versions](https://github.com/geerlingguy/ansible-role-php-versions)
 
+You can install it by running either `ansible-galaxy role install geerlingguy.php-versions`
+or  `ansible-galaxy role install -r ./requirements.yml` when working in this role directory
 ## Role Variables
 
 Role's variables (and their default values):
