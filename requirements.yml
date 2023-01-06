@@ -1,0 +1,4 @@
+---
+roles:
+  - name: geerlingguy.php-versions
+    version: 5.0.1

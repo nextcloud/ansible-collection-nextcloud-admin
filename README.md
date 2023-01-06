@@ -16,6 +16,7 @@ The role's main actions are:
 -   [x] Post installation of Nextcloud applications
 
 ## Requirements
+
 ### Ansible version
 
 Ansible >= 2.10
@@ -40,18 +41,23 @@ This role requires root access, so either configure it in your inventory files, 
     - role: aalaesar.install_nextcloud
 ```
 
+## Dependencies
+
+- [geerlingguy.php-versions](https://github.com/geerlingguy/ansible-role-php-versions)
+
+You can install it by running either `ansible-galaxy role install geerlingguy.php-versions`
+or  `ansible-galaxy role install -r ./requirements.yml` when working in this role directory
 ## Role Variables
 
 Role's variables (and their default values):
 
 ### Choose the version
 
-**_WARNING: Since Nexcloud 24 requires php v7.4 or later, command line installation will fail on old OS without php v7.4+ support._**
-
 An URL will be generated following naming rules used in the nextcloud repository
 _Not following this rules correctly may make the role unable to download nextcloud._
 
-#### Repository naming rules:
+#### Repository naming rules
+
 Some variables changes depending on the channel used and if get_latest is true.
 This table summarize the possible cases.
 
@@ -63,7 +69,8 @@ This table summarize the possible cases.
 
 **major&latest** = major value when latest is true
 _null_ = "not used"
-#### version variables:
+
+#### Version variables
 
 ```yaml
 nextcloud_version_channel: "releases" # releases | prereleases | daily
@@ -437,10 +444,19 @@ Set the size of the shared nginx TLS session cache to 50 MB.
 
 ### System configuration
 
+**_WARNING: Current Nextcloud requires php v8.0 or later. This role is tested and installs by default the recommended version through third party repos. See more details below._**
+
+Nextcloud's [supported version of php](https://docs.nextcloud.com/server/25/admin_manual/installation/system_requirements.html#server) can often not be available in your distro official repository. `php_install_external_repos` will use [geerlingguy.php-versions](https://github.com/geerlingguy/ansible-role-php-versions) role to add the appropriate third party for your distribution version.
+
+If you do not want to install the third party repository, you can set the following  variable to false, but you'll have to install php on your own before running this role. 
+```yaml
+php_install_external_repos: true
+```
+
 Install and use a custom version for PHP instead of the default one:
 
 ```yaml
-php_ver: '7.1'
+php_ver: '8.1'
 php_dir: "/etc/php/{{ php_ver }}"
 php_bin: "php-fpm{{ php_ver }}"
 php_pkg_apcu: "php-apcu"
@@ -520,10 +536,6 @@ The name may not be canon some times. (like **appName-x.y.z** instead of **appNa
 -   The configuration is applied only when the app in enabled the first time:
 Changing a parameter, then running the role again while the app is already enabled will **not** update its configuration.
 -   this post_install process is tagged and can be called directly using the `--tags install_apps` option.
-
-## Dependencies
-
-none
 
 ## Example Playbook
 ### Case 1: Installing a quick Nextcloud demo
