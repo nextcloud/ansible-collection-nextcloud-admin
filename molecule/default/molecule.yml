@@ -17,3 +17,5 @@ provisioner:
   name: ansible
   playbooks:
     converge: "${MOLECULE_NC:-latest}-converge.yml"
+verifier:
+  name: ansible

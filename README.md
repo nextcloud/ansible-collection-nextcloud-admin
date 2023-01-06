@@ -306,7 +306,7 @@ nextcloud_config_settings:
   - { name: 'overwrite.cli.url', value: 'https://{{ nextcloud_trusted_domain | first }}' }
   - { name: 'memcache.local', value: '\OC\Memcache\APCu' }
   - { name: 'open_basedir', value: '/dev/urandom' }
-  - { name: 'mysql.utf8mb4', value: 'true' }
+  - { name: 'mysql.utf8mb4', value: true }
   - { name: 'updater.release.channel', value: 'production' } # production | stable | daily | beta
 ```
 
