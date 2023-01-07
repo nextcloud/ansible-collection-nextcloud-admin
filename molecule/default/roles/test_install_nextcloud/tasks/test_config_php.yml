@@ -7,6 +7,7 @@
   args:
     chdir: "{{ nextcloud_webroot }}"
   register: _config_php
+  changed_when: _config_php.rc != 0
 
 - name: "Check values inside config.php"
   ansible.builtin.assert:

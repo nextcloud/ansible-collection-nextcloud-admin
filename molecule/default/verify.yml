@@ -8,9 +8,8 @@
     php_config_ref: "{{ lookup('ansible.builtin.template', '../../defaults/php_config_ref.yml') | from_yaml }}"
   vars_files:
     - ../../defaults/main.yml
-  #  - ../../vars/main.yml
 
   tasks:
     - name: "Include test_install_nextcloud"
-      include_role:
+      ansible.legacy.include_role:
         name: "test_install_nextcloud"
