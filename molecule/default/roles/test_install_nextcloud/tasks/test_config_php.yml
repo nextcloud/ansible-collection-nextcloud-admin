@@ -1,3 +1,4 @@
+---
 - name: "Get the config.php content"
   become_user: "{{ nextcloud_websrv_user }}"
   become_flags: "{{ ansible_become_flags | default(omit) }}"
