@@ -11,5 +11,5 @@
 
   tasks:
     - name: "Include test_install_nextcloud"
-      ansible.legacy.include_role:
+      ansible.builtin.import_role:
         name: "test_install_nextcloud"
