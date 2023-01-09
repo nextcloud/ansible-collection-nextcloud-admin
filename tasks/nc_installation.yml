@@ -104,7 +104,7 @@
   become_user: "{{ nextcloud_websrv_user }}"
   become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: true
-  ansible.builtin.command: php occ config:system:set {{ item.name }} --value="{{ item.value }}"
+  ansible.builtin.command: php occ config:system:set {{ item.name }} --value="{{ item.value }}" {% if item.value | type_debug == 'bool' %}--type=boolean{% endif %}
   args:
     chdir: "{{ nextcloud_webroot }}"
   with_items:
@@ -115,7 +115,7 @@
   become_user: "{{ nextcloud_websrv_user }}"
   become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: true
-  ansible.builtin.command: php occ config:system:set {{ item.name }} --value="{{ item.value }}"
+  ansible.builtin.command: php occ config:system:set {{ item.name }} --value="{{ item.value }}" {% if item.value | type_debug == 'bool' %}--type=boolean{% endif %}
   args:
     chdir: "{{ nextcloud_webroot }}"
   with_items:

@@ -1,0 +1,17 @@
+---
+- name: "Get the config.php content"
+  become_user: "{{ nextcloud_websrv_user }}"
+  become_flags: "{{ ansible_become_flags | default(omit) }}"
+  become: true
+  ansible.builtin.command: php occ config:list
+  args:
+    chdir: "{{ nextcloud_webroot }}"
+  register: _config_php
+  changed_when: _config_php.rc != 0
+
+- name: "Check values inside config.php"
+  ansible.builtin.assert:
+    that:
+      - _config_php.stdout is regex('\"mysql\.utf8mb4\"[:] true,')
+    success_msg: "All regular expressions/searches passed."
+    fail_msg: "At least one check for patterns failed."

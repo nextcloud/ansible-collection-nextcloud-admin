@@ -1,0 +1,15 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+  vars:
+    # load configurations references
+    os_config_ref: "{{ lookup('ansible.builtin.template', '../../defaults/os_config_ref.yml') | from_yaml }}"
+    php_config_ref: "{{ lookup('ansible.builtin.template', '../../defaults/php_config_ref.yml') | from_yaml }}"
+  vars_files:
+    - ../../defaults/main.yml
+
+  tasks:
+    - name: "Include test_install_nextcloud"
+      ansible.builtin.import_role:
+        name: "test_install_nextcloud"
