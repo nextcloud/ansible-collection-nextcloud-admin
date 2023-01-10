@@ -19,7 +19,7 @@ provisioner:
     converge: "${MOLECULE_NC:-latest}-converge.yml"
 verifier:
   name: ansible
-#lint: |
-#  set -e
-#  yamllint .
-#  ansible-lint
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
