@@ -56,9 +56,10 @@ collections:
 
 ### Installing the netaddr Python Library
 
-Content in this collection requires the [network address manipulation library](https://pypi.org/project/netaddr/) to APIs. You can install it with:
-
+Content in this collection requires the [network address manipulation library](https://pypi.org/project/netaddr/) to manipulate network address. You can install it with:
+```
     pip3 install netaddr
+```
 
 ### Using modules from the Nextcloud Collection in your playbooks
 
