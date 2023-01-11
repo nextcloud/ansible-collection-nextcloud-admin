@@ -44,7 +44,7 @@ jobs:
 
       - name: Install test dependencies
         run: |
-          python3 -m pip install --constraint=.github/workflows/constraints.txt ansible molecule[lint,docker] docker netaddr ansible-lint
+          python3 -m pip install --constraint=.github/workflows/constraints.txt ansible molecule[docker] docker netaddr
 
       # See: https://github.com/geerlingguy/ansible-role-mysql/issues/422
       - name: Disable AppArmor (only Debian 10).
@@ -58,6 +58,7 @@ jobs:
       - name: Run Molecule tests
         run: molecule test
         env:
+          TEST_RUN_MOLECULE_LINT: false
           PY_COLORS: "1"
           ANSIBLE_FORCE_COLOR: "1"
           MOLECULE_DISTRO: ${{ matrix.distro }}

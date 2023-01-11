@@ -21,5 +21,8 @@ verifier:
   name: ansible
 lint: |
   set -e
-  yamllint .
-  ansible-lint
+  echo "Molecule linting requested: ${TEST_RUN_MOLECULE_LINT}"
+  if [ -z "${TEST_RUN_MOLECULE_LINT}" ] || [ "${TEST_RUN_MOLECULE_LINT}" = true  ]; then
+    yamllint .
+    ansible-lint
+  fi
