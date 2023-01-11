@@ -33,7 +33,7 @@ aalaesar.nextcloud.run_occ|Run the occ command line tool with given arguments
 ### Roles
 Name | Description
 --- | ---
-aalaesar.nextcloud.install_nextcloud|formerly `aalaesar.install_nextcloud`
+aalaesar.nextcloud.install_nextcloud|Install and configure an Nextcloud instance for a Debian/Ubuntu server - formerly `aalaesar.install_nextcloud`
 
 <!--end collection content-->
 
@@ -76,7 +76,7 @@ It's preferable to use content in this collection using their Fully Qualified Co
         command: app:list
 ```
 
-If upgrading older playbooks which were built prior to Ansible 2.10 and this collection's existence, you can also define `collections` in your play and refer to this collection's modules as you did in Ansible 2.9 and below, as in this example:
+If upgrading older playbooks from <2.0.0, you can minimise your changes by defining `collections` in your play and refer to this collection's role as `install_nextcloud`, instead of `aalaesar.install_nextcloud`, as in this example:
 
 ```yaml
 ---
@@ -91,6 +91,8 @@ If upgrading older playbooks which were built prior to Ansible 2.10 and this col
     - name: deploy nextcloud and dependencies
       include_role:
         name: install_nextcloud
+        # previously:
+        # name: aalaesar.install_nextcloud
 ```
 
 For documentation on how to use:
