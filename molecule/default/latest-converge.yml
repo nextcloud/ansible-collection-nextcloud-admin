@@ -4,7 +4,6 @@
   become: true
   collections:
     - aalaesar.nextcloud
-    
   pre_tasks:
     - name: Update apt cache.
       ansible.builtin.apt:
