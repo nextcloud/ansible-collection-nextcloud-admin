@@ -2,7 +2,9 @@
 - name: Converge
   hosts: all
   become: true
-
+  collections:
+    - aalaesar.nextcloud
+    
   pre_tasks:
     - name: Update apt cache.
       ansible.builtin.apt:
@@ -12,4 +14,4 @@
       changed_when: false
 
   roles:
-    - role: aalaesar.install_nextcloud
+    - role: install_nextcloud
