@@ -3,12 +3,12 @@
 
 - name: "Load os specific variables"
   ansible.builtin.include_tasks: ./setup_env.yml
-  tags: always
-
+  tags:
+    - install_apps
 - name: "Install PHP packages"
   ansible.builtin.include_tasks: php_install.yml
-  tags: always
-
+  tags:
+    - install_apps
 - name: Install web server packages
   when: nextcloud_install_websrv
   ansible.builtin.include_tasks: ./websrv_install.yml
@@ -85,7 +85,8 @@
   when:
     - nextcloud_apps is defined
     - nextcloud_apps is mapping
-  tags: install_apps
+  tags:
+    - install_apps
   block:
     - name: "[NC apps] - lists the number of apps available in the instance."
       ansible.builtin.command: php occ app:list --output=json_pretty --no-warnings
