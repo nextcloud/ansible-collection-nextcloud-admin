@@ -199,9 +199,8 @@
       become_user: "{{ nextcloud_websrv_user }}"
       become_flags: "{{ ansible_become_flags | default(omit) }}"
       become: true
-      when:
-        - item in nc_available_apps.enabled
+      register: _occ_app_disable_result
       changed_when:
-        - "'enabled' in stdout"
-        - "'No such app' not in stdout"
+        - "'disabled' in _occ_app_disable_result.stdout"
+        - "'No such app' not in _occ_app_disable_result.stdout"
       with_items: "{{ nextcloud_disable_apps }}"
