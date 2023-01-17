@@ -10,31 +10,22 @@ nextcloud_version_channel: "releases"  # mandatory # (releases/prereleases/daily
 nextcloud_get_latest: true  # mandatory # specify if the latest archive should be downloaded.
 # Override generated file name for channels: releases/daily.
 # optional : version_major.
-# nextcloud_version_major: 25 # (24/25/26) for releases or for daily (master/stable25/stable26...)
-# nextcloud_version_full: "25.0.3" # full version string
+# nextcloud_version_major: 25 # (23/24/25/26) for releases or for daily (master/stable25/stable26...)
+# nextcloud_version_full: "24.0.3" # full version string
 # nextcloud_version_special: "" #  For prereleases: "RCn/beta" or for daily "YYYY-MM-DD"
 nextcloud_repository: "https://download.nextcloud.com/server"  # Domain URL where to download Nextcloud.
 nextcloud_archive_format: "zip"  # zip/tar.bz2
-# nextcloud_full_url: "https://download.nextcloud.com/server/releases/nextcloud-25.0.0.zip"  # specify directly a full URL to the archive
+# nextcloud_full_url: "https://download.nextcloud.com/server/releases/nextcloud-23.0.0.zip"  # specify directly a full URL to the archive
 
 
 # [PHP CONFIG AND EXTENSIONS]
-# PHP configs
 # by default, use references stored in defaults/php_configs.yml
-php_install_external_repos: true
-php_ver: "8.1"
-php_dir: "/etc/php/{{ php_ver }}"
-php_bin: "php-fpm{{ php_ver }}"
-php_pkg_apcu: "php{{ php_ver }}-apcu"
-php_pkg_spe:
-  - "php{{ php_ver }}-bcmath"
-  - "php{{ php_ver }}-gmp"
-  - "php{{ php_ver }}-imagick"
-  - "php{{ php_ver }}-mbstring"
-  - "php{{ php_ver }}-redis"
-  - "php{{ php_ver }}-xml"
-  - "php{{ php_ver }}-zip"
-php_socket: "/run/php/php{{ php_ver }}-fpm.sock"
+php_ver: "{{ os_config_ref[ansible_distribution | lower][ansible_distribution_release | lower].php_ver }}"
+php_dir: "{{ php_config_ref[php_ver | replace('.', '_')].php_dir | d(php_config_ref.defaults.php_dir) }}"
+php_bin: "{{ php_config_ref[php_ver | replace('.', '_')].php_bin | d(php_config_ref.defaults.php_bin) }}"
+php_pkg_apcu: "{{ php_config_ref[php_ver | replace('.', '_')].php_pkg_apcu | d(php_config_ref.defaults.php_pkg_apcu) }}"
+php_pkg_spe: "{{ php_config_ref[php_ver | replace('.', '_')].php_pkg_spe | d(php_config_ref.defaults.php_pkg_spe) }}"
+php_socket: "{{ php_config_ref[php_ver | replace('.', '_')].php_socket | d(php_config_ref.defaults.php_socket) }}"
 php_memory_limit: 512M
 
 # [NEXTCLOUD CONFIG]
@@ -77,13 +68,13 @@ nextcloud_config_settings:
   - { name: 'overwrite.cli.url', value: 'https://{{ nextcloud_trusted_domain | first }}' }
   - { name: 'memcache.local', value: '\OC\Memcache\APCu' }
   - { name: 'open_basedir', value: '/dev/urandom' }
-  - { name: 'mysql.utf8mb4', value: true }
+  - { name: 'mysql.utf8mb4', value: 'true' }
   - { name: 'updater.release.channel', value: 'production' }  # production/stable/daily/beta
 
 # [DATABASE]
 nextcloud_install_db: true
 nextcloud_db_host: "127.0.0.1"
-nextcloud_db_backend: "mysql"  # mysql/mariadb/pgsql
+nextcloud_db_backend: "pgsql"  # mysql/mariadb/pgsql
 mysql_daemon: >-
   {{
   os_config_ref[ansible_distribution | lower][ansible_distribution_release | lower].mysql_daemon |
@@ -101,10 +92,10 @@ nextcloud_mysql_root_pwd_update: false
 nextcloud_max_upload_size: 512m  # in Byte or human readable size notation (g/m/k)
 nextcloud_install_tls: true
 nextcloud_tls_enforce: true
-nextcloud_mozilla_modern_ssl_profile: false  # when false, intermediate profile is used
+nextcloud_mozilla_modern_ssl_profile: true  # when false, intermediate profile is used
 nextcloud_tls_cert_method: "self-signed"  # self-signed/signed/installed
 nextcloud_tls_dhparam: "/etc/ssl/dhparam.pem"
-nextcloud_hsts: false  # recommended >= 15552000
+nextcloud_hsts: true  # recommended >= 15552000
 # nextcloud_tls_cert: /path/to/cert
 # nextcloud_tls_cert_key: /path/to/cert/key
 # nextcloud_tls_cert_chain: /path/to/cert/chain

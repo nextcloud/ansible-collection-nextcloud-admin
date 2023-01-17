@@ -7,17 +7,43 @@
   ansible.builtin.set_fact:
     nextcloud_tls_cert_key_file: "{{ nextcloud_tls_cert_key | default(\"/etc/ssl/\" + nextcloud_instance_name + \".key\") }}"
 
-- name: "[SIGNED TLS] - Certificate is on the host"
+- name: "[SIGNED TLS] - Define certificate chain path"
+  ansible.builtin.set_fact:
+    nextcloud_tls_chain_file: "{{ nextcloud_tls_chain_file | default(\"/etc/ssl/\" + nextcloud_instance_name + \".pem\") }}"
+  when: nextcloud_tls_src_chain is defined
+
+- name: "[SIGNED TLS] - Certificate is copied to the host"
   ansible.builtin.copy:
     dest: "{{ nextcloud_tls_cert_file }}"
     src: "{{ nextcloud_tls_src_cert }}"
-    mode: 0640
+    mode: 0644
 
-- name: "[SIGNED TLS] - Key is on the host"
+- name: "[SIGNED TLS] - Key is copied to the host"
   ansible.builtin.copy:
     dest: "{{ nextcloud_tls_cert_key_file }}"
     src: "{{ nextcloud_tls_src_cert_key }}"
     mode: 0640
+
+- name: "[SIGNED TLS] - Certificate chain is copied to the host"
+  ansible.builtin.copy:
+    dest: "{{ nextcloud_tls_chain_file }}"
+    src: "{{ nextcloud_tls_src_chain }}"
+    mode: 0644
+  when: nextcloud_tls_src_chain is defined
+
+- name: "[SIGNED TLS] - Create chained certificate file for nginx"
+  # Source: https://serverfault.com/questions/1034066/how-to-merge-two-files-into-single-file-using-ansible-in-remote-server
+  block:
+    - name: "[SIGNED TLS] - Create chained certificate file for nginx (step 1)"
+      command: awk 1 {{ nextcloud_tls_cert_file }} {{ nextcloud_tls_chain_file }}
+      register: concat
+    - name: "[SIGNED TLS] - Create chained certificate file for nginx (step 2)"
+      ansible.builtin.copy:
+        dest: "{{ nextcloud_tls_cert_file }}"
+        content: "{{ concat.stdout_lines |join('\n') }}"
+  when:
+    - nextcloud_tls_src_chain is defined
+    - nextcloud_websrv == "nginx"
 
 - name: "[SIGNED TLS] - Check TLS certificate permissions"
   ansible.builtin.file:
@@ -30,3 +56,10 @@
     path: "{{ nextcloud_tls_cert_key_file }}"
     mode: 0640
     group: "{{ nextcloud_websrv_group }}"
+
+- name: "[SIGNED TLS] - Check TLS chain permissions"
+  ansible.builtin.file:
+    path: "{{ nextcloud_tls_chain_file }}"
+    mode: 0644
+    group: "{{ nextcloud_websrv_group }}"
+  when: nextcloud_tls_src_chain is defined
