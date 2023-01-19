@@ -1,4 +1,4 @@
---
+---
 # tasks file for nextcloud
 
 - name: "Load os specific variables"
@@ -90,6 +90,7 @@
   when: |
     (not nc_nextcloud_conf.stat.exists) or
     (nc_nextcloud_configured.rc is defined and nc_nextcloud_configured.rc != 0)
+
 - name: Install Nextcloud Apps
   when:
     - nextcloud_apps is defined
