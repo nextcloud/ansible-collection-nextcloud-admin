@@ -1,17 +1,30 @@
----
+--
 # tasks file for nextcloud
 
 - name: "Load os specific variables"
   ansible.builtin.include_tasks: ./setup_env.yml
-  tags: always
+  tags:
+    - install_apps
 
-- name: "Install required packages"
+# Source: https://www.cyberciti.biz/faq/ansible-apt-update-all-packages-on-ubuntu-debian-linux/
+- name: "[INSTALL] -  Update packages cache."
+  apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+- name: "[INSTALL] - Upgrade all packages to latest version."
+  apt: upgrade=dist force_apt_get=yes
+  when: upgrade_packages_first is defined
+
+- name: "Install PHP packages"
   ansible.builtin.include_tasks: php_install.yml
-  tags: always
+  tags:
+    - install_apps
+
+- name: Install web server packages
+  when: nextcloud_install_websrv
+  ansible.builtin.include_tasks: ./websrv_install.yml
 
 - name: Install certificates
   when: nextcloud_install_tls
-  tags: install_certs
   block:
     - name: Verify permission for installed TLS certificates
       ansible.builtin.include_tasks: ./tls_installed.yml
@@ -77,12 +90,12 @@
   when: |
     (not nc_nextcloud_conf.stat.exists) or
     (nc_nextcloud_configured.rc is defined and nc_nextcloud_configured.rc != 0)
-
 - name: Install Nextcloud Apps
   when:
     - nextcloud_apps is defined
     - nextcloud_apps is mapping
-  tags: install_apps
+  tags:
+    - install_apps
   block:
     - name: "[NC apps] - lists the number of apps available in the instance."
       ansible.builtin.command: php occ app:list --output=json_pretty --no-warnings
@@ -104,8 +117,7 @@
       # do if the app is not enabled and ( (archive path is not "") or (app is disabled) )
       when:
         - item.key not in nc_available_apps.enabled
-        #- item.key in nc_available_apps.disabled
-        #- (item.value is not none) or (item.key in nc_available_apps.disabled)
+        - (item.value is not none) or (item.key in nc_available_apps.disabled)
       with_dict: "{{ nextcloud_apps }}"
 
 - name: Add indices
