@@ -10,7 +10,7 @@
   ansible.builtin.package:
     name: "libapache2-mod-php{{ php_ver }}"
     state: present
-  when: nextcloud_websrv == "apache2"
+  when: nextcloud_websrv in ["apache", "apache2"]
   notify:
     - Start http
     - Reload php-fpm
@@ -19,7 +19,7 @@
   ansible.builtin.package:
     name: "php{{ php_ver }}-fpm"
     state: present
-  when: nextcloud_websrv == "nginx"
+  when: nextcloud_websrv in ["nginx"]
   notify:
     - Start http
     - Reload php-fpm
