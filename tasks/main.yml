@@ -16,6 +16,8 @@
   ansible.builtin.include_tasks: ./websrv_install.yml
 
 - name: Install certificates
+  tags:
+    - install_certs
   when: nextcloud_install_tls
   block:
     - name: Verify permission for installed TLS certificates

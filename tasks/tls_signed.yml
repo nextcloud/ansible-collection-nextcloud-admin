@@ -48,18 +48,21 @@
 - name: "[SIGNED TLS] - Check TLS certificate permissions"
   ansible.builtin.file:
     path: "{{ nextcloud_tls_cert_file }}"
-    mode: 0644
+    mode: 0640
+    owner: "{{ nextcloud_websrv_user }}"
     group: "{{ nextcloud_websrv_group }}"
 
 - name: "[SIGNED TLS] - Check TLS key permissions"
   ansible.builtin.file:
     path: "{{ nextcloud_tls_cert_key_file }}"
     mode: 0640
+    owner: "{{ nextcloud_websrv_user }}"
     group: "{{ nextcloud_websrv_group }}"
 
 - name: "[SIGNED TLS] - Check TLS chain permissions"
   ansible.builtin.file:
     path: "{{ nextcloud_tls_chain_file }}"
-    mode: 0644
+    mode: 0640
+    owner: "{{ nextcloud_websrv_user }}"
     group: "{{ nextcloud_websrv_group }}"
   when: nextcloud_tls_src_chain is defined
