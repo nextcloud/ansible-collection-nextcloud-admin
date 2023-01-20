@@ -16,7 +16,7 @@
   ansible.builtin.copy:
     dest: "{{ nextcloud_tls_cert_file }}"
     src: "{{ nextcloud_tls_src_cert }}"
-    mode: 0644
+    mode: 0640
 
 - name: "[SIGNED TLS] - Key is copied to the host"
   ansible.builtin.copy:
@@ -43,7 +43,7 @@
         content: "{{ concat.stdout_lines |join('\n') }}"
   when:
     - nextcloud_tls_src_chain is defined
-    - nextcloud_websrv == "nginx"
+    - nextcloud_websrv in ["nginx"]
 
 - name: "[SIGNED TLS] - Check TLS certificate permissions"
   ansible.builtin.file:

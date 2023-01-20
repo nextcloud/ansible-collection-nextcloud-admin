@@ -6,14 +6,6 @@
   tags:
     - install_apps
 
-# Source: https://www.cyberciti.biz/faq/ansible-apt-update-all-packages-on-ubuntu-debian-linux/
-- name: "[INSTALL] -  Update packages cache."
-  apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
-
-- name: "[INSTALL] - Upgrade all packages to latest version."
-  apt: upgrade=dist force_apt_get=yes
-  when: upgrade_packages_first is defined
-
 - name: "Install PHP packages"
   ansible.builtin.include_tasks: php_install.yml
   tags:
