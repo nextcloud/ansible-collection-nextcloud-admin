@@ -39,7 +39,7 @@
 
     - name: Configure Apache web server
       ansible.builtin.include_tasks: ./http_apache.yml
-      when: nextcloud_websrv in ["apache", "apache2"]
+      when: nextcloud_websrv in ["apache2"]
 
 - name: Configure Redis server
   ansible.builtin.include_tasks: ./redis_server.yml

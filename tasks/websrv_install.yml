@@ -10,7 +10,7 @@
   ansible.builtin.package:
     name: "libapache2-mod-php{{ php_ver }}"
     state: present
-  when: nextcloud_websrv in ["apache", "apache2"]
+  when: nextcloud_websrv in ["apache2"]
   notify:
     - Start http
     - Reload php-fpm
