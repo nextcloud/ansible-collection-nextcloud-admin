@@ -40,6 +40,7 @@
       ansible.builtin.command: php occ app:enable "{{ nc_app_name }}"
       args:
         chdir: "{{ nextcloud_webroot }}"
+      changed_when: true
 
     - name: "[App] - Configure the application \"{{ nc_app_name }}\""
       become_user: "{{ nextcloud_websrv_user }}"
