@@ -49,8 +49,8 @@
     - name: "[SIGNED TLS] - Create chained certificate file for nginx (step 1)"
       ansible.builtin.shell:
         cmd: awk 1 {{ nextcloud_tls_cert_file }} {{ nextcloud_tls_chain_file }}
-      register: concat
       changed_when: false
+      register: concat
 
     - name: "[SIGNED TLS] - Create chained certificate file for nginx (step 2)"
       ansible.builtin.copy:

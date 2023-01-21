@@ -21,8 +21,7 @@
 - name: "[ENV] - Upgrade all packages to latest version."
   ansible.builtin.apt:
     upgrade: "yes"
-    foce_apt_get: true
-  #apt: upgrade=dist force_apt_get=yes
+    force_apt_get: true
   when:
     - ansible_os_family in [ "Debian" ]
     - upgrade_packages_first is defined
