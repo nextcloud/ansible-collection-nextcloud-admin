@@ -14,7 +14,7 @@
         msg: "{{ nc_app_name }} is not well declared."
       when: nc_app_cfg is not string
 
-    - name: "[App] - Install the app \"{{ nc_app_name }}\" from the official app-store"
+    - name: "[App] - Install from the official app-store app: \"{{ nc_app_name }}\""
       become_user: "{{ nextcloud_websrv_user }}"
       become_flags: "{{ ansible_become_flags | default(omit) }}"
       become: true
