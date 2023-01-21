@@ -1,15 +1,19 @@
 ---
-- name: "[SIGNED TLS] - Define signed certificate path"
+- name: "[SIGNED TLS] - Define certificate-file locations as abolute path"
   ansible.builtin.set_fact:
-    nextcloud_tls_cert_file: "{{ nextcloud_tls_cert | default(\"/etc/ssl/\" + nextcloud_instance_name + \".crt\") }}"
+    cert_path: "/etc/ssl/"
 
-- name: "[SIGNED TLS] - Define signed certificate's key path"
+- name: "[SIGNED TLS] - Define signed certificate-file with abolute path"
   ansible.builtin.set_fact:
-    nextcloud_tls_cert_key_file: "{{ nextcloud_tls_cert_key | default(\"/etc/ssl/\" + nextcloud_instance_name + \".key\") }}"
+    nextcloud_tls_cert_file: "{{ nextcloud_tls_cert | default(cert_path + nextcloud_instance_name + \".crt\") }}"
 
-- name: "[SIGNED TLS] - Define certificate chain path"
+- name: "[SIGNED TLS] - Define signed certificate's key-file with absolute path"
   ansible.builtin.set_fact:
-    nextcloud_tls_chain_file: "{{ nextcloud_tls_chain_file | default(\"/etc/ssl/\" + nextcloud_instance_name + \".pem\") }}"
+    nextcloud_tls_cert_key_file: "{{ nextcloud_tls_cert_key | default(cert_path + nextcloud_instance_name + \".key\") }}"
+
+- name: "[SIGNED TLS] - Define certificate chain-file with absolute path"
+  ansible.builtin.set_fact:
+    nextcloud_tls_chain_file: "{{ nextcloud_tls_chain_file | default(cert_path + nextcloud_instance_name + \".pem\") }}"
   when: nextcloud_tls_src_chain is defined
 
 - name: "[SIGNED TLS] - Certificate is copied to the host"
@@ -41,22 +45,13 @@
   when: nextcloud_tls_src_chain is defined
 
 - name: "[SIGNED TLS] - Create chained certificate file for nginx"
+  ansible.builtin.assemble:
+    src: "{{ cert_path }}"
+    regexp: "{{ nextcloud_instance_name }}\\.crt|{{ nextcloud_instance_name }}\\.pem"
+    dest: "{{ nextcloud_tls_cert_file }}"
+    owner: "{{ nextcloud_websrv_user }}"
+    group: "{{ nextcloud_websrv_group }}"
+    mode: 0640
   when:
     - nextcloud_tls_src_chain is defined
     - nextcloud_websrv in ["nginx"]
-  # Source: https://serverfault.com/questions/1034066/how-to-merge-two-files-into-single-file-using-ansible-in-remote-server
-  block:
-    - name: "[SIGNED TLS] - Create chained certificate file for nginx (step 1)"
-      ansible.builtin.shell:
-        cmd: awk 1 {{ nextcloud_tls_cert_file }} {{ nextcloud_tls_chain_file }}
-      changed_when: false
-      register: concat
-
-    - name: "[SIGNED TLS] - Create chained certificate file for nginx (step 2)"
-      ansible.builtin.copy:
-        dest: "{{ nextcloud_tls_cert_file }}"
-        content: "{{ concat.stdout_lines |join('\n') }}"
-        mode: 0640
-        owner: "{{ nextcloud_websrv_user }}"
-        group: "{{ nextcloud_websrv_group }}"
-      changed_when: true
