@@ -8,26 +8,7 @@ debian:
     nextcloud_websrv_user: "www-data"
     nextcloud_websrv_group: "www-data"
     upgrade_packages_first: false
-  stretch:
-    php_ver: 7.0
-    mysql_daemon: mysql
-  buster:
-    php_ver: 8.1
-  bullseye:
-    php_ver: 8.1
-  testing: &debian-testing
-    php_ver: 8.1
-  sid: *debian-testing
 
 ubuntu:
   defaults:
     mysql_daemon: mysql
-    upgrade_packages_first: false
-  xenial:
-    php_ver: 7.0
-  bionic:
-    php_ver: 7.2
-  focal:
-    php_ver: 7.4
-  jammy:
-    php_ver: 8.1
