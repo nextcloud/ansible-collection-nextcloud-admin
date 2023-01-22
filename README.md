@@ -459,7 +459,6 @@ Install and use a custom version for PHP instead of the default one:
 php_ver: '8.1'
 php_dir: "/etc/php/{{ php_ver }}"
 php_bin: "php-fpm{{ php_ver }}"
-php_pkg_apcu: "php-apcu"
 php_pkg_spe:
   - "php{{ php_ver }}-imap"
   - "php{{ php_ver }}-imagick"
