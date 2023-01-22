@@ -30,7 +30,6 @@ php_pkg_spe:
   - "php{{ php_ver }}-gmp"
   - "php{{ php_ver }}-imagick"
   - "php{{ php_ver }}-mbstring"
-  - "php{{ php_ver }}-redis"
   - "php{{ php_ver }}-xml"
   - "php{{ php_ver }}-zip"
 php_socket: "/run/php/php{{ php_ver }}-fpm.sock"

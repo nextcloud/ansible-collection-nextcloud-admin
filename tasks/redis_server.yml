@@ -1,11 +1,12 @@
 ---
 - name: "[REDIS] -  Required packages are installed."
   ansible.builtin.package:
-    name: "{{ redix_deps + php_pkg_spe }}"
+    name: "{{ redis_deps }}"
     state: present
   vars:
-    redix_deps:
+    redis_deps:
       - redis-server
+      - "php{{ php_ver }}-redis"
   notify: Start redis
 
 - name: "[REDIS] -  Redis configuration is present."

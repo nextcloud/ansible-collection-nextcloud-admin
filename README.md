@@ -465,7 +465,6 @@ php_pkg_spe:
   - "php{{ php_ver }}-xml"
   - "php{{ php_ver }}-zip"
   - "php{{ php_ver }}-mbstring"
-  - "php-redis"
 php_socket: "/run/php/{{ php_ver }}-fpm.sock"
 php_memory_limit: 512M
 ```
