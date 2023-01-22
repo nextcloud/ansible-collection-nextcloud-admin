@@ -14,3 +14,6 @@ nextcloud_max_upload_size_in_bytes: "{{ nextcloud_max_upload_size | human_to_byt
 # load configurations references
 os_config_ref: "{{ lookup('ansible.builtin.template', [role_path, 'defaults', 'os_config_ref.yml'] | join('/')) | from_yaml }}"
 php_config_ref: "{{ lookup('ansible.builtin.template', [role_path, 'defaults', 'php_config_ref.yml'] | join('/')) | from_yaml }}"
+
+# read os-specific defaults
+upgrade_packages_first: "{{ os_config_ref[ansible_os_family | lower].defaults.upgrade_packages_first }}"
