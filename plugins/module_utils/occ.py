@@ -24,8 +24,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-# import json
-
 
 def run_occ(module, command, ):
   cli_full_path = module.params.get('nextcloud_path') + '/occ'
