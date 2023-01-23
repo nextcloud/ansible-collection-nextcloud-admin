@@ -10,6 +10,8 @@
         cache_valid_time: 600
       when: ansible_os_family == 'Debian'
       changed_when: false
-
+  vars:
+    nextcloud_disable_apps:
+      - photos
   roles:
     - role: aalaesar.install_nextcloud
