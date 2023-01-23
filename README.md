@@ -448,7 +448,7 @@ Set the size of the shared nginx TLS session cache to 50 MB.
 
 Nextcloud's [supported version of php](https://docs.nextcloud.com/server/25/admin_manual/installation/system_requirements.html#server) can often not be available in your distro official repository. `php_install_external_repos` will use [geerlingguy.php-versions](https://github.com/geerlingguy/ansible-role-php-versions) role to add the appropriate third party for your distribution version.
 
-If you do not want to install the third party repository, you can set the following  variable to false, but you'll have to install php on your own before running this role. 
+If you do not want to install the third party repository, you can set the following  variable to false, but you'll have to install php on your own before running this role.
 ```yaml
 php_install_external_repos: true
 ```
@@ -502,6 +502,19 @@ The role uses Ansible's password Lookup:
 -   see [the ansible password lookup documentation](https://docs.ansible.com/ansible/latest/plugins/lookup/password.html) for more info
 
 ### Post installation:
+#### Disabling pre-installed Applications
+
+Since **1.8.0**, it is possible to disable applications that comes pre-installed in a new nextcloud server.
+Simply provide the list of applications you want disabled in `nextcloud_disable_apps`
+
+```yaml
+nextcloud_disable_apps:
+  - photos
+  - circles
+```
+
+__WARNING__: depending on the app you are disabling, you may make the new server unmanageable.
+
 #### Applications installation
 
 Since **v1.3.0**, it is possible to download, install and enable nextcloud applications during a post-install process.
