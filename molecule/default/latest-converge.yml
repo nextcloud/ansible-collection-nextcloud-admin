@@ -13,4 +13,4 @@
       changed_when: false
 
   roles:
-    - role: aalaesar.install_nextcloud
+    - role: install_nextcloud
