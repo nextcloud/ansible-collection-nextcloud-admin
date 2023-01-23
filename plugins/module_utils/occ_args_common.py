@@ -25,15 +25,8 @@
 
 
 OCC_ARGS_SPEC = dict(
-  nextcloud_path = dict(
-    type = "str",
-    required = True,
-    aliases = ["path", "nc_path", "nc_dir"]
-  ),
-  php_runtime=dict(
-    type="str",
-    required = False,
-    default = "php",
-    aliases = ["php"]
-  ),
+    nextcloud_path=dict(
+        type="str", required=True, aliases=["path", "nc_path", "nc_dir"]
+    ),
+    php_runtime=dict(type="str", required=False, default="php", aliases=["php"]),
 )

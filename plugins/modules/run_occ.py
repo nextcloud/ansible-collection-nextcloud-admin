@@ -103,47 +103,52 @@ stderr_lines:
 import copy
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.aalaesar.nextcloud.plugins.module_utils.occ import run_occ
-from ansible_collections.aalaesar.nextcloud.plugins.module_utils.occ_args_common import OCC_ARGS_SPEC
+from ansible_collections.aalaesar.nextcloud.plugins.module_utils.occ_args_common import (
+    OCC_ARGS_SPEC,
+)
+
 
 def args_spec():
-  arg_spec = copy.deepcopy(OCC_ARGS_SPEC)
-  arg_spec.update(
-    dict(
-      command=dict(
-        type='str',
-        required=True,
-      ),
-    ),
-  )
-  return arg_spec
+    arg_spec = copy.deepcopy(OCC_ARGS_SPEC)
+    arg_spec.update(
+        dict(
+            command=dict(
+                type="str",
+                required=True,
+            ),
+        ),
+    )
+    return arg_spec
+
 
 def main():
-  global module
+    global module
 
-  module = AnsibleModule(
-    argument_spec=args_spec(),
-    supports_check_mode=False,
-  )
-  command = module.params.get('command')
-  returnCode, stdOut, stdErr = run_occ(module, command)
-  result=dict(
-    command=command,
-    rc = returnCode,
-    stdout = stdOut,
-    stderr = stdErr,
-  )
-  if returnCode != 0:
-    module.fail_json(
-      msg="Failure when executing occ command. Exited {0}.\nstdout: {1}\nstderr: {2}".format(
-          returnCode, stdOut, stdErr
-      ),
-        **result,
+    module = AnsibleModule(
+        argument_spec=args_spec(),
+        supports_check_mode=False,
     )
-  else:
-    module.exit_json(
-      changed = True,
-      **result,
+    command = module.params.get("command")
+    returnCode, stdOut, stdErr = run_occ(module, command)
+    result = dict(
+        command=command,
+        rc=returnCode,
+        stdout=stdOut,
+        stderr=stdErr,
     )
+    if returnCode != 0:
+        module.fail_json(
+            msg="Failure when executing occ command. Exited {0}.\nstdout: {1}\nstderr: {2}".format(
+                returnCode, stdOut, stdErr
+            ),
+            **result,
+        )
+    else:
+        module.exit_json(
+            changed=True,
+            **result,
+        )
+
 
 if __name__ == "__main__":
-  main()
+    main()

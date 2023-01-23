@@ -23,9 +23,10 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
 class ModuleDocFragment(object):
     # Standard documentation
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 options:
   nextcloud_path:
     description:
@@ -44,4 +45,4 @@ options:
     default: php
     aliases:
       - php
-'''
+"""
