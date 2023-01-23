@@ -44,5 +44,5 @@
 
 - name: "[PHP] - APCu is installed."
   ansible.builtin.package:
-    name: "{{ php_pkg_apcu }}"
+    name: "php{{ php_ver }}-apcu"
     state: present
