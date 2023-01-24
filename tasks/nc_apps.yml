@@ -23,7 +23,9 @@
         chdir: "{{ nextcloud_webroot }}"
       when: (nc_app_source is string) and (nc_app_source | length == 0)
 
-    - name: "[App] - Download Archive in apps folder \"{{ nc_app_name }}\""
+    - name: "[App] - Download Archive in apps folder from \"{{ nc_app_source }}\""
+      become_user: "{{ nextcloud_websrv_user }}"
+      become_flags: "{{ ansible_become_flags | default(omit) }}"
       ansible.builtin.unarchive:
         copy: false
         src: "{{ nc_app_source }}"

@@ -7,7 +7,6 @@ debian:
     # thoses 2 are globals for debian family:
     nextcloud_websrv_user: "www-data"
     nextcloud_websrv_group: "www-data"
-    upgrade_packages_first: false
 
 ubuntu:
   defaults:

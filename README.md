@@ -407,7 +407,6 @@ nextcloud_tls_cert_method: "self-signed"
 
 Defines various method for retrieving a TLS certificate.
 -   **self-signed**: generate a _one year_ self-signed certificate for the trusted domain on the remote host and store it in _/etc/ssl_.
--   **signed**: copy provided signed certificate for the trusted domain to the remote host or in /etc/ssl by default.
   Uses:
 
 ```yaml
@@ -422,6 +421,22 @@ Defines various method for retrieving a TLS certificate.
   # ^remote absolute path to the certificate's key.
   nextcloud_tls_cert_key: "/etc/ssl/{{ nextcloud_trusted_domain }}.key"
   # ^remote absolute path to the certificate.
+```
+-   **signed**: copy provided signed certificate for the trusted domain to the remote host or in /etc/ssl by default.
+  Uses:
+
+```yaml
+  # Mandatory:
+  nextcloud_tls_src_cert: ./files/cert.crt
+  # ^local path to the certificate's key.
+  nextcloud_tls_src_cert_key: ./files/cert.key
+  # ^local path to the certificate.
+
+  # Optional:
+  cert_path: "/etc/ssl/"
+  # ^remote absolute path where the certificates are placed.
+  nextcloud_tls_src_chain: ./files/intermedca.pem
+  # ^local path to the intermediate CA chain file.
 ```
 -   **installed**: if the certificate for the trusted domain is already on the remote host, specify its location.
 
@@ -444,6 +459,10 @@ Set the size of the shared nginx TLS session cache to 50 MB.
 
 ### System configuration
 
+Before the installation and configuration will start, the local 'apt' packages-cache may be outdated. This is helpful in case last time 'apt update' is some time ago and newer versions would be available. If this is the case, the ansible-script will fail, because there is a mismatch of the versions in the local 'apt' cache and the remote server.
+```yaml
+upgrade_packages_first: true
+```
 **_WARNING: Current Nextcloud requires php v8.0 or later. This role is tested and installs by default the recommended version through third party repos. See more details below._**
 
 Nextcloud's [supported version of php](https://docs.nextcloud.com/server/25/admin_manual/installation/system_requirements.html#server) can often not be available in your distro official repository. `php_install_external_repos` will use [geerlingguy.php-versions](https://github.com/geerlingguy/ansible-role-php-versions) role to add the appropriate third party for your distribution version.
@@ -459,14 +478,12 @@ Install and use a custom version for PHP instead of the default one:
 php_ver: '8.1'
 php_dir: "/etc/php/{{ php_ver }}"
 php_bin: "php-fpm{{ php_ver }}"
-php_pkg_apcu: "php-apcu"
 php_pkg_spe:
   - "php{{ php_ver }}-imap"
   - "php{{ php_ver }}-imagick"
   - "php{{ php_ver }}-xml"
   - "php{{ php_ver }}-zip"
   - "php{{ php_ver }}-mbstring"
-  - "php-redis"
 php_socket: "/run/php/{{ php_ver }}-fpm.sock"
 php_memory_limit: 512M
 ```
@@ -508,12 +525,12 @@ Since **v1.3.0**, it is possible to download, install and enable nextcloud appli
 
 The application (app) to install have to be declared in the `nextcloud_apps` dictionary in a "key:value" pair.
 -   The app name is the key
--   The download link, is the value.
+-   The download link, is the value. If left blank, the app is tried to be downloaded and installed from the nextcloud official app-store. 
 
 ```yaml
 nextcloud_apps:
   app_name_1: "http://download_link.com/some_archive.zip"
-  app_name_2: "http://getlink.com/another_archive.zip"
+  app_name_2:
 ```
 
 Alternatively, if you need to configure an application after enabling it, you can use this structure.
@@ -525,11 +542,13 @@ nextcloud_apps:
     conf:
       parameter1: ldap:\/\/ldapsrv
       parameter2: another_value
+  app_name_1: # Download from nextcloud official app-store
+    conf:
+      parameter1: ldap:\/\/ldapsrv
+      parameter2: another_value
 ```
 
 **Notes:**
--   Because the role is using nextcloud's occ, it is not possible to install an app from the official nextcloud app store.
--   If you know that the app is already installed, you can give an empty string to skip the download.
 -   The app name need the be equal to the folder name located in the **apps folder** of the nextcloud instance, which is extracted from the downloaded archive.
 The name may not be canon some times. (like **appName-x.y.z** instead of **appName**)
 -   The role will **not** update an already enabled application.
@@ -625,7 +644,7 @@ He can run the role with the following variables to install Nextcloud accordingl
      nextcloud_mysql_root_pwd: "42h2g2"
      nextcloud_apps:
        files_external: "" # enable files_external which is already installed in nextcloud
-       calendar: "https://github.com/nextcloud/calendar/releases/download/v1.5.0/calendar.tar.gz"
+       calendar:  # Download from official store
        contacts: "https://github.com/nextcloud/contacts/releases/download/v1.5.3/contacts.tar.gz"
        richdocuments-1.1.25: # the app name is equal to the extracted folder name from the archive
           source: "https://github.com/nextcloud/richdocuments/archive/1.1.25.zip"

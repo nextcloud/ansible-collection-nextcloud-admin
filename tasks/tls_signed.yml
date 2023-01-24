@@ -1,8 +1,4 @@
 ---
-- name: "[SIGNED TLS] - Define certificate-file locations as abolute path"
-  ansible.builtin.set_fact:
-    cert_path: "/etc/ssl/"
-
 - name: "[SIGNED TLS] - Define signed certificate-file with abolute path"
   ansible.builtin.set_fact:
     nextcloud_tls_cert_file: "{{ nextcloud_tls_cert | default(cert_path + nextcloud_instance_name + \".crt\") }}"
