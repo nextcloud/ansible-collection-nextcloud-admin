@@ -433,10 +433,18 @@ Defines various method for retrieving a TLS certificate.
   # ^local path to the certificate.
 
   # Optional:
-  cert_path: "/etc/ssl/"
-  # ^remote absolute path where the certificates are placed.
   nextcloud_tls_src_chain: ./files/intermedca.pem
   # ^local path to the intermediate CA chain file.
+
+  # Optional (for remote host):
+  cert_path: "/etc/ssl/"
+  # ^remote absolute path where the certificates are placed if not defined through nextcloud_tls_cert_file, nextcloud_tls_cert_key_file or nextcloud_tls_chain_file
+  nextcloud_tls_cert_file: "/etc/ssl/{{ nextcloud_trusted_domain }}.crt"
+  # ^remote absolute path to the certificate, including the filename.
+  nextcloud_tls_cert_key_file: "/etc/ssl/{{ nextcloud_trusted_domain }}.key"
+  # ^remote absolute path to the certificate's key, including the filename.
+  nextcloud_tls_chain_file: "/etc/ssl/{{ nextcloud_trusted_domain }}.pem"
+  # ^remote absolute path to the certificate chain, including the filename.
 ```
 -   **installed**: if the certificate for the trusted domain is already on the remote host, specify its location.
 

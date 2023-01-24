@@ -108,6 +108,9 @@ nextcloud_hsts: false  # recommended >= 15552000
 # nextcloud_tls_cert: /path/to/cert
 # nextcloud_tls_cert_key: /path/to/cert/key
 # cert_path: /path/where/cert/to/copy   # Default: /etc/ssl/
+# nextcloud_tls_chain_file: /path/to/cert/chain/chain.pem
+# nextcloud_tls_cert_file: /path/to/cert/cert.crt
+# nextcloud_tls_cert_key_file: /path/to/cert/key/cert.key
 # nextcloud_tls_src_chain: /path/to/cert/chain
 # nextcloud_tls_src_cert: /path/to/cert
 # nextcloud_tls_src_cert_key: /path/to/cert/key

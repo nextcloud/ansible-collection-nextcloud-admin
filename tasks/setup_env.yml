@@ -24,7 +24,7 @@
     force_apt_get: true
   when:
     - ansible_os_family in [ "Debian" ]
-    - (upgrade_packages_first is defined) and (upgrade_packages_first)
+    - upgrade_packages_first
 
   # fix for debian not using sudo :
   # finding out if sudo is installed or not
