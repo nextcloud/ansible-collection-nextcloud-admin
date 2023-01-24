@@ -13,5 +13,7 @@
   vars:
     nextcloud_disable_apps:
       - photos
+      - theming
+      - mail
   roles:
     - role: aalaesar.install_nextcloud
