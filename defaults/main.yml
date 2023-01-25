@@ -107,6 +107,7 @@ nextcloud_tls_dhparam: "/etc/ssl/dhparam.pem"
 nextcloud_hsts: false  # recommended >= 15552000
 # nextcloud_tls_cert: /path/to/cert
 # nextcloud_tls_cert_key: /path/to/cert/key
+# nextcloud_tls_cert_chain: /path/to/cert/chain
 # cert_path: /path/where/cert/to/copy   # Default: /etc/ssl/
 # nextcloud_tls_chain_file: /path/to/cert/chain/chain.pem
 # nextcloud_tls_cert_file: /path/to/cert/cert.crt
