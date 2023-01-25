@@ -112,6 +112,7 @@ nextcloud_tls_session_cache_size: 50m  # in Byte or human readable size notation
 
 # [APPS]
 nextcloud_apps: {}
+nextcloud_disable_apps: []
 
 # [SYSTEM]
 # nextcloud_mysql_root_pwd: "secret"
