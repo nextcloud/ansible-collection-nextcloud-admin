@@ -407,21 +407,7 @@ nextcloud_tls_cert_method: "self-signed"
 
 Defines various method for retrieving a TLS certificate.
 -   **self-signed**: generate a _one year_ self-signed certificate for the trusted domain on the remote host and store it in _/etc/ssl_.
-  Uses:
 
-```yaml
-  # Mandatory:
-  nextcloud_tls_src_cert: /local/path/to/cert
-  # ^local path to the certificate's key.
-  nextcloud_tls_src_cert_key: /local/path/to/cert/key
-  # ^local path to the certificate.
-
-  # Optional:
-  nextcloud_tls_cert: "/etc/ssl/{{ nextcloud_trusted_domain }}.crt"
-  # ^remote absolute path to the certificate's key.
-  nextcloud_tls_cert_key: "/etc/ssl/{{ nextcloud_trusted_domain }}.key"
-  # ^remote absolute path to the certificate.
-```
 -   **signed**: copy provided signed certificate for the trusted domain to the remote host or in /etc/ssl by default.
   Uses:
 
@@ -451,10 +437,13 @@ Defines various method for retrieving a TLS certificate.
   Uses:
 
 ```yaml
+  # Mandatory:
   nextcloud_tls_cert: /path/to/cert
   # ^remote absolute path to the certificate's key. mandatory
   nextcloud_tls_cert_key: /path/to/cert/key
   # ^remote absolute path to the certificate. mandatory
+
+  # Optional:
   nextcloud_tls_cert_chain: /path/to/cert/chain
   # ^remote absolute path to the certificate's full chain- used only by apache - Optional
 ```
