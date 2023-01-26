@@ -175,3 +175,16 @@
     - config
     - themes
     - updater
+
+- name: "[NC apps] - Disable Nextcloud apps"
+  ansible.builtin.command: php occ app:disable "{{ item }}"
+  become_user: "{{ nextcloud_websrv_user }}"
+  become_flags: "{{ ansible_become_flags | default(omit) }}"
+  become: true
+  register: _occ_app_disable_result
+  args:
+    chdir: "{{ nextcloud_webroot }}"
+  changed_when:
+    - "'disabled' in _occ_app_disable_result.stdout"
+    - "'No such app' not in _occ_app_disable_result.stdout"
+  with_items: "{{ nextcloud_disable_apps }}"
