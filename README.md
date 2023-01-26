@@ -20,7 +20,7 @@ The role has to know where the server files are, how to access it and where to s
 ```yaml
 nextcloud_backup_target_dir: "/opt/nextcloud_backups"
 nextcloud_webroot: "/opt/nextcloud"
-# nextcloud_data_dir: "/var/ncdata" # optionnal.
+# nextcloud_data_dir: "/var/ncdata" # optional.
 nextcloud_websrv_user: www-data # you may need to change this to the nextcloud file owner depending of your setup and OS
 ```
 
@@ -104,6 +104,7 @@ None
 - hosts: nextcloud
   roles:
       - role: aalaesar.backup_nextcloud
+  vars:
         nextcloud_backup_suffix: _only_app_data
         nextcloud_backup_user: false
         nextcloud_backup_database: false

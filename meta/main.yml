@@ -1,3 +1,4 @@
+---
 galaxy_info:
   author: Aalaesar
   description: Create a backup of your nextcloud server with this ansible role
@@ -9,13 +10,13 @@ galaxy_info:
   platforms:
     - name: EL
       versions:
-      - all
+        - all
     - name: Debian
       versions:
-      - all
+        - all
     - name: Ubuntu
       versions:
-      - all
+        - all
 
   galaxy_tags:
     - backup
