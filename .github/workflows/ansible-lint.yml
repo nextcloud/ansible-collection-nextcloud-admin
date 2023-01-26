@@ -1,0 +1,17 @@
+---
+## Source: https://github.com/marketplace/actions/ansible-lint
+
+name: Ansible Lint
+on: [push, pull_request]  # yamllint disable-line rule:truthy
+
+jobs:
+  ansible-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Important: This sets up your GITHUB_WORKSPACE environment variable
+      - uses: actions/checkout@v3
+
+      - name: Run ansible-lint
+        # replace `main` with any valid ref, or tags like `v6`
+        uses: ansible-community/ansible-lint-action@v6

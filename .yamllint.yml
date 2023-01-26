@@ -1,0 +1,28 @@
+---
+## Ansible Galaxy yamllint rules: https://github.com/ansible/galaxy/blob/devel/galaxy/importer/linters/yamllint.yaml
+extends: default
+
+rules:
+  braces: {max-spaces-inside: 1, level: error}
+  brackets: {max-spaces-inside: 1, level: error}
+  colons: {max-spaces-after: -1, level: error}
+  commas: {max-spaces-after: -1, level: error}
+  comments: disable
+  comments-indentation: disable
+  # document-start: disable
+  empty-lines: {max: 3, level: error}
+  hyphens: {level: error}
+  # indentation: disable
+  key-duplicates: enable
+  # line-length: disable
+  # new-line-at-end-of-file: disable
+  new-lines: {type: unix}
+  # trailing-spaces: disable
+  # truthy: disable
+
+  ## Additional rules with warnings
+  document-start: {level: warning}
+  indentation: {level: warning, spaces: 2, indent-sequences: consistent}
+  line-length: {level: warning, max: 180}
+  trailing-spaces: {level: warning}
+  truthy: {level: warning, allowed-values: ['true', 'false']}

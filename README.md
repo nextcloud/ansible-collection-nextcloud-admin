@@ -1,3 +1,5 @@
+[![Ansible-lint status](https://github.com/aalaesar/backup_nextcloud/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/aalaesar/backup_nextcloud/actions?workflow=Ansible%20Lint)
+[![YAML-lint status](https://github.com/aalaesar/backup_nextcloud/actions/workflows/yamllint.yml/badge.svg)](https://github.com/aalaesar/backup_nextcloud/actions?workflow=Yaml%20Lint)
 # backup_nextcloud
 
 An ansible role that creates a backup of a Nextcloud server. The backup is kept on the server.
@@ -96,18 +98,18 @@ None
 ```yaml
 - hosts: nextcloud
   roles:
-      - role: aalaesar.backup_nextcloud
+    - role: aalaesar.backup_nextcloud
 ```
 
 ### Making a partial backup with only the app_data
 ```yaml
 - hosts: nextcloud
   roles:
-      - role: aalaesar.backup_nextcloud
+    - role: aalaesar.backup_nextcloud
   vars:
-        nextcloud_backup_suffix: _only_app_data
-        nextcloud_backup_user: false
-        nextcloud_backup_database: false
+    nextcloud_backup_suffix: _only_app_data
+    nextcloud_backup_user: false
+    nextcloud_backup_database: false
 ```
 
 ## License
