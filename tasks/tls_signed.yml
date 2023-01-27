@@ -1,11 +1,11 @@
 ---
 - name: "[SIGNED TLS] - Define signed certificate-file with abolute path"
   ansible.builtin.set_fact:
-    nextcloud_tls_cert_file: "{{ nextcloud_tls_cert | default(cert_path + nextcloud_instance_name + \".crt\") }}"
+    nextcloud_tls_cert_file: "{{ nextcloud_tls_cert_file | default(cert_path + nextcloud_instance_name + \".crt\") }}"
 
 - name: "[SIGNED TLS] - Define signed certificate's key-file with absolute path"
   ansible.builtin.set_fact:
-    nextcloud_tls_cert_key_file: "{{ nextcloud_tls_cert_key | default(cert_path + nextcloud_instance_name + \".key\") }}"
+    nextcloud_tls_cert_key_file: "{{ nextcloud_tls_cert_key_file | default(cert_path + nextcloud_instance_name + \".key\") }}"
 
 - name: "[SIGNED TLS] - Define certificate chain-file with absolute path"
   ansible.builtin.set_fact:
