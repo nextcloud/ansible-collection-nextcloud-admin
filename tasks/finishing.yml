@@ -20,8 +20,8 @@
   ansible.builtin.command: "php {{ nextcloud_webroot }}/occ maintenance:mode --off"
   become_user: "{{ nextcloud_websrv_user }}"
   become: true
-  become_method: su
-  become_flags: -s /bin/sh
+  become_method: "{{ ansible_become_method }}"
+  become_flags: "{{ ansible_become_flags }}"
   register: __leave_maintenance
   changed_when:
     - __leave_maintenance.stdout | regex_search('already') == none

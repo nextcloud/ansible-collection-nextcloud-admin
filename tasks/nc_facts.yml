@@ -3,8 +3,8 @@
   ansible.builtin.command: "php {{ nextcloud_webroot }}/occ status --output=json"
   become_user: "{{ nextcloud_websrv_user }}"
   become: true
-  become_method: su
-  become_flags: -s /bin/sh
+  become_method: "{{ ansible_become_method }}"
+  become_flags: "{{ ansible_become_flags }}"
   register: _nc_status
   changed_when: false
 
@@ -12,8 +12,8 @@
   ansible.builtin.command: "php {{ nextcloud_webroot }}/occ config:system:get instanceid"
   become_user: "{{ nextcloud_websrv_user }}"
   become: true
-  become_method: su
-  become_flags: -s /bin/sh
+  become_method: "{{ ansible_become_method }}"
+  become_flags: "{{ ansible_become_flags }}"
   register: _nc_id
   changed_when: false
   when: nextcloud_backup_app_data or nextcloud_backup_user
@@ -24,8 +24,8 @@
     ansible.builtin.command: "php {{ nextcloud_webroot }}/occ config:system:get datadirectory"
     become_user: "{{ nextcloud_websrv_user }}"
     become: true
-    become_method: su
-    become_flags: -s /bin/sh
+    become_method: "{{ ansible_become_method }}"
+    become_flags: "{{ ansible_become_flags }}"
     register: nc_data_dir
     changed_when: false
   - name: Set missing fact
@@ -39,8 +39,8 @@
   ansible.builtin.command: "php {{ nextcloud_webroot }}/occ app:list --output=json"
   become_user: "{{ nextcloud_websrv_user }}"
   become: true
-  become_method: su
-  become_flags: -s /bin/sh
+  become_method: "{{ ansible_become_method }}"
+  become_flags: "{{ ansible_become_flags }}"
   register: _nc_app_list
   changed_when: false
 
@@ -48,8 +48,8 @@
   ansible.builtin.command: "php {{ nextcloud_webroot }}/occ user:list --output=json"
   become_user: "{{ nextcloud_websrv_user }}"
   become: true
-  become_method: su
-  become_flags: -s /bin/sh
+  become_method: "{{ ansible_become_method }}"
+  become_flags: "{{ ansible_become_flags }}"
   register: _nc_user_list
   changed_when: false
   when:
@@ -60,8 +60,8 @@
   - nextcloud_backup_database
   become_user: "{{ nextcloud_websrv_user }}"
   become: true
-  become_method: su
-  become_flags: -s /bin/sh
+  become_method: "{{ ansible_become_method }}"
+  become_flags: "{{ ansible_become_flags }}"
   block:
   - name: Get database type
     ansible.builtin.command: "php {{ nextcloud_webroot }}/occ config:system:get dbtype"
