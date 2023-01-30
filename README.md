@@ -16,14 +16,6 @@ You'll need enough space on the target file system, depending on the size of you
 
 ## Role Variables
 
-### Setting Ansible `become` method
-On different hosts `become` method used by Ansible could be different. Some host may be run on `root`, other on unprivileged user, some of hosts has `sudo` command installed, some not.
-You can tweak this setting using these flags:
-```yaml
-ansible_become_method: "su" # set default become method: (su/sudo)
-ansible_become_flags: "-s /bin/sh" # set become flags or leave empty if additional flags are not needed
-```
-
 ### Locating the nextcloud server
 
 The role has to know where the server files are, how to access it and where to store the backup.

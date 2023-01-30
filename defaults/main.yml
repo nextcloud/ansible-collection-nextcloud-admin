@@ -8,10 +8,6 @@ nextcloud_websrv_user: www-data
 
 nextcloud_exit_maintenance_mode: true
 
-### ANSIBLE SETTINGS ###
-ansible_become_method: "su"
-ansible_become_flags: "-s /bin/sh"
-
 ### ARCHIVE PROPERTIES ###
 nextcloud_backup_suffix: ""
 nextcloud_backup_owner: "{{ nextcloud_websrv_user }}"
