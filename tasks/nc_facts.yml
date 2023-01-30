@@ -56,6 +56,12 @@
   - nextcloud_backup_user
 
 - name: Find the DB credential if required
+  when:
+  - nextcloud_backup_database
+  become_user: "{{ nextcloud_websrv_user }}"
+  become: true
+  become_method: su
+  become_flags: -s /bin/sh
   block:
   - name: Get database type
     ansible.builtin.command: "php {{ nextcloud_webroot }}/occ config:system:get dbtype"
@@ -78,9 +84,3 @@
     register: _nc_dbpassword
     changed_when: false
     no_log: true
-  when:
-  - nextcloud_backup_database
-  become_user: "{{ nextcloud_websrv_user }}"
-  become: true
-  become_method: su
-  become_flags: -s /bin/sh
