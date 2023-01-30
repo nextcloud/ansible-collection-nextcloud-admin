@@ -1,5 +1,5 @@
 ---
-- name: get nextcloud status
+- name: Get nextcloud status
   ansible.builtin.command: "php {{ nextcloud_webroot }}/occ status --output=json"
   become_user: "{{ nextcloud_websrv_user }}"
   become: true
@@ -8,7 +8,7 @@
   register: _nc_status
   changed_when: false
 
-- name: get Nextcloud instance ID
+- name: Get Nextcloud instance ID
   ansible.builtin.command: "php {{ nextcloud_webroot }}/occ config:system:get instanceid"
   become_user: "{{ nextcloud_websrv_user }}"
   become: true
@@ -18,9 +18,9 @@
   changed_when: false
   when: nextcloud_backup_app_data or nextcloud_backup_user
 
-- name: find the data folder if required
+- name: Find the data folder if required
   block:
-  - name: get the data directory
+  - name: Get the data directory
     ansible.builtin.command: "php {{ nextcloud_webroot }}/occ config:system:get datadirectory"
     become_user: "{{ nextcloud_websrv_user }}"
     become: true
@@ -28,14 +28,14 @@
     become_flags: -s /bin/sh
     register: nc_data_dir
     changed_when: false
-  - name: set missing fact
+  - name: Set missing fact
     ansible.builtin.set_fact:
       nextcloud_data_dir: "{{ nc_data_dir.stdout }}"
   when:
   - nextcloud_backup_app_data or nextcloud_backup_user
   - nextcloud_data_dir|d('') == ''
 
-- name: get the list of apps installed
+- name: Get the list of apps installed
   ansible.builtin.command: "php {{ nextcloud_webroot }}/occ app:list --output=json"
   become_user: "{{ nextcloud_websrv_user }}"
   become: true
@@ -44,7 +44,7 @@
   register: _nc_app_list
   changed_when: false
 
-- name: get the list of users
+- name: Get the list of users
   ansible.builtin.command: "php {{ nextcloud_webroot }}/occ user:list --output=json"
   become_user: "{{ nextcloud_websrv_user }}"
   become: true
@@ -55,25 +55,25 @@
   when:
   - nextcloud_backup_user
 
-- name: find the DB credential if required
+- name: Find the DB credential if required
   block:
-  - name: get database type
+  - name: Get database type
     ansible.builtin.command: "php {{ nextcloud_webroot }}/occ config:system:get dbtype"
     register: _nc_dbtype
     changed_when: false
-  - name: get DB host
+  - name: Get DB host
     ansible.builtin.command: "php {{ nextcloud_webroot }}/occ config:system:get dbhost"
     register: _nc_dbhost
     changed_when: false
-  - name: get DB name
+  - name: Get DB name
     ansible.builtin.command: "php {{ nextcloud_webroot }}/occ config:system:get dbname"
     register: _nc_dbname
     changed_when: false
-  - name: get DB user
+  - name: Get DB user
     ansible.builtin.command: "php {{ nextcloud_webroot }}/occ config:system:get dbuser"
     register: _nc_dbuser
     changed_when: false
-  - name: get DB password
+  - name: Get DB password
     ansible.builtin.command: "php {{ nextcloud_webroot }}/occ config:system:get dbpassword"
     register: _nc_dbpassword
     changed_when: false

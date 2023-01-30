@@ -1,15 +1,15 @@
 ---
-- name: gather some nextcloud configuration facts
+- name: Gather some nextcloud configuration facts
   ansible.builtin.import_tasks: nc_facts.yml
   tags:
     - always
     - facts
-- name: set archive name
+- name: Set archive name
   ansible.builtin.set_fact:
     nc_archive_path: "{{ nextcloud_backup_target_dir }}/{{ nc_archive_name }}"
   tags:
     - always
-- name: enter maintenance mode
+- name: Enter maintenance mode
   ansible.builtin.command: "php {{ nextcloud_webroot }}/occ maintenance:mode --on"
   become_user: "{{ nextcloud_websrv_user }}"
   become: true
