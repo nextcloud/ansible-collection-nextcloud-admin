@@ -1,5 +1,5 @@
 ---
-- name: the data backup folder exists
+- name: The data backup folder exists
   ansible.builtin.file:
     path: "{{ nc_archive_path }}/data"
     state: directory
@@ -7,7 +7,7 @@
     group: "{{ nextcloud_backup_group }}"
     mode: "{{ nextcloud_backup_mode }}"
 
-- name: backup user data
+- name: Backup user data
   ansible.builtin.command: >-
     rsync -r {{ _exclude_folders }}
     {{ nextcloud_data_dir }}/{{ item }}

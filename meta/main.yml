@@ -1,6 +1,8 @@
 ---
 galaxy_info:
   author: Aalaesar
+  role_name: backup_nextcloud
+  namespace: aalaesar
   description: Create a backup of your nextcloud server with this ansible role
 
   license: license GPL-3.0-only
