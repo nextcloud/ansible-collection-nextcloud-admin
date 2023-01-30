@@ -1,5 +1,6 @@
 ---
-- import_tasks: nc_facts.yml
+- name: gather some nextcloud configuration facts
+  ansible.builtin.import_tasks: nc_facts.yml
   tags:
     - always
     - facts
@@ -20,13 +21,18 @@
   tags:
     - always
 
-- import_tasks: files.yml
-- import_tasks: user_data.yml
+- name: Run basic backup
+  ansible.legacy.import_tasks: files.yml
+- name: Run users data backup
+  ansible.legacy.import_tasks: user_data.yml
   when: nextcloud_backup_user
-- import_tasks: app_data.yml
+- name: Run applications backups
+  ansible.legacy.import_tasks: app_data.yml
   when: nextcloud_backup_user
-- import_tasks: database.yml
+- name: Run batabase backup
+  ansible.legacy.import_tasks: database.yml
   when: nextcloud_backup_database
   tags:
     - db_dump
-- import_tasks: finishing.yml
+- name: Finish the backup
+  ansible.legacy.import_tasks: finishing.yml
