@@ -1,3 +1,4 @@
+---
 - import_tasks: nc_facts.yml
   tags:
     - always

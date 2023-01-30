@@ -1,3 +1,4 @@
+---
 ### APPLICATION SETTINGS ##
 nextcloud_instance_name: "nextcloud"
 nextcloud_backup_target_dir: "/opt/nextcloud_backups"

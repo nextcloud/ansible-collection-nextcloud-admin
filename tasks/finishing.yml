@@ -1,3 +1,4 @@
+---
 - name: create the archive
   community.general.archive:
     path:

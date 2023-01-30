@@ -1,3 +1,4 @@
+---
 - name: get nextcloud status
   ansible.builtin.command: "php {{ nextcloud_webroot }}/occ status --output=json"
   become_user: "{{ nextcloud_websrv_user }}"

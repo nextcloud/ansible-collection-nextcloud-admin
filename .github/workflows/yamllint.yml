@@ -1,0 +1,17 @@
+---
+## Source: https://github.com/marketplace/actions/yaml-lint
+name: Yaml Lint
+"on":
+  pull_request:
+  push:
+
+jobs:
+  yaml-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run yaml-lint
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          config_file: .yamllint.yml
+          format: github

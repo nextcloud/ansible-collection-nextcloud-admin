@@ -1,3 +1,4 @@
+---
 - name: the data backup folder exists
   ansible.builtin.file:
     path: "{{ nc_archive_path }}/data"
