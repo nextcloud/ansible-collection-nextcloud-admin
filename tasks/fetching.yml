@@ -1,0 +1,7 @@
+---
+- name: Fetch file from remote to local
+  become: false # Using become may cause OOM errors. (https://docs.ansible.com/ansible/latest/collections/ansible/builtin/fetch_module.html#notes)
+  ansible.builtin.fetch:
+    src: "{{ nc_archive_path }}.{{ nextcloud_backup_format }}"
+    dest: "{{ nextcloud_backup_fetch_local_path }}"
+  when: nextcloud_backup_fetch_to_local

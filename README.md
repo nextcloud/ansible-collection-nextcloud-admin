@@ -2,7 +2,7 @@
 [![YAML-lint status](https://github.com/aalaesar/backup_nextcloud/actions/workflows/yamllint.yml/badge.svg)](https://github.com/aalaesar/backup_nextcloud/actions?workflow=Yaml%20Lint)
 # backup_nextcloud
 
-An ansible role that creates a backup of a Nextcloud server. The backup is kept on the server.
+An ansible role that creates a backup of a Nextcloud server. The backup is kept on the server (unless you [fetch it](#fetching-backup-from-remote-to-local-machine)).
 
 ## Requirements
 
@@ -90,6 +90,15 @@ nextcloud_backup_user_files_versions: true
 nextcloud_backup_user_uploads: true
 nextcloud_backup_user_cache: true
 ```
+
+### Fetching backup from remote to local machine
+You can fetch created backup from remote by setting these variables.
+WARNING: user which you are used in Ansible has to be set as [backup owner](#adjusting-the-backup-owner) due to Ansible limitation on using `become` with `ansible.builtin.fetch`
+```yaml
+nextcloud_backup_fetch_to_local: true
+nextcloud_backup_fetch_local_path: "/local_path/nextcloud_backup"
+```
+
 ### Other
  You can leave the server in maintenance mode at the end of the process by turning false
  ```yaml

@@ -31,3 +31,7 @@ nextcloud_backup_user_cache: true
 
 ### DATABASE BACKUP ###
 nextcloud_backup_database: true
+
+### FETCH TO LOCAL MACHINE ###
+nextcloud_backup_fetch_to_local: false
+nextcloud_backup_fetch_local_path: "/tmp/nextcloud_backup"
