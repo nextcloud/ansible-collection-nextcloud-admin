@@ -23,7 +23,15 @@ The role has to know where the server files are, how to access it and where to s
 nextcloud_backup_target_dir: "/opt/nextcloud_backups"
 nextcloud_webroot: "/opt/nextcloud"
 # nextcloud_data_dir: "/var/ncdata" # optional.
-nextcloud_websrv_user: www-data # you may need to change this to the nextcloud file owner depending of your setup and OS
+nextcloud_websrv_user: "www-data" # you may need to change this to the nextcloud file owner depending of your setup and OS
+```
+
+### Adjusting the backup owner:
+The backup owner can be adjusted with. This may be useful when operating user is different than nextcloud's process owner.
+
+```yaml
+nextcloud_backup_owner: "www-data" # user name who will get owner on backup_target_dir and final archive
+nextcloud_backup_group: "www-data" # user group who will get owner on backup_target_dir and final archive
 ```
 
 ### Adjusting the backup name:
