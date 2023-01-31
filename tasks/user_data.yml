@@ -5,7 +5,7 @@
     state: directory
     owner: "{{ nextcloud_backup_owner }}"
     group: "{{ nextcloud_backup_group }}"
-    mode: "{{ nextcloud_backup_mode }}"
+    mode: "{{ nextcloud_backup_dir_mode }}"
 
 - name: Backup user data
   ansible.builtin.command: >-

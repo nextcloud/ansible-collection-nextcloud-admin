@@ -23,10 +23,18 @@ The role has to know where the server files are, how to access it and where to s
 nextcloud_backup_target_dir: "/opt/nextcloud_backups"
 nextcloud_webroot: "/opt/nextcloud"
 # nextcloud_data_dir: "/var/ncdata" # optional.
-nextcloud_websrv_user: www-data # you may need to change this to the nextcloud file owner depending of your setup and OS
+nextcloud_websrv_user: "www-data" # you may need to change this to the nextcloud file owner depending of your setup and OS
 ```
 
-### Adjusting the backup name:
+### Adjusting the backup owner
+The backup owner can be adjusted with. This may be useful when operating user is different than nextcloud's process owner.
+
+```yaml
+nextcloud_backup_owner: "www-data" # user name who will get owner on backup_target_dir and final archive
+nextcloud_backup_group: "www-data" # user group who will get owner on backup_target_dir and final archive
+```
+
+### Adjusting the backup name
 The backup name can be adjusted with
 
 ```yaml
@@ -41,7 +49,7 @@ Or you can change it completely by redefining
 nc_archive_name: "{{ nextcloud_instance_name }}_nextcloud-{{ nc_status.versionstring }}_{{ ansible_date_time.iso8601_basic_short }}{{ nextcloud_backup_suffix }}"
 ```
 
-### Adjusting the backup content:
+### Adjusting the backup content
 
 The role will __always__:
  - backup the server's config
@@ -56,7 +64,7 @@ nextcloud_backup_user: true
 nextcloud_backup_database: true
 ```
 
-### Adjusting app data backup:
+### Adjusting app data backup
 
 You may want to exclude some app_data folders from the backup.
 But you cannot target a specific app to backup, this requires knowledge of the app's code.
@@ -68,7 +76,7 @@ nextcloud_backup_app_data_exclude_folder:
 
 By default the preview folder is excluded from the backup as it can be notoriously __large__
 
-### Adjusting user backup:
+### Adjusting user backup
 
 You can exclude a list of user(s) from the backup
 ```yaml
@@ -94,7 +102,7 @@ None
 
 ## Example Playbook
 
-### Running a full backup of your nextcloud server:
+### Running a full backup of your nextcloud server
 ```yaml
 - hosts: nextcloud
   roles:
