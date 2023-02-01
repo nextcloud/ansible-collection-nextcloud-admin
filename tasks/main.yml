@@ -36,3 +36,6 @@
     - db_dump
 - name: Finish the backup
   ansible.legacy.import_tasks: finishing.yml
+- name: Fetch backup to local
+  ansible.legacy.import_tasks: fetching.yml
+  when: nextcloud_backup_fetch_to_local
