@@ -1,6 +1,8 @@
 ---
 - hosts: all
   become: true
+  collections:
+    - aalaesar.nextcloud
 
   pre_tasks:
     - name: Update apt cache.
