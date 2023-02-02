@@ -15,6 +15,7 @@ The roles requires the following tools to be available on the host:
 You'll need enough space on the target file system, depending on the size of your nextcloud server.
 
 ## Role Variables
+
 ### Locating the nextcloud server
 
 The role has to know where the server files are, how to access it and where to store the backup.
