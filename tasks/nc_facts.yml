@@ -1,6 +1,6 @@
 ---
 - name: Check if host has sudo
-  ansible.builtin.command: "dpkg -l sudo"
+  ansible.builtin.command: "dpkg-query -s sudo"
   changed_when: false
   register: __sudo_installed
   failed_when: false
