@@ -6,5 +6,5 @@ nc_archive_name: >-
   {{ nextcloud_instance_name }}_nextcloud-{{ nc_status.versionstring }}_{{ ansible_date_time.iso8601_basic_short }}{{ nextcloud_backup_suffix }}
 
 # ansible parameters to switch to the www-data user with or without sudo
-occ_become_method: "{{ __sudo_installed.rc == 0 | ternary('sudo', 'su') }}"
-occ_become_flags: "{{ __sudo_installed.rc == 0 | ternary(omit, '-s /bin/sh') }}"
+occ_become_method: "{{ (__sudo_installed.rc == 0) | ternary('sudo', 'su') }}"
+occ_become_flags: "{{ (__sudo_installed.rc == 0) | ternary(omit, '-s /bin/sh') }}"
