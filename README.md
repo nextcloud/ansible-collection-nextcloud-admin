@@ -115,6 +115,6 @@ Releases are automatically built and pushed to Ansible Galaxy for any new tag.
 
 ## License
 
-GNU General Public License v3.0 or later
+BSD
 
 See LICENCE to see the full text.
