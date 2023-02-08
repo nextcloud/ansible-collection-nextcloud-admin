@@ -16,8 +16,6 @@ Plugins and modules within a collection may be tested with only specific Ansible
 
 * Collection tested on 3.10+
 
-Note: Python2 is deprecated from [1st January 2020](https://www.python.org/doc/sunset-python-2/). Please switch to Python3.
-
 ## Nextcloud Version Support
 
 This collection supports Nextcloud versions >=24.
