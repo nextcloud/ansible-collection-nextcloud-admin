@@ -2,9 +2,9 @@
 [![YAML-lint status](https://github.com/aalaesar/install_nextcloud/actions/workflows/yamllint.yml/badge.svg)](https://github.com/aalaesar/install_nextcloud/actions?workflow=Yaml%20Lint)
 [![Tests](https://github.com/aalaesar/install_nextcloud/actions/workflows/tests.yml/badge.svg)](https://github.com/aalaesar/install_nextcloud/actions?workflow=Tests)
 
-# nextcloud collection for ansible
+# ansible collection for nextcloud administration
 
-This repository hosts the `aalaesar.nextcloud`  Ansible Collection (formerly the role `aalaesar.install_nextcloud`).
+This repository hosts the `nextcloud.admin`  Ansible Collection (formerly the role `aalaesar.install_nextcloud`).
 
 The collection includes a variety of Ansible content to help automate the management of nextcloud, as well as provisioning and maintenance of instances of nextcloud.
 
@@ -20,7 +20,7 @@ Plugins and modules within a collection may be tested with only specific Ansible
 
 * Collection tested on 3.10+
 
-## Nextcloud Version Support
+## Supported nextcloud version 
 
 This collection supports Nextcloud versions >=24.
 
@@ -30,12 +30,12 @@ This collection supports Nextcloud versions >=24.
 ### Modules
 Name | Description
 --- | ---
-aalaesar.nextcloud.run_occ|Run the occ command line tool with given arguments
+nextcloud.admin.run_occ|Run the occ command line tool with given arguments
 
 ### Roles
 Name | Description
 --- | ---
-aalaesar.nextcloud.install_nextcloud|Install and configure an Nextcloud instance for a Debian/Ubuntu server - formerly `aalaesar.install_nextcloud`
+nextcloud.admin.install_nextcloud|Install and configure an Nextcloud instance for a Debian/Ubuntu server - formerly `aalaesar.install_nextcloud`
 
 <!--end collection content-->
 
@@ -64,20 +64,20 @@ Alternatively, you can also add the content of [this file](requirements.yml) in 
 
 Before using the nextcloud collection, you need to install it with the Ansible Galaxy CLI:
 
-    ansible-galaxy collection install aalaesar.nextcloud
+    ansible-galaxy collection install nextcloud.admin
 
 You can also include it in a `requirements.yml` file and install it via `ansible-galaxy collection install -r requirements.yml`, using the format:
 
 ```yaml
 ---
 collections:
-  - name: aalaesar.nextcloud
+  - name: nextcloud.admin
     version: 2.0.0
 ```
 
 ### Using modules from the Nextcloud Collection in your playbooks
 
-It's preferable to use content in this collection using their Fully Qualified Collection Namespace (FQCN), for example `aalaesar.nextcloud.run_occ`:
+It's preferable to use content in this collection using their Fully Qualified Collection Namespace (FQCN), for example `nextcloud.admin.run_occ`:
 
 ```yaml
 ---
@@ -86,12 +86,12 @@ It's preferable to use content in this collection using their Fully Qualified Co
   become: true
   tasks:
     - name: list installed apps
-      aalaesar.nextcloud.run_occ:
+      nextcloud.admin.run_occ:
         nextcloud_path: /var/www/nextcloud
         command: app:list
 ```
 
-If upgrading older playbooks from <2.0.0, you can minimise your changes by defining `collections` in your play and refer to this collection's role as `install_nextcloud`, instead of `aalaesar.install_nextcloud`, as in this example:
+If upgrading older playbooks from <2.0.0, you can minimise your changes by defining `collections` in your play and refer to this collection's role as `install_nextcloud`, instead of `nextcloud.admin.install_nextcloud`, as in this example:
 
 ```yaml
 ---
@@ -100,7 +100,7 @@ If upgrading older playbooks from <2.0.0, you can minimise your changes by defin
   connection: local
 
   collections:
-    - aalaesar.nextcloud
+    - nextcloud.admin
 
   tasks:
     - name: deploy nextcloud and dependencies
