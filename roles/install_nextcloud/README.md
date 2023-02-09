@@ -38,7 +38,7 @@ This role requires root access, so either configure it in your inventory files, 
 - hosts: dnsserver
   become: true
   roles:
-    - role: aalaesar.install_nextcloud
+    - role: aalaesar.nextcloud.install_nextcloud
 ```
 
 ## Dependencies
@@ -574,11 +574,11 @@ In some case, you may want to deploy quickly many instances of Nextcloud on mult
 ---
 - hosts: server
   roles:
-   - role: aalaesar.install_nextcloud
+   - role: aalaesar.nextcloud.install_nextcloud
 ```
 
--   This will install a Nextcloud 10.0.1 instance in /opt/nextcloud using apache2 and mysql.
--   it will be available at **https:// {{ ansible default ipv4 }}**  using a self signed certificate.
+-   This will install a Nextcloud instance in /opt/nextcloud using apache2 and mysql.
+-   it will be available at **https://{{ ansible default ipv4 }}**  using a self signed certificate.
 -   Generated passwords are stored in **nextcloud_instances/{{ nextcloud_trusted_domain }}/** from your working directory.
 
 ### Case 1.1: specifying the version channel, branch, etc.
@@ -588,7 +588,7 @@ You can choose the version channel to download a specific version of nextcloud. 
 ---
 - hosts: server
   roles:
-   - role: aalaesar.install_nextcloud
+   - role: aalaesar.nextcloud.install_nextcloud
      nextcloud_version_channel: "daily"
      nextcloud_version_major: "master"
 ```
@@ -606,7 +606,7 @@ Here 2 examples for apache and nginx (because they have slightly different confi
 ---
 - hosts: apache_server
   roles:
-   - role: aalaesar.install_nextcloud
+   - role: aalaesar.nextcloud.install_nextcloud
      nextcloud_trusted_domain:
        - "example.com"
      nextcloud_tls_cert_method: "installed"
@@ -616,7 +616,7 @@ Here 2 examples for apache and nginx (because they have slightly different confi
 
 - hosts: nginx_server
   roles:
-    - role: aalaesar.install_nextcloud
+    - role: aalaesar.nextcloud.install_nextcloud
       nextcloud_trusted_domain:
         - "example2.com"
       nextcloud_tls_cert_method: "installed"
@@ -625,7 +625,7 @@ Here 2 examples for apache and nginx (because they have slightly different confi
 ```
 
 ### Case 3: integration to an existing system.
--   An Ansible master want to install a new Nextcloud instance on an existing Ubuntu 20.04 server with nginx & mariadb installed.
+-   An Ansible master want to install a new Nextcloud instance on an existing Ubuntu 22.04 server with nginx & mariadb installed.
 -   As is server do not meet the php requirements for Nextcloud 11, he chooses to use the lastest Nextcloud 10 release.
 -   He wants it to be accessible from internet at _cloud.example.tld_ and from his intranet at _dbox.intra.net_.
 -   He already have a valid certificate for the intranet domain in /etc/nginx/certs/ installed
@@ -638,7 +638,7 @@ He can run the role with the following variables to install Nextcloud accordingl
 ---
 - hosts: server
   roles:
-   - role: aalaesar.install_nextcloud
+   - role: aalaesar.nextcloud.install_nextcloud
      nextcloud_version_major: 25
      nextcloud_trusted_domain:
        - "cloud.example.tld"
