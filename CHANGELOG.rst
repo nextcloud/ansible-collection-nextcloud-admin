@@ -1,6 +1,6 @@
 ===================================
-nextcloud Collection Release Notes
+Nextcloud admin ansible collection Release Notes
 ===================================
 
 Full changelog can be found here:
-https://github.com/aalaesar/install_nextcloud/releases
+https://github.com/nextcloud/ansible-collection-nextcloud-admin/releases
