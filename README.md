@@ -1,3 +1,7 @@
+[![Ansible-lint status](https://github.com/aalaesar/install_nextcloud/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/aalaesar/install_nextcloud/actions?workflow=Ansible%20Lint)
+[![YAML-lint status](https://github.com/aalaesar/install_nextcloud/actions/workflows/yamllint.yml/badge.svg)](https://github.com/aalaesar/install_nextcloud/actions?workflow=Yaml%20Lint)
+[![Tests](https://github.com/aalaesar/install_nextcloud/actions/workflows/tests.yml/badge.svg)](https://github.com/aalaesar/install_nextcloud/actions?workflow=Tests)
+
 # nextcloud collection for ansible
 
 This repository hosts the `aalaesar.nextcloud`  Ansible Collection (formerly the role `aalaesar.install_nextcloud`).
