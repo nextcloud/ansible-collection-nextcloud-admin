@@ -29,7 +29,7 @@
 - name: Run applications backups
   ansible.legacy.import_tasks: app_data.yml
   when: nextcloud_backup_user
-- name: Run batabase backup
+- name: Run database backup
   ansible.legacy.import_tasks: database.yml
   when: nextcloud_backup_database
   tags:
