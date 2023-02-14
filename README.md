@@ -55,15 +55,19 @@ nc_archive_name: "{{ nextcloud_instance_name }}_nextcloud-{{ nc_status.versionst
 The role will __always__:
  - backup the server's config
  - create a list of installed & enabled applications(along with the version numbers)
- - download the proper server archive from the nextcloud download site.
 
 You can adjust the scope of the backup by enabling/disabling some flags defined in default:
 
 ```yaml
+nextcloud_backup_download_server_archive: true
 nextcloud_backup_app_data: true
 nextcloud_backup_user: true
 nextcloud_backup_database: true
 ```
+
+### Adjusting nextcloud-server archive included in backup
+Role can download the proper server archive from the nextcloud download site and add it to backup archive. 
+It can be turned on using: `nextcloud_backup_download_server_archive` variable.
 
 ### Adjusting app data backup
 

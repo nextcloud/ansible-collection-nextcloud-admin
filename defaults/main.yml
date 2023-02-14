@@ -16,6 +16,9 @@ nextcloud_backup_file_mode: "0640"
 nextcloud_backup_dir_mode: "0750"
 nextcloud_backup_format: "tgz"
 
+### NEXTCLOUD SERVER ARCHIVE DOWNLOAD ###
+nextcloud_backup_download_server_archive: false
+
 ### APPS BACKUPS ###
 nextcloud_backup_app_data: true
 nextcloud_backup_app_data_exclude_folder:

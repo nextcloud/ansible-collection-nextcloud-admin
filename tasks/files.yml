@@ -30,6 +30,7 @@
     owner: "{{ nextcloud_backup_owner }}"
     group: "{{ nextcloud_backup_group }}"
     mode: "{{ nextcloud_backup_file_mode }}"
+  when: nextcloud_backup_download_server_archive
 
 - name: Export the list of apps in the backup
   ansible.builtin.copy:
