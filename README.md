@@ -66,7 +66,8 @@ nextcloud_backup_database: true
 ```
 
 ### Adjusting nextcloud-server archive included in backup
-Role will download the proper server archive from the nextcloud download site by default. It can be turned off using: `nextcloud_backup_download_server_archive` variable.
+Role can download the proper server archive from the nextcloud download site and add it to backup archive. 
+It can be turned on using: `nextcloud_backup_download_server_archive` variable.
 
 ### Adjusting app data backup
 
