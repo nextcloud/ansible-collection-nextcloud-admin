@@ -41,6 +41,25 @@ aalaesar.nextcloud.install_nextcloud|Install and configure an Nextcloud instance
 
 ## Installation and Usage
 
+### Dependencies
+
+#### netaddr Python Library
+
+Content in this collection requires the [network address manipulation library](https://pypi.org/project/netaddr/) to manipulate network address. You can install it with:
+```
+    pip3 install netaddr
+```
+
+#### required standalone roles
+
+By default, some roles in this collection are dependant of standalone roles from other namespaces. (this can be disabled).
+
+Due to some limitations, ansible-galaxy does not install them automatically, them need to be installed afterward.
+
+Once the collection is installed, run the command `ansible-galaxy role install -r <this_collection_folder>/requirements.yml`.
+
+Alternatively, you can also add the content of [this file](requirements.yml) in your own `requirements.yml` file prior to installing the collection
+
 ### Installing the Collection from Ansible Galaxy
 
 Before using the nextcloud collection, you need to install it with the Ansible Galaxy CLI:
@@ -54,13 +73,6 @@ You can also include it in a `requirements.yml` file and install it via `ansible
 collections:
   - name: aalaesar.nextcloud
     version: 2.0.0
-```
-
-### Installing the netaddr Python Library
-
-Content in this collection requires the [network address manipulation library](https://pypi.org/project/netaddr/) to manipulate network address. You can install it with:
-```
-    pip3 install netaddr
 ```
 
 ### Using modules from the Nextcloud Collection in your playbooks
