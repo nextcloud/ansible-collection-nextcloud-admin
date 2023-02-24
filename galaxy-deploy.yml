@@ -10,7 +10,8 @@
 #   ansible-playbook -i 'localhost,' galaxy-deploy.yml \
 #   -e "github_tag=${{ github.ref }}"
 
-- hosts: localhost
+- name: Galaxy deployment playbook
+  hosts: localhost
   connection: local
   gather_facts: false
 
@@ -20,31 +21,37 @@
 
   pre_tasks:
     - name: Ensure ANSIBLE_GALAXY_TOKEN is set.
-      fail:
+      ansible.builtin.fail:
         msg: A valid ANSIBLE_GALAXY_TOKEN must be set.
-      when: "lookup('env','ANSIBLE_GALAXY_TOKEN') | length == 0"
+      when: "lookup('env', 'ANSIBLE_GALAXY_TOKEN') | length == 0"
 
     - name: Ensure the ~/.ansible directory exists.
-      file:
+      ansible.builtin.file:
         path: ~/.ansible
         state: directory
+        mode: 0755
 
     - name: Write the Galaxy token to ~/.ansible/galaxy_token
-      copy:
+      ansible.builtin.copy:
         content: |
-          token: {{ lookup('env','ANSIBLE_GALAXY_TOKEN') }}
+          token: {{ lookup('env', 'ANSIBLE_GALAXY_TOKEN') }}
         dest: ~/.ansible/galaxy_token
+        mode: 0544
 
   tasks:
     - name: Ensure the galaxy.yml tag is up to date.
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: galaxy.yml
         regexp: "^version:"
         line: 'version: "{{ release_tag }}"'
 
     - name: Build the collection.
-      command: ansible-galaxy collection build
+      ansible.builtin.command: ansible-galaxy collection build
+      register: output
+      changed_when: "output.rc == 0"
 
     - name: Publish the collection.
-      command: >
+      ansible.builtin.command: >
         ansible-galaxy collection publish ./{{ ansible_namespace }}-{{ collection }}-{{ release_tag }}.tar.gz
+      register: output
+      changed_when: "output.rc == 0"

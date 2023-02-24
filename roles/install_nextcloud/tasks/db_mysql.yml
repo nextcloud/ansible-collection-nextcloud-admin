@@ -52,6 +52,8 @@
   when: >
     ((mysql_install_packages | bool) or nextcloud_mysql_root_pwd_update)
     and ('5.7.' in mysql_cli_version.stdout or '8.0.' in mysql_cli_version.stdout)
+  register: output
+  changed_when: "output.rc == 0"
 
 - name: "[mySQL] - Update MySQL root password for localhost root account (< 5.7.x)."
   ansible.builtin.shell: >
@@ -61,6 +63,8 @@
   when: >
     ((mysql_install_packages | bool) or nextcloud_mysql_root_pwd_update)
     and ('5.7.' not in mysql_cli_version.stdout and '8.0.' not in mysql_cli_version.stdout)
+  register: output
+  changed_when: "output.rc == 0"
 
 - name: "[mySQL] - Copy .my.cnf file with root password credentials."
   ansible.builtin.template:

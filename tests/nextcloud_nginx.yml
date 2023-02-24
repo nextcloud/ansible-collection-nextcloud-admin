@@ -1,8 +1,7 @@
 ---
-- hosts: all
+- name: Test Nginx
+  hosts: all
   become: true
-  collections:
-    - aalaesar.nextcloud
 
   pre_tasks:
     - name: Update apt cache.
@@ -20,7 +19,7 @@
         - curl
 
   roles:
-    - ansible-nextcloud
+    - aalaesar.nextcloud.install_nextcloud
 
   vars:
     nextcloud_db_backend: "mariadb"

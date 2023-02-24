@@ -40,6 +40,8 @@
     - name: "[NC-DL] - Move extracted files to {{ nextcloud_webroot }}"
       ansible.builtin.command: "cp -r /tmp/nextcloud/. {{ nextcloud_webroot }}/"
       when: nextcloud_webroot is not none
+      register: output
+      changed_when: "output.rc == 0"
 
     - name: "[NC-DL] - Remove nextcloud archive files"
       ansible.builtin.file:

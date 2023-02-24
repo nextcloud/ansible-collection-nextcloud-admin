@@ -121,6 +121,8 @@
   with_items:
     - "{{ nextcloud_redis_settings }}"
   when: (nextcloud_install_redis_server | bool)
+  register: output
+  changed_when: "output.rc == 0"
 
 - name: "[NC] - Configure Cron"
   when: (nextcloud_background_cron | bool)
@@ -146,6 +148,8 @@
   args:
     chdir: "{{ nextcloud_webroot }}"
   when: (nextcloud_background_cron | bool)
+  register: output
+  changed_when: "output.rc == 0"
 
 - name: "[NC] - Set Custom Mimetype"
   ansible.builtin.copy:

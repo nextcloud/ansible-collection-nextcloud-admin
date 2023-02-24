@@ -22,6 +22,8 @@
       args:
         chdir: "{{ nextcloud_webroot }}"
       when: (nc_app_source is string) and (nc_app_source | length == 0)
+      register: output
+      changed_when: "output.rc == 0"
 
     - name: "[App] - Download Archive in apps folder from \"{{ nc_app_source }}\""
       become_user: "{{ nextcloud_websrv_user }}"
@@ -55,3 +57,5 @@
       loop_control:
         loop_var: item_cfg
       when: nc_app_cfg.conf is defined
+      register: output
+      changed_when: "output.rc == 0"
