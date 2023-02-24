@@ -38,7 +38,7 @@ jobs:
         with:
           tag-template: "{VERSION}"
           version-command: |
-            cat galaxy.yml|grep version:|cut -d' ' -f2
+            cat galaxy.yml | grep version: | cut -d' ' -f2
 
       - name: Install Ansible
         run: |
