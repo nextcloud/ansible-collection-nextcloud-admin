@@ -9,7 +9,7 @@ namespace: aalaesar
 name: nextcloud
 
 # The version of the collection. Must be compatible with semantic versioning
-version: 1.9.1
+version: 1.9.2
 
 # The path to the Markdown (.md) readme file. This path is relative to the root of the collection
 readme: README.md
@@ -31,10 +31,10 @@ license_file: 'LICENSE.md'
 # requirements as 'namespace' and 'name'
 tags:
 - cloud
-- self-hosted
+- self_hosted
 - nextcloud
 - administration
-- file-sharing
+- file_sharing
 
 # Collections that this collection requires to be installed for it to be usable. The key of the dict is the
 # collection label 'namespace.name'. The value is a version range
