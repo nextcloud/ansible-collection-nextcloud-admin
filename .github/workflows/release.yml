@@ -45,15 +45,18 @@ jobs:
           pip install --constraint=.github/workflows/constraints.txt ansible
 
       - name: Release to Ansible Galaxy.
+        if: "steps.check-version.outputs.tag"
         env:
           ANSIBLE_GALAXY_TOKEN: ${{ secrets.GALAXY_TOKEN }}
         run: >-
-          ansible-playbook -i 'localhost,' galaxy-deploy.yml
-          -e "github_tag=${{ github.ref }}"
-          -e "namespace=$(echo ${{ github.repository }}
-          | cut -d/ -f1)"
-          -e "collection=$(echo ${{ github.repository }}
-          | cut -d/ -f2)"
+          ansible-playbook -vvv -i 'localhost,' galaxy-deploy.yml
+          -e "github_tag=$(cat galaxy.yml|grep version:|cut -d' ' -f2)"
+          -e "ansible_namespace=aalaesar"
+          -e "collection=nextcloud"
+          # -e "ansible_namespace=$(echo ${{ github.repository }}
+          # | cut -d/ -f1)"
+          # -e "collection=$(echo ${{ github.repository }}
+          # | cut -d/ -f2)"
 
       - name: Publish the release notes
         uses: release-drafter/release-drafter@v5

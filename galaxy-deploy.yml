@@ -47,4 +47,4 @@
 
     - name: Publish the collection.
       command: >
-        ansible-galaxy collection publish ./{{ namespace }}-{{ collection }}-{{ release_tag }}.tar.gz
+        ansible-galaxy collection publish ./{{ ansible_namespace }}-{{ collection }}-{{ release_tag }}.tar.gz
