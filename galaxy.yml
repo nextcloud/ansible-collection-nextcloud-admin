@@ -9,7 +9,7 @@ namespace: aalaesar
 name: nextcloud
 
 # The version of the collection. Must be compatible with semantic versioning
-version: 1.9.2
+version: 1.8.0
 
 # The path to the Markdown (.md) readme file. This path is relative to the root of the collection
 readme: README.md

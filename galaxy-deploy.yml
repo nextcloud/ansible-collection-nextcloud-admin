@@ -37,6 +37,7 @@
           token: {{ lookup('env', 'ANSIBLE_GALAXY_TOKEN') }}
         dest: ~/.ansible/galaxy_token
         mode: 0544
+      no_log: true
 
   tasks:
     - name: Ensure the galaxy.yml tag is up to date.
