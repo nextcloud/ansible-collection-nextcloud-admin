@@ -22,4 +22,10 @@ jobs:
           branch: update/pre-commit-hooks
           title: Update pre-commit hooks
           commit-message: "chore: update pre-commit hooks"
+          committer: "dependabot[bot] <support@github.com>"
+          author: "dependabot[bot] <support@github.com>"
+          signoff: true
+          labels: |
+            dependencies
+            pre-commit
           body: Update versions of pre-commit hooks to latest version.
