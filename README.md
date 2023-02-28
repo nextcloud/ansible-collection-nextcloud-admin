@@ -1,6 +1,6 @@
-[![Ansible-lint status](https://github.com/aalaesar/install_nextcloud/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/aalaesar/install_nextcloud/actions?workflow=Ansible%20Lint)
-[![YAML-lint status](https://github.com/aalaesar/install_nextcloud/actions/workflows/yamllint.yml/badge.svg)](https://github.com/aalaesar/install_nextcloud/actions?workflow=Yaml%20Lint)
-[![Tests](https://github.com/aalaesar/install_nextcloud/actions/workflows/tests.yml/badge.svg)](https://github.com/aalaesar/install_nextcloud/actions?workflow=Tests)
+[![Ansible-lint status](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions?workflow=Ansible%20Lint)
+[![YAML-lint status](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/yamllint.yml/badge.svg)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions?workflow=Yaml%20Lint)
+[![Tests](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/tests.yml/badge.svg)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions?workflow=Tests)
 
 # ansible collection for nextcloud administration
 
