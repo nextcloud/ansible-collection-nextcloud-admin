@@ -19,7 +19,7 @@
         - curl
 
   roles:
-    - aalaesar.nextcloud.install_nextcloud
+    - nextcloud.admin.install_nextcloud
 
   vars:
     nextcloud_db_backend: "mysql"

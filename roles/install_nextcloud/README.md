@@ -34,7 +34,7 @@ This role requires root access, so either configure it in your inventory files, 
 - hosts: dnsserver
   become: true
   roles:
-    - role: aalaesar.nextcloud.install_nextcloud
+    - role: nextcloud.admin.install_nextcloud
 ```
 
 ## Dependencies
@@ -570,7 +570,7 @@ In some case, you may want to deploy quickly many instances of Nextcloud on mult
 ---
 - hosts: server
   roles:
-   - role: aalaesar.nextcloud.install_nextcloud
+   - role: nextcloud.admin.install_nextcloud
 ```
 
 -   This will install a Nextcloud instance in /opt/nextcloud using apache2 and mysql.
@@ -584,7 +584,7 @@ You can choose the version channel to download a specific version of nextcloud. 
 ---
 - hosts: server
   roles:
-   - role: aalaesar.nextcloud.install_nextcloud
+   - role: nextcloud.admin.install_nextcloud
      nextcloud_version_channel: "daily"
      nextcloud_version_major: "master"
 ```
@@ -602,7 +602,7 @@ Here 2 examples for apache and nginx (because they have slightly different confi
 ---
 - hosts: apache_server
   roles:
-   - role: aalaesar.nextcloud.install_nextcloud
+   - role: nextcloud.admin.install_nextcloud
      nextcloud_trusted_domain:
        - "example.com"
      nextcloud_tls_cert_method: "installed"
@@ -612,7 +612,7 @@ Here 2 examples for apache and nginx (because they have slightly different confi
 
 - hosts: nginx_server
   roles:
-    - role: aalaesar.nextcloud.install_nextcloud
+    - role: nextcloud.admin.install_nextcloud
       nextcloud_trusted_domain:
         - "example2.com"
       nextcloud_tls_cert_method: "installed"
@@ -634,7 +634,7 @@ He can run the role with the following variables to install Nextcloud accordingl
 ---
 - hosts: server
   roles:
-   - role: aalaesar.nextcloud.install_nextcloud
+   - role: nextcloud.admin.install_nextcloud
      nextcloud_version_major: 25
      nextcloud_trusted_domain:
        - "cloud.example.tld"

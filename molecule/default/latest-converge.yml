@@ -22,4 +22,4 @@
       - external
       - mail
   roles:
-    - role: aalaesar.nextcloud.install_nextcloud
+    - role: nextcloud.admin.install_nextcloud

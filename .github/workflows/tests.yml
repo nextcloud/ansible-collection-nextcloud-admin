@@ -11,7 +11,7 @@ name: Tests
 
 defaults:
   run:
-    working-directory: "aalaesar.install_nextcloud"
+    working-directory: "nextcloud.ansible-collection-nextcloud-admin"
 
 jobs:
   molecule:
@@ -30,7 +30,7 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v3
         with:
-          path: "aalaesar.install_nextcloud"
+          path: "nextcloud.ansible-collection-nextcloud-admin"
 
       - name: Set up Python
         uses: actions/setup-python@v4
