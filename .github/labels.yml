@@ -67,3 +67,6 @@
 - name: skip-changelog
   description: This will not be added to release notes
   color: "dddddd"
+- name: pre-commit
+  description: Pull requests that update pre-commit code
+  color: "424242"
