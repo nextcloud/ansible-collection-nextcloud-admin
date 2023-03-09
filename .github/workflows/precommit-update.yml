@@ -5,6 +5,8 @@ name: Pre-commit auto-update
   # every day at midnight
   schedule:
     - cron: "0 0 * * *"
+  # on demand
+  workflow_dispatch:
 
 jobs:
   pre-commit-auto-update:
@@ -22,8 +24,8 @@ jobs:
           branch: update/pre-commit-hooks
           title: Update pre-commit hooks
           commit-message: "chore: update pre-commit hooks"
-          committer: "dependabot[bot] <support@github.com>"
-          author: "dependabot[bot] <support@github.com>"
+          committer: "dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>"
+          author: "dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>"
           signoff: true
           labels: |
             dependencies
