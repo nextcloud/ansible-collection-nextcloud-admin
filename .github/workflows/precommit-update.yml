@@ -17,15 +17,6 @@ jobs:
       - name: Update pre-commit hooks
         uses: browniebroke/pre-commit-autoupdate-action@main
 
-      - name: Run ansible-lint
-        uses: ansible-community/ansible-lint-action@v6
-
-      - name: Run yaml-lint
-        uses: ibiqlik/action-yamllint@v3
-        with:
-          config_file: .yamllint.yml
-          format: github
-
       - name: Create pull request with update
         uses: peter-evans/create-pull-request@v4
         with:
