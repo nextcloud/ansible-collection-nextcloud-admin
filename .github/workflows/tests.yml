@@ -20,11 +20,8 @@ jobs:
 
     strategy:
       matrix:
-        include:
-          - { distro: "debian11" }
-          - { distro: "debian10" }
-          - { distro: "ubuntu2204" }
-          - { distro: "ubuntu2004" }
+        distro: [debian11, debian10, ubuntu2204, ubuntu2004]
+        nc_version: [latest, nc25, nc24]
 
     steps:
       - name: Check out the repository
