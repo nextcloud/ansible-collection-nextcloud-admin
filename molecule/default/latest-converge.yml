@@ -10,6 +10,9 @@
       when: ansible_os_family == 'Debian'
       changed_when: false
   vars:
+    nextcloud_version_channel: "releases"
+    nextcloud_get_latest: true
+    nextcloud_version_major: 25
     nextcloud_apps:
       calendar:
       contacts:
