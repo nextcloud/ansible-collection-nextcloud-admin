@@ -1,6 +1,7 @@
 [![Ansible-lint status](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions?workflow=Ansible%20Lint)
 [![YAML-lint status](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/yamllint.yml/badge.svg)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions?workflow=Yaml%20Lint)
-[![Tests](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/tests.yml/badge.svg)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions?workflow=Tests)
+[![Tests for all supported versions](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/tests.yml/badge.svg)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions?workflow=Tests)
+[![Tests for latest](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/tests_latest.yml/badge.svg)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions?workflow=Tests%20latest)
 
 # ansible collection for nextcloud administration
 
@@ -22,7 +23,7 @@ Plugins and modules within a collection may be tested with only specific Ansible
 
 ## Supported nextcloud version 
 
-This collection supports Nextcloud versions >=24.
+This collection supports Nextcloud versions: `24`, `25`, `26 (latest)`
 
 ## Included content
 

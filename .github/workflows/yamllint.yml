@@ -4,6 +4,8 @@ name: Yaml Lint
 "on":
   pull_request:
   push:
+  schedule:
+    - cron: "0 7 * * *"
 
 jobs:
   yaml-lint:
