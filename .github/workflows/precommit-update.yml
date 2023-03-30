@@ -2,9 +2,9 @@
 name: Pre-commit auto-update
 
 "on":
-  # every day at midnight
+  # run once a week
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "0 0 * * 0"
 
 jobs:
   pre-commit-auto-update:
