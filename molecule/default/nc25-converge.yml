@@ -12,10 +12,11 @@
   vars:
     nextcloud_version_channel: "releases"
     nextcloud_get_latest: true
+    nextcloud_version_major: 25
     nextcloud_apps:
       calendar:
       contacts:
-        source: "https://github.com/nextcloud-releases/contacts/releases/download/v5.2.0/contacts-v5.2.0.tar.gz"
+        source: "https://github.com/nextcloud-releases/contacts/releases/download/v5.0.2/contacts-v5.0.2.tar.gz"
         conf:
           var_1: "no"
       passwords:

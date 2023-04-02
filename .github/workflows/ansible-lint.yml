@@ -2,7 +2,11 @@
 ## Source: https://github.com/marketplace/actions/ansible-lint
 
 name: Ansible Lint
-on: [push, pull_request]  # yamllint disable-line rule:truthy
+"on":
+  pull_request:
+  push:
+  schedule:
+    - cron: "0 7 * * *"
 
 jobs:
   ansible-lint:
