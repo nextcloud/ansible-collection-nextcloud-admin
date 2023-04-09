@@ -6,7 +6,7 @@ repos:
       - id: yamllint
         args: ["-c=.yamllint.yml", "."]
   - repo: https://github.com/ansible-community/ansible-lint.git
-    rev: v6.14.3
+    rev: v6.14.4
     hooks:
       - id: ansible-lint
         files: \.(yaml|yml)$
