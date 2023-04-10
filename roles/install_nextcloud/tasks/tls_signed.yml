@@ -18,8 +18,8 @@
     src: "{{ nextcloud_tls_src_cert }}"
     owner: "{{ nextcloud_websrv_user }}"
     group: "{{ nextcloud_websrv_group }}"
+    mode: "0640"
     force: true
-    mode: 0640
 
 - name: "[SIGNED TLS] - Key is copied to the host"
   ansible.builtin.copy:
@@ -27,7 +27,7 @@
     src: "{{ nextcloud_tls_src_cert_key }}"
     owner: "{{ nextcloud_websrv_user }}"
     group: "{{ nextcloud_websrv_group }}"
-    mode: 0400
+    mode: "0400"
     force: false
 
 - name: "[SIGNED TLS] - Certificate chain is copied to the host"
@@ -36,18 +36,19 @@
     src: "{{ nextcloud_tls_src_chain }}"
     owner: "{{ nextcloud_websrv_user }}"
     group: "{{ nextcloud_websrv_group }}"
-    mode: 0640
+    mode: "0640"
     force: false
   when: nextcloud_tls_src_chain is defined
 
-- name: "[SIGNED TLS] - Create chained certificate file for nginx"
-  ansible.builtin.assemble:
-    src: "{{ cert_path }}"
-    regexp: "{{ nextcloud_instance_name }}\\.crt|{{ nextcloud_instance_name }}\\.pem"
+- name: "[SIGNED TLS] - Overwrite and create chained certificate file for nginx"
+  ansible.builtin.template:
+    src: templates/concatenate.j2
     dest: "{{ nextcloud_tls_cert_file }}"
     owner: "{{ nextcloud_websrv_user }}"
     group: "{{ nextcloud_websrv_group }}"
-    mode: 0640
+    mode: "0640"
+  vars:
+    input_files: ["{{ nextcloud_tls_src_cert }}", "{{ nextcloud_tls_src_chain }}"]
   when:
     - nextcloud_tls_src_chain is defined
     - nextcloud_websrv in ["nginx"]
