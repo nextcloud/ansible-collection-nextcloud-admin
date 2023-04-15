@@ -1,0 +1,3 @@
+{% for item in input_files %}
+{{ lookup('file', item) }}
+{% endfor %}
