@@ -3,7 +3,7 @@ role_name_check: 1
 dependency:
   name: galaxy
 driver:
-  name: podman
+  name: docker
 platforms:
   - name: instance
     image: "docker.io/geerlingguy/docker-${MOLECULE_DISTRO:-debian11}-ansible:latest"
