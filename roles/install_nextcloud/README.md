@@ -24,9 +24,12 @@ To use `ipwrap` filter in Ansible, you need to install the netaddr Python librar
 $ pip install netaddr
 ```
 
-### Setup module:
+### Setup module
+
 The role uses facts gathered by Ansible on the remote host. If you disable the Setup module in your playbook, the role will not work properly.
+
 ### Root access
+
 This role requires root access, so either configure it in your inventory files, run it in a playbook with a global `become: true` or invoke the role in your playbook like:
 > playbook.yml:
 
