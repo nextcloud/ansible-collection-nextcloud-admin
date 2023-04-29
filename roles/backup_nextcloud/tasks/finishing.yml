@@ -1,0 +1,30 @@
+---
+- name: Create the archive
+  community.general.archive:
+    path:
+      - "{{ nc_archive_path }}/*"
+    dest: "{{ nc_archive_path }}.{{ nextcloud_backup_format }}"
+    owner: "{{ nextcloud_backup_owner }}"
+    group: "{{ nextcloud_backup_group }}"
+    mode: "{{ nextcloud_backup_file_mode }}"
+    format: "{{ nextcloud_backup_format | regex_replace('tgz', 'gz') }}"
+  tags:
+    - always
+
+- name: Cleanup the archive folder
+  ansible.builtin.file:
+    path: "{{ nc_archive_path }}"
+    state: absent
+
+- name: Leave maintenance mode
+  ansible.builtin.command: "php {{ nextcloud_webroot }}/occ maintenance:mode --off"
+  become_user: "{{ nextcloud_websrv_user }}"
+  become: true
+  become_method: "{{ occ_become_method }}"
+  become_flags: "{{ occ_become_flags }}"
+  register: __leave_maintenance
+  changed_when:
+    - __leave_maintenance.stdout | regex_search('already') == none
+  when: nextcloud_exit_maintenance_mode
+  tags:
+    - always
