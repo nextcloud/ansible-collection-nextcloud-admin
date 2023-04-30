@@ -45,7 +45,6 @@ server {
     root {{ nextcloud_webroot }};
     
     ssl_certificate {{ nextcloud_tls_cert_file }};
-{{ nextcloud_tls_cert_file }};
     ssl_certificate_key {{ nextcloud_tls_cert_key_file }};
 
     # Prevent nginx HTTP Server Detection
