@@ -26,8 +26,6 @@ server {
 {% endif %}
 
 server {
-    server_name {{ nextcloud_trusted_domain | ansible.utils.ipwrap | join(' ') }};
-
 {% if not nextcloud_install_tls or not nextcloud_tls_enforce %}
     listen 80;
 {% if nextcloud_ipv6 %}
@@ -36,11 +34,18 @@ server {
 {% endif %}
 
 {% if nextcloud_install_tls %}
-    listen 443 ssl http2;
+    listen 443      ssl http2;
 {% if nextcloud_ipv6 %}
     listen [::]:443 ssl http2;
 {% endif %}
-    ssl_certificate {{ nextcloud_tls_cert_file }};
+
+    server_name {{ nextcloud_trusted_domain | ansible.utils.ipwrap | join(' ') }};
+
+    # Path to the root of your installation
+    root {{ nextcloud_webroot }};
+    
+    ssl_certificate     server_name {{ nextcloud_trusted_domain | ansible.utils.ipwrap | join(' ') }};
+{{ nextcloud_tls_cert_file }};
     ssl_certificate_key {{ nextcloud_tls_cert_key_file }};
 
     # Prevent nginx HTTP Server Detection
@@ -95,7 +100,12 @@ server {
 
     # Pagespeed is not supported by Nextcloud, so if your server is built
     # with the `ngx_pagespeed` module, uncomment this line to disable it.
-    # pagespeed off;
+    #pagespeed off;
+
+    # The settings allows you to optimize the HTTP2 bandwitdth.
+    # See https://blog.cloudflare.com/delivering-http-2-upload-speed-improvements/
+    # for tunning hints
+    client_body_buffer_size 512k;    
 
     # HTTP response headers borrowed from Nextcloud `.htaccess`
     add_header Referrer-Policy                      "no-referrer"           always;
@@ -109,8 +119,14 @@ server {
     # Remove X-Powered-By, which is an information leak
     fastcgi_hide_header X-Powered-By;
 
-    # Path to the root of your installation
-    root {{ nextcloud_webroot }};
+    # Add .mjs as a file extension for javascript
+    # Either include it in the default mime.types list
+    # or include you can include that list explicitly and add the file extension
+    # only for Nextcloud like below:
+    include mime.types;
+    types {
+        application/javascript js mjs;
+    }
 
     # Specify how to handle directories -- specifying `/index.php$request_uri`
     # here as the fallback means that Nginx always exhibits the desired behaviour
@@ -184,6 +200,8 @@ server {
 
         fastcgi_intercept_errors on;
         fastcgi_request_buffering off;
+
+        fastcgi_max_temp_fil e_size 0;
     }
 
     location ~ \.(?:css|js|svg|gif|png|jpg|ico|wasm|tflite|map)$ {
