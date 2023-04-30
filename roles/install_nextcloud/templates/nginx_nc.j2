@@ -44,7 +44,7 @@ server {
     # Path to the root of your installation
     root {{ nextcloud_webroot }};
     
-    ssl_certificate     server_name {{ nextcloud_trusted_domain | ansible.utils.ipwrap | join(' ') }};
+    ssl_certificate {{ nextcloud_tls_cert_file }};
 {{ nextcloud_tls_cert_file }};
     ssl_certificate_key {{ nextcloud_tls_cert_key_file }};
 
