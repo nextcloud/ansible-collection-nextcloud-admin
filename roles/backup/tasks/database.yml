@@ -17,6 +17,8 @@
   no_log: true
   when:
     - _nc_dbtype.stdout == 'mysql'
+  register: output
+  changed_when: output.rc != 0
 
 - name: Create a dump of the postgreSQL database
   ansible.builtin.command: >-
@@ -31,3 +33,5 @@
     PGPASSWORD: "{{ _nc_dbpassword.stdout }}"
   when:
     - _nc_dbtype.stdout == 'pgsql'
+  register: output
+  changed_when: output.rc != 0

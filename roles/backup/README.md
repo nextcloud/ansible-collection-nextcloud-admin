@@ -1,4 +1,4 @@
-# backup_nextcloud
+# Ansible role: backup
 
 An ansible role that creates a backup of a Nextcloud server. The backup is kept on the server (unless you [fetch it](#fetching-backup-from-remote-to-local-machine)).
 
@@ -82,11 +82,13 @@ By default the preview folder is excluded from the backup as it can be notorious
 ### Adjusting user backup
 
 You can exclude a list of user(s) from the backup
+
 ```yaml
 nextcloud_backup_exclude_users: []
 ```
 
 You can also decide to include or not some side-folders.
+
 ```yaml
 nextcloud_backup_user_files_trashbin: true
 nextcloud_backup_user_files_versions: true
@@ -95,18 +97,22 @@ nextcloud_backup_user_cache: true
 ```
 
 ### Fetching backup from remote to local machine
+
 You can fetch created backup from remote by setting these variables.
 WARNING: user which you are used in Ansible has to be set as [backup owner](#adjusting-the-backup-owner) due to Ansible limitation on using `become` with `ansible.builtin.fetch`
+
 ```yaml
 nextcloud_backup_fetch_to_local: true
 nextcloud_backup_fetch_local_path: "/local_path/nextcloud_backup"
 ```
 
 ### Other
- You can leave the server in maintenance mode at the end of the process by turning false
- ```yaml
- nextcloud_exit_maintenance_mode: true
- ```
+
+You can leave the server in maintenance mode at the end of the process by turning false
+
+```yaml
+nextcloud_exit_maintenance_mode: true
+```
 
 ## The Dependencies
 
@@ -115,22 +121,30 @@ None
 ## Example Playbook
 
 ### Running a full backup of your nextcloud server
+
 ```yaml
 - hosts: nextcloud
   roles:
-    - role: nextcloud.admin.backup_nextcloud
+    - role: nextcloud.admin.backup
 ```
 
 ### Making a partial backup with only the app_data
+
 ```yaml
 - hosts: nextcloud
   roles:
-    - role: nextcloud.admin.backup_nextcloud
+    - role: nextcloud.admin.backup
   vars:
     nextcloud_backup_suffix: _only_app_data
     nextcloud_backup_user: false
     nextcloud_backup_database: false
 ```
+
+## Contributing
+
+We encourage you to contribute to this role! Please check out the
+[contributing guide](../CONTRIBUTING.md) for guidelines about how to proceed.
+
 ## License
 
 BSD

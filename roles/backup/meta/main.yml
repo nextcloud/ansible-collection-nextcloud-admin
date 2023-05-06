@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: aalaesar
-  role_name: backup_nextcloud
+  role_name: backup
   description: Create a backup of your nextcloud server with this ansible role
 
   license: BSD
