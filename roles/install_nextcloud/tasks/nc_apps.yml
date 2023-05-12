@@ -19,7 +19,9 @@
   ansible.builtin.command: php occ app:install "{{ nc_app_name }}"
   args:
     chdir: "{{ nextcloud_webroot }}"
-  when: (nc_app_source is string) and (nc_app_source | length == 0)
+  when:
+    - (nc_app_source is string) and (nc_app_source | length == 0)
+    - nc_app_name not in nc_available_apps.disabled
   register: output
   changed_when: "output.rc == 0"
 
@@ -33,7 +35,9 @@
     owner: "{{ nextcloud_websrv_user }}"
     group: "{{ nextcloud_websrv_group }}"
     creates: "{{ nextcloud_webroot }}/apps/{{ nc_app_name }}"
-  when: (nc_app_source is string) and (nc_app_source | length > 0)
+  when:
+    - (nc_app_source is string) and (nc_app_source | length > 0)
+    - nc_app_name not in nc_available_apps.disabled
 
 - name: "[App] - Enable the application \"{{ nc_app_name }}\""
   become_user: "{{ nextcloud_websrv_user }}"
