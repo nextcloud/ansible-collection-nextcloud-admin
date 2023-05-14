@@ -1,12 +1,12 @@
 ---
 repos:
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.30.0
+    rev: v1.31.0
     hooks:
       - id: yamllint
         args: ["-c=.yamllint.yml", "."]
   - repo: https://github.com/ansible-community/ansible-lint.git
-    rev: v6.14.6
+    rev: v6.16.0
     hooks:
       - id: ansible-lint
         files: \.(yaml|yml)$
