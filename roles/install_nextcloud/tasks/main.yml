@@ -89,6 +89,7 @@
     - nextcloud_apps is mapping
   tags:
     - install_apps
+    - patch_user_saml_app
   block:
     - name: "[NC apps] - lists the number of apps available in the instance."
       ansible.builtin.command: php occ app:list --output=json_pretty --no-warnings
@@ -110,7 +111,9 @@
       # do if the app is not enabled and ( (archive path is not "") or (app is disabled) )
       when:
         - item.key not in nc_available_apps.enabled
+        - ansible_run_tags is not search('patch_user_saml_app')
       with_dict: "{{ nextcloud_apps }}"
+
 
 - name: Add indices
   ansible.builtin.command: php occ db:add-missing-indices
@@ -122,3 +125,26 @@
   register: nc_indices_cmd
   changed_when: '"Done" not in nc_indices_cmd.stdout'
   when: nextcloud_install_db
+
+- name: "[Main] - Patch from the app 'user_saml' the file SAMLController.php."
+  when:
+    - nextcloud_patch_user_saml_app
+    - nc_available_apps.enabled['user_saml'] is defined or nc_available_apps.disabled['user_saml'] is defined
+  tags:
+    - patch_user_saml_app
+  vars:
+    pattern: '.*\$this->session->set\(.user_saml\.samlUserData.,\s+\$_SERVER\);.*'
+    file2patch: "{{ nextcloud_webroot + 'apps/user_saml/lib/Controller/SAMLController.php' }}"
+  block:
+    - name: "[Main] - Check if SAMLController.php can be patched."
+      ansible.builtin.slurp:
+        src: "{{ file2patch }}"
+      register: df_file
+
+    - name: "[Main] - Patch file SAMController.php."
+      ansible.builtin.blockinfile:
+        block: "{{ lookup('ansible.builtin.file', 'files/SAMLController.patch') }}"
+        path: "{{ file2patch }}"
+        insertbefore: "{{ pattern }}"
+        marker: "                                /** {mark} ANSIBLE MANAGED BLOCK */"
+      when: df_file.content | b64decode | regex_search(pattern)
