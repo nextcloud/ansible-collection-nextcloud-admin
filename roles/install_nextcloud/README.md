@@ -564,8 +564,8 @@ Changing a parameter, then running the role again while the app is already enabl
 
 #### Patch **user_saml** Application
 
-When `user_saml` Application is configured via Environment-variable the returned principal contains an upper-case realm. This is e.g. undesirable when the user backend stores the principals with realm in lower-case.
-This patch adds a workaround to `SAMLController.php`, which converts the realm to lower-case. To activate this patch, you also need to `user_saml` application defined in `nextcloud_apps`.
+When the `user_saml` application is configured using the environment-variable, the returned principal contains an upper-case realm. This is e.g. undesirable when the user backend stores the principals with realm in lower-case, because the case-sensitive lookup for the existing user would not find the existing user.
+This patch adds a workaround to `SAMLController.php`, which converts the realm to lower-case. To activate this patch, you also need to define `user_saml` application in `nextcloud_apps`.
 ```yaml
 nextcloud_apps:
   user_saml:
