@@ -1,0 +1,40 @@
+---
+### APPLICATION SETTINGS ##
+nextcloud_instance_name: "nextcloud"
+nextcloud_backup_target_dir: "/opt/nextcloud_backups"
+nextcloud_webroot: "/opt/nextcloud"
+# nextcloud_data_dir: "/var/ncdata"
+nextcloud_websrv_user: www-data
+
+nextcloud_exit_maintenance_mode: true
+
+### ARCHIVE PROPERTIES ###
+nextcloud_backup_suffix: ""
+nextcloud_backup_owner: "{{ nextcloud_websrv_user }}"
+nextcloud_backup_group: "{{ nextcloud_websrv_user }}"
+nextcloud_backup_file_mode: "0640"
+nextcloud_backup_dir_mode: "0750"
+nextcloud_backup_format: "tgz"
+
+### NEXTCLOUD SERVER ARCHIVE DOWNLOAD ###
+nextcloud_backup_download_server_archive: false
+
+### APPS BACKUPS ###
+nextcloud_backup_app_data: true
+nextcloud_backup_app_data_exclude_folder:
+  - preview
+
+### USER BACKUPS ###
+nextcloud_backup_user: true
+nextcloud_backup_exclude_users: []
+nextcloud_backup_user_files_trashbin: true
+nextcloud_backup_user_files_versions: true
+nextcloud_backup_user_uploads: true
+nextcloud_backup_user_cache: true
+
+### DATABASE BACKUP ###
+nextcloud_backup_database: true
+
+### FETCH TO LOCAL MACHINE ###
+nextcloud_backup_fetch_to_local: false
+nextcloud_backup_fetch_local_path: "/tmp/nextcloud_backup"

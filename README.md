@@ -34,9 +34,11 @@ Name | Description
 nextcloud.admin.run_occ|Run the occ command line tool with given arguments
 
 ### Roles
+
 Name | Description
 --- | ---
-nextcloud.admin.install_nextcloud|Install and configure an Nextcloud instance for a Debian/Ubuntu server - formerly `aalaesar.install_nextcloud`
+nextcloud.admin.backup (**beta**)|Create a backup of a Nextcloud server - formerly `aalaesar.backup_nextcloud`
+nextcloud.admin.install_nextcloud | Install and configure an Nextcloud instance for a Debian/Ubuntu server - formerly `aalaesar.install_nextcloud`
 
 <!--end collection content-->
 

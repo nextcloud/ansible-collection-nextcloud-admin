@@ -1,0 +1,41 @@
+---
+- name: Backup target dir exists on the host
+  ansible.builtin.file:
+    path: "{{ nextcloud_backup_target_dir }}"
+    state: directory
+    owner: "{{ nextcloud_backup_owner }}"
+    group: "{{ nextcloud_backup_group }}"
+    mode: "{{ nextcloud_backup_dir_mode }}"
+
+- name: Backup folder exists on the host
+  ansible.builtin.file:
+    path: "{{ nc_archive_path }}"
+    state: directory
+    owner: "{{ nextcloud_backup_owner }}"
+    group: "{{ nextcloud_backup_group }}"
+    mode: "{{ nextcloud_backup_dir_mode }}"
+
+- name: Copy config in archive
+  ansible.builtin.shell: "rsync -r --exclude='*.sample.*' {{nextcloud_webroot}}/config/ {{ nc_archive_path }}/config/"
+  tags:
+    - skip_ansible_lint
+
+- name: Download server files for current version
+  vars:
+    nc_server_dl_url: "https://download.nextcloud.com/server/releases/nextcloud-{{ nc_status.versionstring }}.zip"
+  ansible.builtin.get_url:
+    url: "{{ nc_server_dl_url }}"
+    checksum: "sha512:{{ nc_server_dl_url }}.sha512"
+    dest: "{{ nc_archive_path }}/nextcloud-{{ nc_status.versionstring }}.zip"
+    owner: "{{ nextcloud_backup_owner }}"
+    group: "{{ nextcloud_backup_group }}"
+    mode: "{{ nextcloud_backup_file_mode }}"
+  when: nextcloud_backup_download_server_archive
+
+- name: Export the list of apps in the backup
+  ansible.builtin.copy:
+    content: "{{ _nc_app_list.stdout | from_json | to_nice_json }}"
+    dest: "{{ nc_archive_path }}/installed_apps.json"
+    owner: "{{ nextcloud_backup_owner }}"
+    group: "{{ nextcloud_backup_group }}"
+    mode: "{{ nextcloud_backup_file_mode }}"
