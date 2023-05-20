@@ -100,3 +100,6 @@ GitHub.sublime-settings
 # test credentials
 /molecule/default/nextcloud_instances
 **/__pycache__/
+
+# Environments
+.venv

@@ -1,0 +1,37 @@
+---
+- name: The app_data backup folder exists
+  ansible.builtin.file:
+    path: "{{ nc_archive_path }}"
+    state: directory
+    owner: "{{ nextcloud_backup_owner }}"
+    group: "{{ nextcloud_backup_group }}"
+    mode: "{{ nextcloud_backup_dir_mode }}"
+
+- name: Create a dump of the mysql database
+  ansible.builtin.shell: >-
+    mysqldump --single-transaction --default-character-set=utf8mb4
+    -h {{ _nc_dbhost.stdout }} -u {{ _nc_dbuser.stdout }} -p{{ _nc_dbpassword.stdout }}
+    {{ _nc_dbname.stdout }} > database_dump.bak.sql
+  args:
+    chdir: "{{ nc_archive_path }}"
+  no_log: true
+  when:
+    - _nc_dbtype.stdout == 'mysql'
+  register: output
+  changed_when: output.rc != 0
+
+- name: Create a dump of the postgreSQL database
+  ansible.builtin.command: >-
+    pg_dump {{ _nc_dbname.stdout }}
+    -h {{ _nc_dbhost.stdout }}
+    -U {{ _nc_dbuser.stdout }}
+    -f database_dump.bak.sql
+  args:
+    chdir: "{{ nc_archive_path }}"
+  no_log: true
+  environment:
+    PGPASSWORD: "{{ _nc_dbpassword.stdout }}"
+  when:
+    - _nc_dbtype.stdout == 'pgsql'
+  register: output
+  changed_when: output.rc != 0

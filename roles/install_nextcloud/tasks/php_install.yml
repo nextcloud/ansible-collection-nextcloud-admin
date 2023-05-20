@@ -8,27 +8,24 @@
 
 - name: "[PHP] - Required and recommended packages are installed."
   ansible.builtin.package:
-    name: "{{ item }}"
+    name:
+      - imagemagick
+      - smbclient
+      - "php{{ php_ver }}-fpm"
+      - "php{{ php_ver }}-gd"
+      - "php{{ php_ver }}-ldap"
+      - "php{{ php_ver }}-imap"
+      - "php{{ php_ver }}-curl"
+      - "php{{ php_ver }}-intl"
+      - "php{{ php_ver }}-bz2"
     state: present
-  with_items:
-    - imagemagick
-    - smbclient
-    - "php{{ php_ver }}-fpm"
-    - "php{{ php_ver }}-gd"
-    - "php{{ php_ver }}-ldap"
-    - "php{{ php_ver }}-imap"
-    - "php{{ php_ver }}-curl"
-    - "php{{ php_ver }}-intl"
-    - "php{{ php_ver }}-bz2"
   notify:
     - Start php-fpm
 
 - name: "[PHP] - Extra packages are installed."
   ansible.builtin.package:
-    name: "{{ item }}"
+    name: "{{ php_pkg_spe }}"
     state: present
-  with_items:
-    - "{{ php_pkg_spe }}"
 
 - name: "[PHP] - Database client - MySQL."
   ansible.builtin.package:
