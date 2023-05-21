@@ -1,4 +1,4 @@
-# Ansible role: install_nextcloud
+# Ansible role: install
 
 This role installs and configures an Nextcloud instance for a Debian/Ubuntu server.
 
@@ -34,7 +34,7 @@ This role requires root access, so either configure it in your inventory files, 
 - hosts: dnsserver
   become: true
   roles:
-    - role: nextcloud.admin.install_nextcloud
+    - role: nextcloud.nextcloud.install
 ```
 
 ## Dependencies
@@ -570,7 +570,7 @@ In some case, you may want to deploy quickly many instances of Nextcloud on mult
 ---
 - hosts: server
   roles:
-   - role: nextcloud.admin.install_nextcloud
+   - role: nextcloud.nextcloud.install
 ```
 
 -   This will install a Nextcloud instance in /opt/nextcloud using apache2 and mysql.
@@ -584,7 +584,7 @@ You can choose the version channel to download a specific version of nextcloud. 
 ---
 - hosts: server
   roles:
-   - role: nextcloud.admin.install_nextcloud
+   - role: nextcloud.nextcloud.install
      nextcloud_version_channel: "daily"
      nextcloud_version_major: "master"
 ```
@@ -594,7 +594,7 @@ This role is not designed to manage letsencrypt certificates. However you can st
 
 You must create first your certificates using a letsencrypt ACME client or an Ansible role like [this one] (https://github.com/jaywink/ansible-letsencrypt)
 
-then call _install_nextcloud_ by setting `nextcloud_tls_cert_method: "installed"`
+then call _install_ by setting `nextcloud_tls_cert_method: "installed"`
 
 Here 2 examples for apache and nginx (because they have slightly different configurations)
 
@@ -602,7 +602,7 @@ Here 2 examples for apache and nginx (because they have slightly different confi
 ---
 - hosts: apache_server
   roles:
-   - role: nextcloud.admin.install_nextcloud
+   - role: nextcloud.nextcloud.install
      nextcloud_trusted_domain:
        - "example.com"
      nextcloud_tls_cert_method: "installed"
@@ -612,7 +612,7 @@ Here 2 examples for apache and nginx (because they have slightly different confi
 
 - hosts: nginx_server
   roles:
-    - role: nextcloud.admin.install_nextcloud
+    - role: nextcloud.nextcloud.install
       nextcloud_trusted_domain:
         - "example2.com"
       nextcloud_tls_cert_method: "installed"
@@ -634,7 +634,7 @@ He can run the role with the following variables to install Nextcloud accordingl
 ---
 - hosts: server
   roles:
-   - role: nextcloud.admin.install_nextcloud
+   - role: nextcloud.nextcloud.install
      nextcloud_version_major: 25
      nextcloud_trusted_domain:
        - "cloud.example.tld"

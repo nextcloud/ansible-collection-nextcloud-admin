@@ -43,7 +43,7 @@ description:
     unless it is run as the user that own the occ tool.
 
 extends_documentation_fragment:
-  - nextcloud.admin.occ_common_options
+  - nextcloud.nextcloud.occ_common_options
 
 options:
   command:
@@ -61,14 +61,14 @@ requirements:
 
 EXAMPLES = r"""
 - name: get nextcloud basic info status
-  nextcloud.admin.run_occ:
+  nextcloud.nextcloud.run_occ:
     command: status --output=json
     nextcloud_path: /var/lib/www/nextcloud
   changed_when: false
   register: nc_status
 
 - name: install an application
-  nextcloud.admin.run_occ:
+  nextcloud.nextcloud.run_occ:
     command: app:install notes
     nextcloud_path: /var/lib/www/nextcloud
 """
@@ -102,8 +102,8 @@ stderr_lines:
 """
 import copy
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible_collections.nextcloud.admin.plugins.module_utils.occ import run_occ
-from ansible_collections.nextcloud.admin.plugins.module_utils.occ_args_common import (
+from ansible_collections.nextcloud.nextcloud.plugins.module_utils.occ import run_occ
+from ansible_collections.nextcloud.nextcloud.plugins.module_utils.occ_args_common import (
     OCC_ARGS_SPEC,
 )
 

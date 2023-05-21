@@ -5,7 +5,7 @@
 
 # ansible collection for nextcloud administration
 
-This repository hosts the `nextcloud.admin`  Ansible Collection (formerly the role `aalaesar.install_nextcloud`).
+This repository hosts the `nextcloud.nextcloud`  Ansible Collection (formerly the role `aalaesar.install_nextcloud`).
 
 The collection includes a variety of Ansible content to help automate the management of nextcloud, as well as provisioning and maintenance of instances of nextcloud.
 
@@ -31,14 +31,14 @@ This collection supports Nextcloud versions: `24`, `25`, `26 (latest)`
 ### Modules
 Name | Description
 --- | ---
-nextcloud.admin.run_occ|Run the occ command line tool with given arguments
+nextcloud.nextcloud.run_occ|Run the occ command line tool with given arguments
 
 ### Roles
 
 Name | Description
 --- | ---
-nextcloud.admin.backup (**beta**)|Create a backup of a Nextcloud server - formerly `aalaesar.backup_nextcloud`
-nextcloud.admin.install_nextcloud | Install and configure an Nextcloud instance for a Debian/Ubuntu server - formerly `aalaesar.install_nextcloud`
+nextcloud.nextcloud.backup (**beta**)|Create a backup of a Nextcloud server - formerly `aalaesar.backup_nextcloud`
+nextcloud.nextcloud.install | Install and configure an Nextcloud instance for a Debian/Ubuntu server - formerly `aalaesar.install_nextcloud`
 
 <!--end collection content-->
 
@@ -67,20 +67,20 @@ Alternatively, you can also add the content of [this file](requirements.yml) in 
 
 Before using the nextcloud collection, you need to install it with the Ansible Galaxy CLI:
 
-    ansible-galaxy collection install nextcloud.admin
+    ansible-galaxy collection install nextcloud.nextcloud
 
 You can also include it in a `requirements.yml` file and install it via `ansible-galaxy collection install -r requirements.yml`, using the format:
 
 ```yaml
 ---
 collections:
-  - name: nextcloud.admin
+  - name: nextcloud.nextcloud
     version: 2.0.0
 ```
 
 ### Using modules from the Nextcloud Collection in your playbooks
 
-It's preferable to use content in this collection using their Fully Qualified Collection Namespace (FQCN), for example `nextcloud.admin.run_occ`:
+It's preferable to use content in this collection using their Fully Qualified Collection Namespace (FQCN), for example `nextcloud.nextcloud.run_occ`:
 
 ```yaml
 ---
@@ -89,12 +89,12 @@ It's preferable to use content in this collection using their Fully Qualified Co
   become: true
   tasks:
     - name: list installed apps
-      nextcloud.admin.run_occ:
+      nextcloud.nextcloud.run_occ:
         nextcloud_path: /var/www/nextcloud
         command: app:list
 ```
 
-If upgrading older playbooks from <2.0.0, you can minimise your changes by defining `collections` in your play and refer to this collection's role as `install_nextcloud`, instead of `nextcloud.admin.install_nextcloud`, as in this example:
+If upgrading older playbooks from <2.0.0, you can minimise your changes by defining `collections` in your play and refer to this collection's role as `install`, instead of `nextcloud.nextcloud.install`, as in this example:
 
 ```yaml
 ---
@@ -103,12 +103,12 @@ If upgrading older playbooks from <2.0.0, you can minimise your changes by defin
   connection: local
 
   collections:
-    - nextcloud.admin
+    - nextcloud.nextcloud
 
   tasks:
     - name: deploy nextcloud and dependencies
       include_role:
-        name: install_nextcloud
+        name: install
         # previously:
         # name: aalaesar.install_nextcloud
 ```

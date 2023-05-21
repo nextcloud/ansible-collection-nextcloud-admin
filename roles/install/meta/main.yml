@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: aalaesar
-  role_name: install_nextcloud
+  role_name: install
   description: Install Nextcloud server like you want ! Apache2 or Nginx ? MariaDB or PostgresQL ? You choose, you watch, it works !
 
   license: BSD

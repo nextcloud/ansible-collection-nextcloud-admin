@@ -125,7 +125,7 @@ None
 ```yaml
 - hosts: nextcloud
   roles:
-    - role: nextcloud.admin.backup
+    - role: nextcloud.nextcloud.backup
 ```
 
 ### Making a partial backup with only the app_data
@@ -133,7 +133,7 @@ None
 ```yaml
 - hosts: nextcloud
   roles:
-    - role: nextcloud.admin.backup
+    - role: nextcloud.nextcloud.backup
   vars:
     nextcloud_backup_suffix: _only_app_data
     nextcloud_backup_user: false

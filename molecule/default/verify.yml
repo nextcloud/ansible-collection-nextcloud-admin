@@ -4,11 +4,11 @@
   gather_facts: true
   vars:
     # load configurations references
-    os_config_ref: "{{ lookup('ansible.builtin.template', '../../roles/install_nextcloud/defaults/os_config_ref.yml') | from_yaml }}"
+    os_config_ref: "{{ lookup('ansible.builtin.template', '../../roles/install/defaults/os_config_ref.yml') | from_yaml }}"
   vars_files:
-    - ../../roles/install_nextcloud/defaults/main.yml
+    - ../../roles/install/defaults/main.yml
 
   tasks:
-    - name: "Include test_install_nextcloud"
+    - name: "Include test_install"
       ansible.builtin.import_role:
-        name: "test_install_nextcloud"
+        name: "test_install"

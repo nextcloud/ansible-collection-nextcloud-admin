@@ -24,4 +24,4 @@
       - external
       - mail
   roles:
-    - role: nextcloud.admin.install_nextcloud
+    - role: nextcloud.nextcloud.install

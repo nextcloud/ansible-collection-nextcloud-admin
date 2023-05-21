@@ -6,7 +6,7 @@
 namespace: nextcloud
 
 # The name of the collection. Has the same character restrictions as 'namespace'
-name: admin
+name: nextcloud
 
 # The version of the collection. Must be compatible with semantic versioning
 version: 2.0.1
