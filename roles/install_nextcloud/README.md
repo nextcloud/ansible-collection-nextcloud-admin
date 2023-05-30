@@ -562,6 +562,18 @@ The name may not be canon some times. (like **appName-x.y.z** instead of **appNa
 Changing a parameter, then running the role again while the app is already enabled will **not** update its configuration.
 -   this post_install process is tagged and can be called directly using the `--tags install_apps` option.
 
+#### Patch **user_saml** Application
+
+If you centrally administer your users and configure nextcloud to include users via LDAP as user-backend through e.g. `user_ldap` module and want to provide Single-sign-on, you may configure the `user_saml` application using the environment-variable `REMOTE_USER`. In this case, the returned principal contains an upper-case realm. This is undesirable when the user backend stores the principals with realm in lower-case, which is the case for `user_ldap`, because the case-sensitive lookup by `user_saml` module for the existing user would not find the existing user. A typical use-case is, when you run a Samba Domain Controller and manage your users centrally in the Domain and want to provide Single-Sign-On in Nextcloud.
+This patch adds a workaround to `SAMLController.php`, which converts the realm to lower-case. To activate this patch, you also need to define `user_saml` application in `nextcloud_apps`.
+```yaml
+nextcloud_apps:
+  user_saml:
+nextcloud_patch_user_saml_app: true
+```
+This patch is a modified version of the workaround proposed [here](https://github.com/nextcloud/user_saml/issues/118).
+Note: When `user_saml` application is updated, this patch will be overwritten. In this case you may re-apply the patch by calling directly using the `--tags patch_user_saml_app` option. The patch is implemented in a way, that it shall work even when `user_saml`-app (including the patched-file `SAMLController.php`) changes, i.e. it shall be robust against changes of the `user_saml`-app. By an educated guess it will work for future versions of `user_saml`, but in any case it would not change anything if the change to `SAMLController.php` would touch the sensitive code therein.
+
 ## Example Playbook
 ### Case 1: Installing a quick Nextcloud demo
 In some case, you may want to deploy quickly many instances of Nextcloud on multiple hosts for testing/demo purpose and don't want to tune the role's variables for each hosts: Just run the playbook without any additional variable (all default) !
@@ -592,7 +604,7 @@ You can choose the version channel to download a specific version of nextcloud. 
 ### Case 2: Using letsencrypt with this role.
 This role is not designed to manage letsencrypt certificates. However you can still use your certificates with nextcloud.
 
-You must create first your certificates using a letsencrypt ACME client or an Ansible role like [this one] (https://github.com/jaywink/ansible-letsencrypt)
+You must create first your certificates using a letsencrypt ACME client or an Ansible role like [this one](https://github.com/jaywink/ansible-letsencrypt)
 
 then call _install_nextcloud_ by setting `nextcloud_tls_cert_method: "installed"`
 

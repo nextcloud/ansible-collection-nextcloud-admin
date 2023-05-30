@@ -1,0 +1,3 @@
+				if (isset($_SERVER['REMOTE_USER'])) {
+					$_SERVER['REMOTE_USER'] = strtolower($_SERVER['REMOTE_USER']);
+				}
