@@ -46,12 +46,13 @@
   DocumentRoot {{ nextcloud_webroot }}
   {% if (nextcloud_max_upload_size_in_bytes|int) <= 2147483647-%}
   LimitRequestBody {{ nextcloud_max_upload_size_in_bytes }}
+  LimitRequestFieldsize 32768
   {% endif -%}
   SSLEngine on
   SSLCertificateFile      {{ nextcloud_tls_cert_file }}
   SSLCertificateKeyFile   {{ nextcloud_tls_cert_key_file }}
-{% if nextcloud_tls_cert_chain_file is defined %}
-  SSLCertificateChainFile {{ nextcloud_tls_cert_chain_file }}
+{% if nextcloud_tls_chain_file is defined %}
+  SSLCertificateChainFile {{ nextcloud_tls_chain_file }}
 {% endif %}
 
   # enable HTTP/2, if available
