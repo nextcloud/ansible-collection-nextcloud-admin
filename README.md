@@ -1,9 +1,8 @@
-[![Ansible-lint status](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions?workflow=Ansible%20Lint)
-[![YAML-lint status](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/yamllint.yml/badge.svg)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions?workflow=Yaml%20Lint)
+[![Lint status](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/lint.yml/badge.svg)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions?workflow=Lint)
 [![Tests for all supported versions](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/tests.yml/badge.svg)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions?workflow=Tests)
 [![Tests for latest](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/tests_latest.yml/badge.svg)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions?workflow=Tests%20latest)
 
-# ansible collection for nextcloud administration
+# Ansible collection for nextcloud administration
 
 This repository hosts the `nextcloud.admin`  Ansible Collection (formerly the role `aalaesar.install_nextcloud`).
 
