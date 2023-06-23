@@ -1,0 +1,38 @@
+---
+name: Lint
+"on":
+  pull_request:
+  push:
+  schedule:
+    - cron: "0 7 * * *"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Run ansible-lint
+        # replace `main` with any valid ref, or tags like `v6`
+        uses: ansible-community/ansible-lint-action@v6
+
+      - name: Set up Python 3.
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Upgrade pip
+        run: |
+          pip install --constraint=.github/workflows/constraints.txt pip
+          pip --version
+
+      - name: Upgrade yamllint
+        run: |
+          pip install --constraint=.github/workflows/constraints.txt yamllint
+
+      - name: Lint code.
+        run: |
+          yamllint -c .yamllint.yml .
