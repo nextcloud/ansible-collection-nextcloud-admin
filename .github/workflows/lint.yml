@@ -35,4 +35,4 @@ jobs:
 
       - name: Lint code.
         run: |
-          yamllint .
+          yamllint -c .yamllint.yml .
