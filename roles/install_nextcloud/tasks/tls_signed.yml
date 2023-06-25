@@ -29,7 +29,7 @@
     dest: "{{ nextcloud_tls_cert_file }}"
     owner: "{{ nextcloud_websrv_user }}"
     group: "{{ nextcloud_websrv_group }}"
-    mode: u=rw,g=r,o=-
+    mode: "0640"
   vars:
     input_files: ["{{ nextcloud_tls_src_cert }}", "{{ nextcloud_tls_src_chain }}"]
   when:
