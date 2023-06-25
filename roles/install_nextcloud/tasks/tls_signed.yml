@@ -18,7 +18,7 @@
     src: "{{ nextcloud_tls_src_cert }}"
     owner: "{{ nextcloud_websrv_user }}"
     group: "{{ nextcloud_websrv_group }}"
-    mode: u=rw,g=r,o=-
+    mode: "0640"
     force: true
   when:
     - nextcloud_websrv not in ["nginx"]
