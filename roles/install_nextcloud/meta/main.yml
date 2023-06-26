@@ -18,7 +18,6 @@ galaxy_info:
       versions:
         - bookworm
         - bullseye
-  
   galaxy_tags:
     - nextcloud
     - filesharing
