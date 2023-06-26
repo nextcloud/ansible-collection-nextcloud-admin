@@ -19,7 +19,7 @@ jobs:
 
     strategy:
       matrix:
-        distro: [debian11, debian10, ubuntu2204, ubuntu2004]
+        distro: [debian12, debian11, ubuntu2204, ubuntu2004]
         nc_version: [latest, nc26, nc25]
 
     steps:
@@ -41,16 +41,6 @@ jobs:
       - name: Install test dependencies
         run: |
           python3 -m pip install --constraint=.github/workflows/constraints.txt ansible 'molecule-plugins[docker]' docker netaddr
-
-      # See: https://github.com/geerlingguy/ansible-role-mysql/issues/422
-      - name: Disable AppArmor (only Debian 10).
-        run: |
-            set -x
-            sudo apt-get update
-            sudo apt-get install apparmor-profiles
-            sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
-            sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
-        if: matrix.distro == 'debian10'
 
       - name: Run Molecule tests
         run: molecule test

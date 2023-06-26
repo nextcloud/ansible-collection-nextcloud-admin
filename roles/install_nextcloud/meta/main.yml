@@ -6,20 +6,18 @@ galaxy_info:
 
   license: BSD
 
-  min_ansible_version: "2.10"
+  min_ansible_version: "2.11"
 
   platforms:
     - name: Ubuntu
       versions:
         - jammy
         - focal
-        - bionic
 
     - name: Debian
       versions:
+        - bookworm
         - bullseye
-        - buster
-
   galaxy_tags:
     - nextcloud
     - filesharing

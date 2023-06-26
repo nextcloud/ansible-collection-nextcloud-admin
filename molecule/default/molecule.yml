@@ -6,7 +6,7 @@ driver:
   name: docker
 platforms:
   - name: instance
-    image: "docker.io/geerlingguy/docker-${MOLECULE_DISTRO:-debian11}-ansible:latest"
+    image: "docker.io/geerlingguy/docker-${MOLECULE_DISTRO:-debian12}-ansible:latest"
     cgroupns_mode: host
     command: ${MOLECULE_COMMAND:-""}
     volumes:
