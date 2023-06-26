@@ -18,11 +18,11 @@ Plugins and modules within a collection may be tested with only specific Ansible
 
 ## Python Support
 
-* Collection tested on 3.10+
+* Collection tested on 3.11+
 
 ## Supported nextcloud version 
 
-This collection supports Nextcloud versions: `24`, `25`, `26 (latest)`
+This collection supports Nextcloud versions: `25`, `26`, `27 (latest)`
 
 ## Included content
 

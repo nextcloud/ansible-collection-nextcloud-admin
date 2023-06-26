@@ -20,7 +20,7 @@ jobs:
     strategy:
       matrix:
         distro: [debian11, debian10, ubuntu2204, ubuntu2004]
-        nc_version: [latest, nc25, nc24]
+        nc_version: [latest, nc26, nc25]
 
     steps:
       - name: Check out the repository
