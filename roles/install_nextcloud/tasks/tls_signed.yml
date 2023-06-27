@@ -42,7 +42,7 @@
     src: "{{ nextcloud_tls_src_chain }}"
     owner: "{{ nextcloud_websrv_user }}"
     group: "{{ nextcloud_websrv_group }}"
-    mode: u=rw,g=r,o=-
+    mode: 0400
     force: false
   when:
     - nextcloud_tls_src_chain is defined
