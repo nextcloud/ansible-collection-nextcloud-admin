@@ -54,5 +54,5 @@
     src: "{{ nextcloud_tls_src_cert_key }}"
     owner: "{{ nextcloud_websrv_user }}"
     group: "{{ nextcloud_websrv_group }}"
-    mode: u=r,g=-,o=-
+    mode: 0400
     force: false
