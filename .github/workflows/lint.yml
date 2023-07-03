@@ -17,7 +17,7 @@ jobs:
 
       - name: Run ansible-lint
         # replace `main` with any valid ref, or tags like `v6`
-        uses: ansible-community/ansible-lint-action@v6
+        uses: ansible/ansible-lint-action@v6
 
       - name: Set up Python 3.
         uses: actions/setup-python@v4
