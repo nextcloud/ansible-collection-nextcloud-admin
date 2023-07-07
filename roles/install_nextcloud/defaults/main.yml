@@ -15,7 +15,7 @@ nextcloud_get_latest: true  # mandatory # specify if the latest archive should b
 # nextcloud_version_special: "" #  For prereleases: "RCn/beta" or for daily "YYYY-MM-DD"
 nextcloud_repository: "https://download.nextcloud.com/server"  # Domain URL where to download Nextcloud.
 nextcloud_archive_format: "zip"  # zip/tar.bz2
-# nextcloud_full_url: "https://download.nextcloud.com/server/releases/nextcloud-25.0.0.zip"  # specify directly a full URL to the archive
+# nextcloud_full_src: "https://download.nextcloud.com/server/releases/nextcloud-25.0.0.zip"  # specify directly a path on the control host or full URL to the archive
 
 
 # [PHP CONFIG AND EXTENSIONS]

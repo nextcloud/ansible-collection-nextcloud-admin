@@ -14,7 +14,7 @@
 - name: "[NC-DL] - You must specify the major version"
   ansible.builtin.assert:
     that: nextcloud_version_major is defined
-  when: nextcloud_full_url is defined
+  when: nextcloud_full_src is defined
 
 - name: "[NC-DL] - Create and set directory ownership & permissions for the webroot folder"
   ansible.builtin.file:
@@ -29,8 +29,8 @@
   block:
     - name: "[NC-DL] - Download & extract Nextcloud to /tmp."
       ansible.builtin.unarchive:
-        copy: false
-        src: "{{ nextcloud_full_url | default(nextcloud_calculated_url) }}"
+        copy: "{{ (nextcloud_full_src is not url) if (nextcloud_full_src is defined) else false }}"
+        src: "{{ nextcloud_full_src | default(nextcloud_calculated_url) }}"
         dest: "/tmp/"
       vars:
         nextcloud_calculated_url: "{{ nextcloud_repository }}/{{ nextcloud_version_channel }}/{{ nextcloud_calculated_file }}"

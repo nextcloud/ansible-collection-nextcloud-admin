@@ -116,7 +116,7 @@ Choose between the 2 archive formats available in the repository.
 ```
 
 _If you don't like rules..._
-Specify directly a full URL to the archive. The role will skip the url generation and download the archive. **Requires nextcloud_version_major to be set along**.
+Specify directly a path or full URL to the archive. The role will skip the url generation and copy from the control-host or download the archive. **Requires nextcloud_version_major to be set along**.
 
 #### Examples:
 - Download your own archive:
