@@ -308,7 +308,6 @@ nextcloud_config_settings:
   - { name: 'default_phone_region', value: 'DE' } # set a country code using [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1)
   - { name: 'overwrite.cli.url', value: 'https://{{ nextcloud_trusted_domain | first }}' }
   - { name: 'memcache.local', value: '\OC\Memcache\APCu' }
-  - { name: 'open_basedir', value: '/dev/urandom' }
   - { name: 'mysql.utf8mb4', value: true }
   - { name: 'updater.release.channel', value: 'production' } # production | stable | daily | beta
 ```

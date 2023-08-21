@@ -69,12 +69,11 @@ nextcloud_redis_settings:
 nextcloud_background_cron: true
 
 ## Custom nextcloud settings
-## https://docs.nextcloud.com/server/12/admin_manual/configuration_server/config_sample_php_parameters.html
+## https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html
 nextcloud_config_settings:
   - { name: 'default_phone_region', value: 'DE' }  # set a country code using ISO 3166-1
   - { name: 'overwrite.cli.url', value: 'https://{{ nextcloud_trusted_domain | first }}' }
   - { name: 'memcache.local', value: '\OC\Memcache\APCu' }
-  - { name: 'open_basedir', value: '/dev/urandom' }
   - { name: 'mysql.utf8mb4', value: true }
   - { name: 'updater.release.channel', value: 'production' }  # production/stable/daily/beta
 
