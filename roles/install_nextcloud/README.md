@@ -536,7 +536,7 @@ Since **v1.3.0**, it is possible to download, install and enable nextcloud appli
 
 The application (app) to install have to be declared in the `nextcloud_apps` dictionary in a "key:value" pair.
 -   The app name is the key
--   The file path or download link, is the value. If left blank, the app is tried to be downloaded and installed from the nextcloud official app-store. If a file path is provided, the app is copied from that path of the control-host.
+-   The download link or file path is the value. If left blank, the app is tried to be downloaded and installed from the nextcloud official app-store. If a file path is provided, the app is copied from that path of the control-host.
 
 ```yaml
 nextcloud_apps:
