@@ -25,7 +25,7 @@
   register: output
   changed_when: "output.rc == 0"
 
-- name: "[App] - Copy or Download Archive to apps folder from \"{{ nc_app_source }}\""
+- name: "[App] - Download or copy Archive to apps folder from \"{{ nc_app_source }}\""
   become_user: "{{ nextcloud_websrv_user }}"
   become_flags: "{{ ansible_become_flags | default(omit) }}"
   ansible.builtin.unarchive:
