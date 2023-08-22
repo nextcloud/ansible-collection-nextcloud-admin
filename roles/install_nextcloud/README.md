@@ -556,7 +556,7 @@ nextcloud_apps:
       parameter2: another_value
   app_name_1: # Copy from control-host.
     source: "files/some_archive.zip"
-  app_name_1: # Download from nextcloud official app-store
+  app_name_3: # Download from nextcloud official app-store
     conf:
       parameter1: ldap:\/\/ldapsrv
       parameter2: another_value
