@@ -112,19 +112,24 @@ nextcloud_archive_format: "zip" # zip | tar.bz2
 Choose between the 2 archive formats available in the repository.
 
 ```yaml
-# nextcloud_full_url:
+# nextcloud_full_src:
 ```
 
 _If you don't like rules..._
-Specify directly a full URL to the archive. The role will skip the url generation and download the archive. **Requires nextcloud_version_major to be set along**.
+Specify directly a path or full URL to the archive. The role will skip the url generation and copy from the control-host or download the archive. **Requires nextcloud_version_major to be set along**.
 
 #### Examples:
-- Download your own archive:
+- Download or Copy your own archive:
   (_you **must** specify the nextcloud major version along_)
 
 ```yaml
-nextcloud_full_url: https://download.nextcloud.com/server/releases/nextcloud-25.0.0.zip
-nextcloud_version_major: 42
+# Download via URL
+nextcloud_full_src: https://download.nextcloud.com/server/releases/nextcloud-25.0.0.zip
+nextcloud_version_major: 25
+# Copy from control host
+nextcloud_full_src: "files/nextcloud-27.0.0.zip"
+nexcloud_version_major: 27
+
 ```
 
 -   Choose the latest release (default):
@@ -530,24 +535,27 @@ Since **v1.3.0**, it is possible to download, install and enable nextcloud appli
 
 The application (app) to install have to be declared in the `nextcloud_apps` dictionary in a "key:value" pair.
 -   The app name is the key
--   The download link, is the value. If left blank, the app is tried to be downloaded and installed from the nextcloud official app-store. 
+-   The download link or file path is the value. If left blank, the app is tried to be downloaded and installed from the nextcloud official app-store. If a file path is provided, the app is copied from that path of the control-host.
 
 ```yaml
 nextcloud_apps:
   app_name_1: "http://download_link.com/some_archive.zip"
-  app_name_2:
+  app_name_2: "files/some_archive.zip"
+  app_name_3:
 ```
 
 Alternatively, if you need to configure an application after enabling it, you can use this structure.
 
 ```yaml
 nextcloud_apps:
-  app_name_1:
+  app_name_1: # Download from specified URL.
     source: "http://download_link.com/some_archive.zip"
     conf:
       parameter1: ldap:\/\/ldapsrv
       parameter2: another_value
-  app_name_1: # Download from nextcloud official app-store
+  app_name_2: # Copy from control-host.
+    source: "files/some_archive.zip"
+  app_name_3: # Download from nextcloud official app-store
     conf:
       parameter1: ldap:\/\/ldapsrv
       parameter2: another_value
