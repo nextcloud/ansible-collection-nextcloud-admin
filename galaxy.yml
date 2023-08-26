@@ -21,7 +21,7 @@ authors:
 
 ### OPTIONAL but strongly recommended
 # A short summary description of the collection
-description: A collection of ansible roles and modules to administrate nextcloud instances
+description: Official Nextcloud Ansible collection of roles and modules to deploy and manage Nextcloud instances
 
 # The path to the license file for the collection. This path is relative to the root of the collection. This key is
 # mutually exclusive with 'license'
