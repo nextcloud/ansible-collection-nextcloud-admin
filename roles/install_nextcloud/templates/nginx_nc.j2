@@ -33,16 +33,16 @@ server {
 {% endif %}
 {% endif %}
 
+    server_name {{ nextcloud_trusted_domain | ansible.utils.ipwrap | join(' ') }};
+
+    # Path to the root of your installation
+    root {{ nextcloud_webroot }};
+
 {% if nextcloud_install_tls %}
     listen 443      ssl http2;
 {% if nextcloud_ipv6 %}
     listen [::]:443 ssl http2;
 {% endif %}
-
-    server_name {{ nextcloud_trusted_domain | ansible.utils.ipwrap | join(' ') }};
-
-    # Path to the root of your installation
-    root {{ nextcloud_webroot }};
     
     ssl_certificate {{ nextcloud_tls_cert_file }};
     ssl_certificate_key {{ nextcloud_tls_cert_key_file }};
@@ -191,7 +191,7 @@ server {
         include fastcgi_params;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
         fastcgi_param PATH_INFO $path_info;
-        fastcgi_param HTTPS on;
+        fastcgi_param HTTPS $https if_not_empty;
 
         fastcgi_param modHeadersAvailable true;         # Avoid sending the security headers twice
         fastcgi_param front_controller_active true;     # Enable pretty urls
