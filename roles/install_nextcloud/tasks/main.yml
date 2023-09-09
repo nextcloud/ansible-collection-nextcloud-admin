@@ -134,7 +134,7 @@
     - patch_user_saml_app
   vars:
     pattern: '.*\$this->session->set\(.user_saml\.samlUserData.,\s+\$_SERVER\);.*'
-    file2patch: "{{ nextcloud_webroot + 'apps/user_saml/lib/Controller/SAMLController.php' }}"
+    file2patch: "{{ nextcloud_webroot + '/apps/user_saml/lib/Controller/SAMLController.php' }}"
   block:
     - name: "[Main] - Check if SAMLController.php can be patched."
       ansible.builtin.slurp:
