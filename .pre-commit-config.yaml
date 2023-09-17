@@ -6,12 +6,12 @@ repos:
       - id: yamllint
         args: ["-c=.yamllint.yml", "."]
   - repo: https://github.com/ansible-community/ansible-lint.git
-    rev: v6.17.2
+    rev: v6.19.0
     hooks:
       - id: ansible-lint
         files: \.(yaml|yml)$
   - repo: https://github.com/psf/black
-    rev: 23.7.0
+    rev: 23.9.1
     hooks:
       - id: black
         language_version: python3.10
