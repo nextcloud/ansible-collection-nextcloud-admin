@@ -15,6 +15,10 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Clean docker cache
+        run: |
+          docker system prune --volumes -a
+
       - name: Run ansible-lint
         # replace `main` with any valid ref, or tags like `v6`
         uses: ansible/ansible-lint-action@v6

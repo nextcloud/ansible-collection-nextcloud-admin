@@ -27,6 +27,10 @@ jobs:
         with:
           path: "nextcloud.ansible-collection-nextcloud-admin"
 
+      - name: Clean docker cache
+        run: |
+          docker system prune --volumes -a
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
