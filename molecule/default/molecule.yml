@@ -4,6 +4,7 @@ dependency:
   name: galaxy
 driver:
   name: podman
+  privileged: true  # Set the driver to run in privileged mode
 platforms:
   - name: instance
     image: "docker.io/geerlingguy/docker-${MOLECULE_DISTRO:-debian12}-ansible:latest"
@@ -11,7 +12,7 @@ platforms:
     command: ${MOLECULE_COMMAND:-""}
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    privileged: true
+    privileged: tru
     pre_build_image: true
 provisioner:
   name: ansible
