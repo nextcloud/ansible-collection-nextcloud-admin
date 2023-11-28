@@ -11,6 +11,7 @@ platforms:
     command: ${MOLECULE_COMMAND:-""}
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    privileged: true
     pre_build_image: true
 provisioner:
   name: ansible
