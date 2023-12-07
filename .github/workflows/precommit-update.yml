@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
 
       - name: Update pre-commit hooks
         uses: browniebroke/pre-commit-autoupdate-action@main
