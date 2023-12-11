@@ -1,18 +1,18 @@
 ---
-- name: "[SIGNED TLS] - Define signed certificate-file with abolute path"
+- name: tls_signed | Define signed certificate-file with abolute path
   ansible.builtin.set_fact:
     nextcloud_tls_cert_file: "{{ nextcloud_tls_cert_file | default(cert_path + nextcloud_instance_name + \".crt\") }}"
 
-- name: "[SIGNED TLS] - Define signed certificate's key-file with absolute path"
+- name: tls_signed | Define signed certificate's key-file with absolute path
   ansible.builtin.set_fact:
     nextcloud_tls_cert_key_file: "{{ nextcloud_tls_cert_key_file | default(cert_path + nextcloud_instance_name + \".key\") }}"
 
-- name: "[SIGNED TLS] - Define certificate chain-file with absolute path"
+- name: tls_signed | Define certificate chain-file with absolute path
   ansible.builtin.set_fact:
     nextcloud_tls_chain_file: "{{ nextcloud_tls_chain_file | default(cert_path + nextcloud_instance_name + \".pem\") }}"
   when: nextcloud_tls_src_chain is defined
 
-- name: "[SIGNED TLS] - Copy certificate file for apache2 to the host"
+- name: tls_signed | Copy certificate file for apache2 to the host
   ansible.builtin.copy:
     dest: "{{ nextcloud_tls_cert_file }}"
     src: "{{ nextcloud_tls_src_cert }}"
@@ -23,7 +23,7 @@
   when:
     - nextcloud_websrv not in ["nginx"]
 
-- name: "[SIGNED TLS] - Copy and concatenate chained certificate file for nginx to host"
+- name: tls_signed | Copy and concatenate chained certificate file for nginx to host
   ansible.builtin.template:
     src: templates/concatenate.j2
     dest: "{{ nextcloud_tls_cert_file }}"
@@ -36,7 +36,7 @@
     - nextcloud_tls_src_chain is defined
     - nextcloud_websrv in ["nginx"]
 
-- name: "[SIGNED TLS] - Copy certificate chain file for apache2 to the host"
+- name: tls_signed | Copy certificate chain file for apache2 to the host
   ansible.builtin.copy:
     dest: "{{ nextcloud_tls_chain_file }}"
     src: "{{ nextcloud_tls_src_chain }}"
@@ -48,7 +48,7 @@
     - nextcloud_tls_src_chain is defined
     - nextcloud_websrv not in ["nginx"]
 
-- name: "[SIGNED TLS] - Key is copied to the host"
+- name: tls_signed | Copy key to the host
   ansible.builtin.copy:
     dest: "{{ nextcloud_tls_cert_key_file }}"
     src: "{{ nextcloud_tls_src_cert_key }}"

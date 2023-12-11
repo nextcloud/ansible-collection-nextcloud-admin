@@ -1,22 +1,22 @@
 ---
-- name: "[NC-DL] - Unzip is installed"
+- name: nc_download | Install unzip package
   ansible.builtin.package:
     name: unzip
     state: present
   when: nextcloud_archive_format == "zip"
 
-- name: "[NC-DL] - bunzip2 is installed"
+- name: nc_download | Install bunzip2 package
   ansible.builtin.package:
     name: bzip2
     state: present
   when: nextcloud_archive_format == "tar.bz2"
 
-- name: "[NC-DL] - You must specify the major version"
+- name: nc_download | You must specify the major version
   ansible.builtin.assert:
     that: nextcloud_version_major is defined
   when: nextcloud_full_src is defined
 
-- name: "[NC-DL] - Create and set directory ownership & permissions for the webroot folder"
+- name: nc_download | Create and set directory ownership & permissions for the webroot folder
   ansible.builtin.file:
     path: "{{ nextcloud_webroot }}"
     mode: "u=rwX,g=rX,o-rwx"
@@ -25,9 +25,9 @@
     owner: "{{ nextcloud_websrv_user }}"
     group: "{{ nextcloud_websrv_group }}"
 
-- name: "Download and extract Nextcloud"
+- name: nc_download | Download and extract Nextcloud
   block:
-    - name: "[NC-DL] - Download & extract Nextcloud to /tmp."
+    - name: nc_download | Download & extract Nextcloud to /tmp."
       ansible.builtin.unarchive:
         copy: "{{ (nextcloud_full_src is not url) if (nextcloud_full_src is defined) else false }}"
         src: "{{ nextcloud_full_src | default(nextcloud_calculated_url) }}"
@@ -37,13 +37,13 @@
         nextcloud_calculated_file: "{{ [nextcloud_dl_file_name[just_a_dict_key], nextcloud_archive_format] | join('.') }}"
         just_a_dict_key: "{{ 'latest' if ((nextcloud_get_latest | bool) and (nextcloud_version_channel != 'prereleases')) else nextcloud_version_channel }}"
 
-    - name: "[NC-DL] - Move extracted files to {{ nextcloud_webroot }}"
+    - name: "nc_download | Move extracted files to {{ nextcloud_webroot }}"
       ansible.builtin.command: "cp -r /tmp/nextcloud/. {{ nextcloud_webroot }}/"
       when: nextcloud_webroot is not none
       register: output
       changed_when: "output.rc == 0"
 
-    - name: "[NC-DL] - Remove nextcloud archive files"
+    - name: nc_download | Remove nextcloud archive files
       ansible.builtin.file:
         path: /tmp/nextcloud
         state: absent

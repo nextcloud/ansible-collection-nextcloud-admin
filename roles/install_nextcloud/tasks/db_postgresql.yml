@@ -1,5 +1,5 @@
 ---
-- name: "[PostgreSQL] - PostgreSQL packages are installed"
+- name: db_postgresql | Install PostgreSQL packages
   ansible.builtin.package:
     name: "{{ pg_deps }}"
     state: "present"
@@ -8,7 +8,7 @@
       - "postgresql"
       - "python3-psycopg2"
 
-- name: "[PostgreSQL] - nextcloud role is created."
+- name: db_postgresql | Create PostgreSQL Nextcloud role
   community.postgresql.postgresql_user:
     name: "{{ nextcloud_db_admin }}"
     password: "{{ nextcloud_db_pwd }}"
@@ -18,7 +18,7 @@
   become_user: postgres
   become: true
 
-- name: "[PostgreSQL] - nextcloud database is created."
+- name: db_postgresql | Create PostgreSQL Nextcloud database
   community.postgresql.postgresql_db:
     name: "{{ nextcloud_db_name }}"
     state: present

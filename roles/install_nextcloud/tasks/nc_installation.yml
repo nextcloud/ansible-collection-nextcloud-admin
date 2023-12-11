@@ -2,10 +2,10 @@
 #########
 # Run command line installation.
 # the web server must be running by now in order to launch the installation
-- name: Trigger all pending handlers
+- name: nc_installation | Trigger all pending handlers
   ansible.builtin.meta: flush_handlers
 
-- name: "[NC] - Setting directory ownership & permissions for the data folder"
+- name: nc_installation | Set directory ownership & permissions for the data folder
   ansible.builtin.file:
     path: "{{ nextcloud_data_dir }}"
     mode: "u=rwX,g=rX,o-rwx"
@@ -14,12 +14,12 @@
     owner: "{{ nextcloud_websrv_user }}"
     group: "{{ nextcloud_websrv_group }}"
 
-- name: "[NC] - Generate password {{ nextcloud_admin_name }}"
+- name: "nc_installation | Generate password {{ nextcloud_admin_name }}"
   ansible.builtin.set_fact:
     nextcloud_admin_pwd: "{{ lookup('password', 'nextcloud_instances/' + nextcloud_instance_name + '/web_admin.pwd') }}"
   when: nextcloud_admin_pwd is not defined
 
-- name: "[NC] - Set temporary permissions for command line installation."
+- name: nc_installation | Set temporary permissions for command line installation
   ansible.builtin.file:
     path: "{{ nextcloud_webroot }}"
     state: directory
@@ -27,14 +27,14 @@
     owner: "{{ nextcloud_websrv_user }}"
     group: "{{ nextcloud_websrv_group }}"
 
-- name: "[NC] - Configuration"
+- name: nc_installation | Configuration
   block:
-    - name: "[NC] - removing possibly old or incomplete config.php"
+    - name: nc_installation | Remove possibly old or incomplete config.php
       ansible.builtin.file:
         path: "{{ nextcloud_webroot }}/config/config.php"
         state: absent
 
-    - name: "[NC] - Run occ installation command"
+    - name: nc_installation | Run occ installation command
       become_user: "{{ nextcloud_websrv_user }}"
       become_flags: "{{ ansible_become_flags | default(omit) }}"
       become: true
@@ -56,13 +56,13 @@
         nextcloud_tmp_backend: "{{ 'mysql' if nextcloud_db_backend == 'mariadb' else nextcloud_db_backend }}"
       notify: Reload http
 
-    - name: "[NC] - Verify config.php - check filesize"
+    - name: nc_installation | Verify config.php - check filesize
       ansible.builtin.stat:
         path: "{{ nextcloud_webroot }}/config/config.php"
       register: nc_installation_confsize
       failed_when: nc_installation_confsize.stat.size is undefined or nc_installation_confsize.stat.size <= 100
 
-    - name: "[NC] - Verify config.php - php syntax check"
+    - name: nc_installation | Verify config.php - php syntax check
       ansible.builtin.command: "php -l {{ nextcloud_webroot }}/config/config.php"
       register: nc_installation_confphp
       changed_when: false
@@ -74,13 +74,13 @@
     # - name: Unfix su issue with occ
     #   include_tasks: tasks/unfix_su.yml
     #   when: ansible_become_method == "su"
-    - name: "[NC] - removing config.php when occ fail"
+    - name: nc_installation | Remove config.php when occ fail
       ansible.builtin.file:
         path: "{{ nextcloud_webroot }}/config/config.php"
         state: absent
       failed_when: true
 
-- name: "[NC] - Set Trusted Domains"
+- name: nc_installation | Set Trusted Domains
   become_user: "{{ nextcloud_websrv_user }}"
   become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: true
@@ -90,7 +90,7 @@
   with_indexed_items: "{{ nextcloud_trusted_domain }}"
   changed_when: true
 
-- name: "[NC] - Set Trusted Proxies"
+- name: nc_installation | Set Trusted Proxies
   become_user: "{{ nextcloud_websrv_user }}"
   become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: true
@@ -100,7 +100,7 @@
   with_indexed_items: "{{ nextcloud_trusted_proxies }}"
   changed_when: true
 
-- name: "[NC] - Set Nextcloud settings in config.php"
+- name: nc_installation | Set Nextcloud settings in config.php
   become_user: "{{ nextcloud_websrv_user }}"
   become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: true
@@ -111,7 +111,7 @@
     - "{{ nextcloud_config_settings }}"
   changed_when: true
 
-- name: "[NC] - Set Redis Server"
+- name: nc_installation | Set Redis Server
   become_user: "{{ nextcloud_websrv_user }}"
   become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: true
@@ -124,15 +124,15 @@
   register: output
   changed_when: "output.rc == 0"
 
-- name: "[NC] - Configure Cron"
+- name: nc_installation | Configure Cron
   when: (nextcloud_background_cron | bool)
   block:
-    - name: "[NC] - Check Cron package"
+    - name: nc_installation | Check Cron package
       ansible.builtin.package:
         name: "cron"
         state: present
 
-    - name: "[NC] - Install Cronjob"
+    - name: nc_installation | Install Cronjob
       ansible.builtin.cron:
         name: "Nextcloud Cronjob"
         minute: "*/10"
@@ -140,7 +140,7 @@
         job: "php {{ nextcloud_webroot }}/cron.php"
         cron_file: "nextcloud"
 
-- name: "[NC] - Set Cron method to Crontab"
+- name: nc_installation | Set Cron method to Crontab
   become_user: "{{ nextcloud_websrv_user }}"
   become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: true
@@ -151,23 +151,23 @@
   register: output
   changed_when: "output.rc == 0"
 
-- name: "[NC] - Set Custom Mimetype"
+- name: nc_installation | Set Custom Mimetype
   ansible.builtin.copy:
     dest: "{{ nextcloud_webroot }}/config/mimetypemapping.json"
     src: files/nextcloud_custom_mimetypemapping.json
     mode: 0640
 
-- name: "[NC] - Ensure Nextcloud directories are 0750"
+- name: nc_installation | Ensure Nextcloud directories are 0750
   ansible.builtin.command: find {{ nextcloud_data_dir }} -type d -exec chmod -c 0750 {} \;
   register: nc_installation_chmod_result
   changed_when: "nc_installation_chmod_result.stdout != \"\""
 
-- name: "[NC] - Ensure Nextcloud files are 0640"
+- name: nc_installation | Ensure Nextcloud files are 0640
   ansible.builtin.command: find {{ nextcloud_data_dir }} -type f -exec chmod -c 0640 {} \;
   register: nc_installation_chmod_result
   changed_when: "nc_installation_chmod_result.stdout != \"\""
 
-- name: "[NC] - Setting stronger directory ownership"
+- name: nc_installation | Set stronger directory ownership
   ansible.builtin.file:
     path: "{{ nextcloud_webroot }}/{{ item }}/"
     recurse: true
@@ -180,7 +180,7 @@
     - themes
     - updater
 
-- name: "[NC apps] - Disable Nextcloud apps"
+- name: nc_installation | Disable Nextcloud apps
   ansible.builtin.command: php occ app:disable "{{ item }}"
   become_user: "{{ nextcloud_websrv_user }}"
   become_flags: "{{ ansible_become_flags | default(omit) }}"
