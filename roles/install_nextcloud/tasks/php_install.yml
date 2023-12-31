@@ -1,12 +1,12 @@
 ---
-- name: "[PHP] - External repository is installed."
+- name: php_install | Add external repository for PHP by using geerlingguy role
   ansible.builtin.import_role:
     name: geerlingguy.php-versions
   vars:
     php_version: "{{ php_ver }}"
   when: php_install_external_repos
 
-- name: "[PHP] - Required and recommended packages are installed."
+- name: php_install | Install required PHP packages for Nextcloud
   ansible.builtin.package:
     name:
       - imagemagick
@@ -22,24 +22,24 @@
   notify:
     - Start php-fpm
 
-- name: "[PHP] - Extra packages are installed."
+- name: php_install | Install extra packages
   ansible.builtin.package:
     name: "{{ php_pkg_spe }}"
     state: present
 
-- name: "[PHP] - Database client - MySQL."
+- name: php_install | Install php*-mysql package
   ansible.builtin.package:
     name: "php{{ php_ver }}-mysql"
     state: present
   when: (nextcloud_db_backend == "mysql") or (nextcloud_db_backend == "mariadb")
 
-- name: "[PHP] - Database client - PostgreSQL."
+- name: php_install | Install php*-pgsql package
   ansible.builtin.package:
     name: "php{{ php_ver }}-pgsql"
     state: present
   when: (nextcloud_db_backend == "pgsql")
 
-- name: "[PHP] - APCu is installed."
+- name: php_install | Install PHP APCu pacakge
   ansible.builtin.package:
     name: "php{{ php_ver }}-apcu"
     state: present

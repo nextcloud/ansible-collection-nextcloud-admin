@@ -1,12 +1,12 @@
 ---
 # tasks file for nextcloud
 
-- name: "Load os specific variables"
+- name: Load os specific variables
   ansible.builtin.include_tasks: ./setup_env.yml
   tags:
     - install_apps
 
-- name: "Install PHP packages"
+- name: Install PHP packages
   ansible.builtin.include_tasks: php_install.yml
   tags:
     - install_apps
@@ -91,7 +91,7 @@
     - install_apps
     - patch_user_saml_app
   block:
-    - name: "[NC apps] - lists the number of apps available in the instance."
+    - name: Lists the number of apps available in the instance
       ansible.builtin.command: php occ app:list --output=json_pretty --no-warnings
       args:
         chdir: "{{ nextcloud_webroot }}"
@@ -102,11 +102,11 @@
       check_mode: false
       register: nc_apps_list
 
-    - name: "[NC apps] - convert list to yaml."
+    - name: Convert list to yaml
       ansible.builtin.set_fact:
         nc_available_apps: "{{ nc_apps_list.stdout | from_json }}"
 
-    - name: "[NC apps] - installation."
+    - name: Install apps
       ansible.builtin.include_tasks: ./nc_apps.yml
       # do if the app is not enabled and ( (archive path is not "") or (app is disabled) )
       when:
@@ -126,7 +126,7 @@
   changed_when: '"Done" not in nc_indices_cmd.stdout'
   when: nextcloud_install_db
 
-- name: "[Main] - Patch from the app 'user_saml' the file SAMLController.php."
+- name: Main | Patch from the app 'user_saml' the file SAMLController.php
   when:
     - nextcloud_patch_user_saml_app
     - nc_available_apps.enabled['user_saml'] is defined or nc_available_apps.disabled['user_saml'] is defined
@@ -136,12 +136,12 @@
     pattern: '.*\$this->session->set\(.user_saml\.samlUserData.,\s+\$_SERVER\);.*'
     file2patch: "{{ nextcloud_webroot + '/apps/user_saml/lib/Controller/SAMLController.php' }}"
   block:
-    - name: "[Main] - Check if SAMLController.php can be patched."
+    - name: Main | Check if SAMLController.php can be patched
       ansible.builtin.slurp:
         src: "{{ file2patch }}"
       register: df_file
 
-    - name: "[Main] - Patch file SAMController.php."
+    - name: Main | Patch file SAMController.php
       ansible.builtin.blockinfile:
         block: "{{ lookup('ansible.builtin.file', 'files/SAMLController.patch') }}"
         path: "{{ file2patch }}"

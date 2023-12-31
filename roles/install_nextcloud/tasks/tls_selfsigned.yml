@@ -1,13 +1,13 @@
 ---
-- name: "[Selfsigned TLS] - Define private certificate path"
+- name: tls_selfsigned | Define private certificate path
   ansible.builtin.set_fact:
     nextcloud_tls_cert_file: "/etc/ssl/{{ nextcloud_instance_name }}.crt"
 
-- name: "[Selfsigned TLS] - Define private key path"
+- name: tls_selfsigned | Define private key path
   ansible.builtin.set_fact:
     nextcloud_tls_cert_key_file: "/etc/ssl/{{ nextcloud_instance_name }}.key"
 
-- name: "[Selfsigned TLS] - Create self-signed SSL cert"
+- name: tls_selfsigned | Create self-signed SSL cert
   ansible.builtin.command: >
     openssl req -new -nodes -x509
     -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=${hostname --fqdn}"
@@ -18,13 +18,13 @@
   args:
     creates: "{{ nextcloud_tls_cert_key_file }}"
 
-- name: "[Selfsigned TLS] - check TLS certificate permissions"
+- name: tls_selfsigned | Check TLS certificate permissions
   ansible.builtin.file:
     path: "{{ nextcloud_tls_cert_file }}"
     mode: 0644
     group: "{{ nextcloud_websrv_group }}"
 
-- name: "[Selfsigned TLS] - check TLS key permissions"
+- name: tls_selfsigned | Check TLS key permissions
   ansible.builtin.file:
     path: "{{ nextcloud_tls_cert_key_file }}"
     mode: 0640

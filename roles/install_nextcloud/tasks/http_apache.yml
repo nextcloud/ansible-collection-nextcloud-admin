@@ -1,5 +1,5 @@
 ---
-- name: "[APACHE] -  enable APC for php CLI"
+- name: http_apache | Enable APC for php CLI
   ansible.builtin.lineinfile:
     dest: "{{ php_dir }}/cli/php.ini"
     line: "apc.enable_cli = 1"
@@ -7,7 +7,7 @@
     state: present
     # validate: "/usr/sbin/{{ php_bin }} -t #%s"
 
-- name: "[APACHE] -  enable PHP OPcache for php.ini"
+- name: http_apache | Enable PHP OPcache for php.ini
   ansible.builtin.lineinfile:
     dest: "{{ php_dir }}/apache2/php.ini"
     state: present
@@ -26,7 +26,7 @@
     # validate: "/usr/sbin/{{ php_bin }} -t #%s"
   notify: Reload http
 
-- name: "[APACHE] -  Required Apache2 modules are enabled"
+- name: http_apache | Enable required Apache2 modules
   community.general.apache2_module:
     name: "{{ item }}"
     state: present
@@ -38,7 +38,7 @@
     - mime
   notify: Restart http
 
-- name: "[APACHE] -  Ssl Apache2 module is enabled"
+- name: http_apache | Enable ssl Apache2 module
   community.general.apache2_module:
     state: present
     name: "{{ item }}"
@@ -47,21 +47,21 @@
   when: (nextcloud_install_tls | bool)
   notify: Restart http
 
-- name: "[APACHE] -  generate Nextcloud configuration for apache"
+- name: http_apache | Generate Nextcloud configuration for apache
   ansible.builtin.template:
     dest: /etc/apache2/sites-available/nc_{{ nextcloud_instance_name }}.conf
     src: "{{ nextcloud_websrv_template }}"
     mode: 0640
   notify: Reload http
 
-- name: "[APACHE] -  Enable Nextcloud site in apache conf"
+- name: http_apache | Enable Nextcloud site in apache conf
   ansible.builtin.file:
     path: /etc/apache2/sites-enabled/nc_{{ nextcloud_instance_name }}.conf
     src: /etc/apache2/sites-available/nc_{{ nextcloud_instance_name }}.conf
     state: link
   notify: Reload http
 
-- name: "[APACHE] -  Disable apache default site"
+- name: http_apache | Disable apache default site
   ansible.builtin.file:
     path: /etc/apache2/sites-enabled/000-default.conf
     state: absent
