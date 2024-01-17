@@ -1,5 +1,5 @@
 ---
-- name: "nc_apps | Parse the item values"
+- name: nc_apps | Parse the item values
   ansible.builtin.set_fact:
     nc_app_name: "{{ item.key }}"
     nc_app_source: "{{ item.value.source if item.value.source is defined else item.value }}"
