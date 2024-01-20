@@ -465,6 +465,7 @@ upgrade_packages_first: true
 Nextcloud's [supported version of php](https://docs.nextcloud.com/server/25/admin_manual/installation/system_requirements.html#server) can often not be available in your distro official repository. `php_install_external_repos` will use [geerlingguy.php-versions](https://github.com/geerlingguy/ansible-role-php-versions) role to add the appropriate third party for your distribution version.
 
 If you do not want to install the third party repository, you can set the following  variable to false, but you'll have to install php on your own before running this role.
+
 ```yaml
 php_install_external_repos: true
 ```

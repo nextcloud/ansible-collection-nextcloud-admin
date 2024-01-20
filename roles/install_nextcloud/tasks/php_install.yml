@@ -19,8 +19,20 @@
       - "php{{ php_ver }}-intl"
       - "php{{ php_ver }}-bz2"
     state: present
+
+- name: "[php-fpm] - setup fpm php.ini"
+  ansible.builtin.lineinfile:
+    dest: "{{ php_dir }}/fpm/php.ini"
+    state: present
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    backrefs: true
+  with_items:
+    - {regexp: 'opcache.interned_strings_buffer', line: 'opcache.interned_strings_buffer=16'}
+    - {regexp: 'memory_limit', line: 'memory_limit={{ php_memory_limit }}'}
   notify:
     - Start php-fpm
+    - Reload http
 
 - name: php_install | Install extra packages
   ansible.builtin.package:
