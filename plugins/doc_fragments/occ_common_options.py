@@ -37,6 +37,8 @@ options:
       - path
       - nc_path
       - nc_dir
+    required: true
+
   php_runtime:
     description:
       - Specify the php runtime used to run the occ tool.
