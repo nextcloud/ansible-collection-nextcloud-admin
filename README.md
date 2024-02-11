@@ -11,7 +11,7 @@ The collection includes a variety of Ansible content to help automate the manage
 <!--start requires_ansible-->
 ## Ansible version compatibility
 
-This collection has been tested against following Ansible versions: **>=2.11.0**.
+This collection has been tested against following Ansible versions: **>=2.14.0**.
 
 Plugins and modules within a collection may be tested with only specific Ansible versions.
 <!--end requires_ansible-->

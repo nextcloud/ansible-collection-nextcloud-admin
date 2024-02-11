@@ -6,7 +6,7 @@ galaxy_info:
 
   license: BSD
 
-  min_ansible_version: "2.11"
+  min_ansible_version: "2.14"
 
   platforms:
     - name: Ubuntu
