@@ -39,10 +39,11 @@ jobs:
 
       - name: Install test dependencies
         run: |
-          python3 -m pip install --constraint=.github/workflows/constraints.txt ansible 'molecule-plugins[docker]' docker netaddr
+          python3 -m pip install --constraint=.github/workflows/constraints.txt ansible 'molecule-plugins[podman]' podman netaddr
 
-      - name: Run Molecule tests
-        run: molecule test
+      - name: Run Molecule tests with Podman
+        run: |
+          molecule test
         env:
           PY_COLORS: "1"
           ANSIBLE_FORCE_COLOR: "1"
