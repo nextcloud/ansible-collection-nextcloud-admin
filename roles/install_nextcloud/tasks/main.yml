@@ -2,7 +2,7 @@
 # tasks file for nextcloud
 
 - name: Load os specific variables
-  ansible.builtin.include_tasks: ./setup_env.yml
+  ansible.builtin.include_tasks: setup_env.yml
   tags:
     - install_apps
 
@@ -13,47 +13,47 @@
 
 - name: Install web server packages
   when: nextcloud_install_websrv
-  ansible.builtin.include_tasks: ./websrv_install.yml
+  ansible.builtin.include_tasks: websrv_install.yml
 
 - name: Install certificates
   when: nextcloud_install_tls
   block:
     - name: Verify permission for installed TLS certificates
-      ansible.builtin.include_tasks: ./tls_installed.yml
+      ansible.builtin.include_tasks: tls_installed.yml
       when: nextcloud_tls_cert_method == "installed"
 
     - name: Install given signed certificates
-      ansible.builtin.include_tasks: ./tls_signed.yml
+      ansible.builtin.include_tasks: tls_signed.yml
       when: nextcloud_tls_cert_method == "signed"
 
     - name: Configure self signed TLS certificates
-      ansible.builtin.include_tasks: ./tls_selfsigned.yml
+      ansible.builtin.include_tasks: tls_selfsigned.yml
       when: nextcloud_tls_cert_method == "self-signed"
 
 - name: Configure web server
   when: nextcloud_install_websrv
   block:
     - name: Configure Nginx web server.
-      ansible.builtin.include_tasks: ./http_nginx.yml
+      ansible.builtin.include_tasks: http_nginx.yml
       when: nextcloud_websrv in ["nginx"]
 
     - name: Configure Apache web server
-      ansible.builtin.include_tasks: ./http_apache.yml
+      ansible.builtin.include_tasks: http_apache.yml
       when: nextcloud_websrv in ["apache2"]
 
 - name: Configure Redis server
-  ansible.builtin.include_tasks: ./redis_server.yml
+  ansible.builtin.include_tasks: redis_server.yml
   when: (nextcloud_install_redis_server | bool)
 
 - name: Configure DB
   when: nextcloud_install_db
   block:
     - name: Configure mysql/mariadb database
-      ansible.builtin.include_tasks: ./db_mysql.yml
+      ansible.builtin.include_tasks: db_mysql.yml
       when: nextcloud_db_backend in ["mysql", "mariadb"]
 
     - name: Configure PostgreSQL database
-      ansible.builtin.include_tasks: ./db_postgresql.yml
+      ansible.builtin.include_tasks: db_postgresql.yml
       when: nextcloud_db_backend in ["pgsql"]
 
 - name: Check Nextcloud installed
@@ -62,7 +62,7 @@
   register: nc_nextcloud_installed
 
 - name: Downloading Nextcloud
-  ansible.builtin.include_tasks: ./nc_download.yml
+  ansible.builtin.include_tasks: nc_download.yml
   when: not nc_nextcloud_installed.stat.exists
 
 - name: Check Nextcloud configuration exists.
@@ -78,7 +78,7 @@
   when: nc_nextcloud_conf.stat.exists
 
 - name: Nextcloud installation
-  ansible.builtin.include_tasks: ./nc_installation.yml
+  ansible.builtin.include_tasks: nc_installation.yml
   when: |
     (not nc_nextcloud_conf.stat.exists) or
     (nc_nextcloud_configured.rc is defined and nc_nextcloud_configured.rc != 0)
@@ -107,7 +107,7 @@
         nc_available_apps: "{{ nc_apps_list.stdout | from_json }}"
 
     - name: Install apps
-      ansible.builtin.include_tasks: ./nc_apps.yml
+      ansible.builtin.include_tasks: nc_apps.yml
       # do if the app is not enabled and ( (archive path is not "") or (app is disabled) )
       when:
         - item.key not in nc_available_apps.enabled
