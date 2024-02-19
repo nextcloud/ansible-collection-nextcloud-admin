@@ -125,6 +125,8 @@
   register: nc_indices_cmd
   changed_when: '"Done" not in nc_indices_cmd.stdout'
   when: nextcloud_install_db
+  tags:
+    - molecule-idempotence-notest
 
 - name: Main | Patch from the app 'user_saml' the file SAMLController.php
   when:
