@@ -1,7 +1,7 @@
 ---
 - name: nc_apps | Parse the item values
   ansible.builtin.set_fact:
-    nc_app_name: "{{ item.value if item.value!=None else item.key }}"
+    nc_app_name: "{{ item.value if item.value != None else item.key }}"
 
 - name: "{{ 'nc_apps | Fetch web-page for app \"' ~ item.key ~'\" from online-apps store (1/2).' }}"
   ansible.builtin.get_url:

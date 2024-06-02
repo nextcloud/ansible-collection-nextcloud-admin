@@ -42,7 +42,7 @@
 
 - name: Download the apps-archive(s) from nextcloud-server.
   ansible.builtin.include_tasks: nc_apps.yml
-  loop: "{{ nextcloud_apps|dict2items }}"
+  loop: "{{ nextcloud_apps | dict2items }}"
   loop_control:
     label: "{{ 'Downloading app package for app \"' ~ item.key ~ '\" from official app-store.' }}"
   when: nextcloud_download_apps
