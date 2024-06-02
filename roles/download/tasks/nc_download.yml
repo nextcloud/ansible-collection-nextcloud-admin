@@ -1,0 +1,8 @@
+---
+- name: nc_download | Download Nextcloud server archive to control host directory nextcloud_download_dir.
+  ansible.builtin.get_url:
+    url: "{{ nextcloud_full_src | default(nextcloud_calculated_url) }}"
+    dest: "{{ nextcloud_download_dir }}/"
+  vars:
+    nextcloud_calculated_url: "{{ nextcloud_repository }}/{{ nextcloud_version_channel }}/{{ nextcloud_calculated_file }}"
+    nextcloud_calculated_file: "{{ [nextcloud_dl_file_name[nextcloud_version_channel], nextcloud_archive_format] | join('.') }}"
