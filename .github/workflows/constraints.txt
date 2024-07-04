@@ -1,4 +1,4 @@
-pip==24.1
+pip==24.1.1
 ansible==10.1.0
 netaddr==1.2.1
 yamllint==1.35.1
