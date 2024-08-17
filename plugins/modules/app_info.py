@@ -97,45 +97,9 @@ nextcloud_application:
       returned: success
 """
 
-import copy
-import json
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.nextcloud.admin.plugins.module_utils.app import app
 from ansible_collections.nextcloud.admin.plugins.module_utils.occ_args_common import args_spec
-from ansible_collections.nextcloud.admin.plugins.module_utils.occ import run_occ
-
-
-def check_app_update(module, app_name):
-    _check_app_update = run_occ(module, ["app:update", "--showonly", app_name])[1]
-    if _check_app_update != "":
-        app_update = True
-        app_update_version_available = _check_app_update.split()[-1]
-    else:
-        app_update = False
-        app_update_version_available = None
-
-    return app_update, app_update_version_available
-
-
-def get_app_info(module, app_name, all_shipped_apps, all_present_apps):
-    if app_name in all_present_apps["enabled"].keys():
-        app_state = "present"
-        app_version = all_present_apps["enabled"][app_name]
-    elif app_name in all_present_apps["disabled"].keys():
-        app_state = "disabled"
-        app_version = all_present_apps["disabled"][app_name]
-    else:
-        return dict(state="absent")
-    _app_updatable, _app_updatable_to = check_app_update(module, app_name)
-    return dict(
-        state=app_state,
-        is_shipped=app_name
-        in [s for a in all_shipped_apps.keys() for s in all_shipped_apps[a].keys()],
-        version=app_version,
-        update_available=_app_updatable,
-        version_available=_app_updatable_to,
-        path=run_occ(module, ["app:getpath", app_name])[1].strip(),
-    )
-
 
 module_arg_spec =  dict(
             name=dict(type="str", required=True),
@@ -148,37 +112,8 @@ def main():
         argument_spec=args_spec(module_arg_spec),
         supports_check_mode=True,
     )
-    app_name = module.params.get("name")
-    # start by gathering all apps present. differentiating between shipped apps and not to reduce calls to occ
-    all_shipped_apps = json.loads(
-        run_occ(module, ["app:list", "--output=json", "--shipped=true"])[1]
-    )
-    all_present_apps = json.loads(run_occ(module, ["app:list", "--output=json"])[1])
-    result = {}
-
-    if app_name in all_present_apps["enabled"].keys():
-        app_state = "present"
-        app_version = all_present_apps["enabled"][app_name]
-    elif app_name in all_present_apps["disabled"].keys():
-        app_state = "disabled"
-        app_version = all_present_apps["disabled"][app_name]
-    else:
-        app_state = None
-        result = dict(state="absent", name=app_name)
-
-    if app_state in ["present", "disabled"]:
-        _app_updatable, _app_updatable_to = check_app_update(module, app_name)
-        result = dict(
-            name=app_name,
-            state=app_state,
-            is_shipped=app_name
-            in [s for a in all_shipped_apps.keys() for s in all_shipped_apps[a].keys()],
-            version=app_version,
-            update_available=_app_updatable,
-            version_available=_app_updatable_to,
-            app_path=run_occ(module, ["app:getpath", app_name])[1].strip(),
-        )
-
+    nc_app = app(module, module.params.get("name"))
+    result = nc_app.infos()
     module.exit_json(changed=False, **result)
 
 
