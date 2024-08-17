@@ -124,7 +124,7 @@ def main():
         supports_check_mode=False,
     )
     command = module.params.get("command")
-    returnCode, stdOut, stdErr = run_occ(module, command)
+    returnCode, stdOut, stdErr, maintenanceMode = run_occ(module, command)
     result = dict(
         command=command,
         rc=returnCode,
