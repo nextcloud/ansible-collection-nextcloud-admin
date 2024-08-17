@@ -100,32 +100,27 @@ stderr_lines:
   type: list
   elements: str
 """
-import copy
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.nextcloud.admin.plugins.module_utils.occ import run_occ
 from ansible_collections.nextcloud.admin.plugins.module_utils.occ_args_common import (
-    OCC_ARGS_SPEC,
+    args_spec,
 )
 
 
-def args_spec():
-    arg_spec = copy.deepcopy(OCC_ARGS_SPEC)
-    arg_spec.update(
-        dict(
-            command=dict(
-                type="str",
-                required=True,
-            ),
-        ),
-    )
-    return arg_spec
+module_arg_spec = dict(
+    command=dict(
+        type="str",
+        required=True,
+    ),
+)
 
 
 def main():
     global module
 
     module = AnsibleModule(
-        argument_spec=args_spec(),
+        argument_spec=args_spec(module_arg_spec),
         supports_check_mode=False,
     )
     command = module.params.get("command")
