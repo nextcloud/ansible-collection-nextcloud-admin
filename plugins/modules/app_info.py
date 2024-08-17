@@ -100,10 +100,8 @@ nextcloud_application:
 import copy
 import json
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.nextcloud.admin.plugins.module_utils.occ_args_common import args_spec
 from ansible_collections.nextcloud.admin.plugins.module_utils.occ import run_occ
-from ansible_collections.nextcloud.admin.plugins.module_utils.occ_args_common import (
-    OCC_ARGS_SPEC,
-)
 
 
 def check_app_update(module, app_name):
@@ -139,21 +137,15 @@ def get_app_info(module, app_name, all_shipped_apps, all_present_apps):
     )
 
 
-def args_spec():
-    arg_spec = copy.deepcopy(OCC_ARGS_SPEC)
-    arg_spec.update(
-        dict(
+module_arg_spec =  dict(
             name=dict(type="str", required=True),
-        ),
-    )
-    return arg_spec
-
+        )
 
 def main():
     global module
 
     module = AnsibleModule(
-        argument_spec=args_spec(),
+        argument_spec=args_spec(module_arg_spec),
         supports_check_mode=True,
     )
     app_name = module.params.get("name")
