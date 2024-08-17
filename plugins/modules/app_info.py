@@ -61,7 +61,6 @@ EXAMPLES = r"""
   nextcloud.admin.app_info:
     nextcloud_path: /var/lib/www/nextcloud
     name: photos
-
 """
 RETURN = r"""
 nextcloud_application:
@@ -99,11 +98,14 @@ nextcloud_application:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.nextcloud.admin.plugins.module_utils.app import app
-from ansible_collections.nextcloud.admin.plugins.module_utils.occ_args_common import args_spec
+from ansible_collections.nextcloud.admin.plugins.module_utils.occ_args_common import (
+    args_spec,
+)
 
-module_arg_spec =  dict(
-            name=dict(type="str", required=True),
-        )
+module_arg_spec = dict(
+    name=dict(type="str", required=True),
+)
+
 
 def main():
     global module
