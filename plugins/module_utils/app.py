@@ -92,3 +92,95 @@ class app:
             result.update(app_path=self.path)
         return result
 
+    def install(self, enable: bool = True) -> dict:
+        result = {}
+        if self.state == "absent":
+            occ_args = ["app:install", self.app_name]
+            if not enable:
+                occ_args.insert(1, "--keep-disabled")
+            if self.module.check_mode:
+                result.update(version="undefined in check mode")
+                fake_actions_taken = ["installed"]
+                if enable:
+                    fake_actions_taken.append("enabled")
+                result.update(actions_taken=fake_actions_taken)
+            else:
+                action_stdout = run_occ(self.module, occ_args)[1].splitlines()
+                result.update(version=action_stdout[0].split()[1])
+                result.update(actions_taken=[a.split()[-1] for a in action_stdout])
+            result.update(changed=True)
+        elif self.state == "disabled" and enable:
+            result.update(self.change_status("enable"))
+        else:
+            result.update(version=self.version)
+            result.update(actions_taken=[])
+            result.update(changed=False)
+        return result
+
+    def remove(self) -> dict:
+        result = {}
+        occ_args = ["app:remove", self.app_name]
+        if self.state != "absent":
+            if self.module.check_mode:
+                removed_version = self.version
+                actions_taken = ["removed"]
+                if self.state == "present":
+                    actions_taken.insert(0, "disabled")
+            else:
+                action_stdout = run_occ(self.module, command=occ_args)[1].splitlines()
+                removed_version = action_stdout[-1].split()[1]
+                actions_taken = [a.split()[-1] for a in action_stdout]
+            result.update(
+                dict(
+                    version=removed_version,
+                    actions_taken=actions_taken,
+                    changed=True,
+                )
+            )
+        else:
+            result.update(
+                dict(
+                    changed=False,
+                    actions_taken=[],
+                    version=None,
+                )
+            )
+
+        return result
+
+    def change_status(self, status: str) -> dict:
+        result = {}
+        trgt_status = status == "enable"
+        app_status = self.state == "present"
+        if trgt_status == app_status:
+            result.update(actions_taken=[])
+            result.update(changed=False)
+        else:
+            if self.module.check_mode:
+                action_stdout = "enabled" if trgt_status else "disabled"
+            else:
+                action_stdout = run_occ(self.module, [f"app:{status}", self.app_name])[
+                    1
+                ]
+            result.update(actions_taken=action_stdout.splitlines()[0].split()[-1])
+            result.update(changed=True)
+        return result
+
+    def update(self) -> dict:
+        result = {}
+        if self.state == "absent":
+            result.update(self.install())
+        elif self.update_version_available:
+            if not self.module.check_mode:
+                run_occ(self.module, [f"app:update", self.app_name])
+
+            result.update(
+                dict(
+                    changed=True,
+                    version=self.update_version_available,
+                    actions_taken=["updated"],
+                )
+            )
+        else:
+            result.update(dict(changed=False, version=self.version, actions_taken=[]))
+        return result
