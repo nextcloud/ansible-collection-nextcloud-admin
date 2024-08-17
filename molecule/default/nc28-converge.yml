@@ -12,7 +12,7 @@
   vars:
     nextcloud_version_channel: "releases"
     nextcloud_get_latest: true
-    nextcloud_version_major: 25
+    nextcloud_version_major: 28
     nextcloud_apps:
       calendar:
       contacts:
