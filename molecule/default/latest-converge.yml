@@ -15,7 +15,7 @@
     nextcloud_apps:
       calendar:
       contacts:
-        source: "https://github.com/nextcloud-releases/contacts/releases/download/v5.5.1/contacts-v5.5.1.tar.gz"
+        source: ""
         conf:
           var_1: "no"
       passwords:

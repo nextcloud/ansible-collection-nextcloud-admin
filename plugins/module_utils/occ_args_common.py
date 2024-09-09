@@ -23,6 +23,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import copy
 
 OCC_ARGS_SPEC = dict(
     nextcloud_path=dict(
@@ -30,3 +31,9 @@ OCC_ARGS_SPEC = dict(
     ),
     php_runtime=dict(type="str", required=False, default="php", aliases=["php"]),
 )
+
+
+def args_spec(some_module_spec):
+    arg_spec = copy.deepcopy(OCC_ARGS_SPEC)
+    arg_spec.update(some_module_spec)
+    return arg_spec
