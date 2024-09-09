@@ -45,6 +45,15 @@ def run_occ(
 
     returnCode, stdOut, stdErr = module.run_command([php_exec] + full_command)
 
+    if "is in maintenance mode" in stdErr:
+        module.warn(" ".join(stdErr.splitlines()[0:1]))
+        maintenanceMode = True
+    else:
+        maintenanceMode = False
+
+    if "is not installed" in stdErr:
+        module.warn(stdErr.splitlines()[0])
+
     if returnCode != 0:
         module.fail_json(
             msg="Failure when executing occ command. Exited {0}.\nstdout: {1}\nstderr: {2}".format(
@@ -54,4 +63,4 @@ def run_occ(
             stderr=stdErr,
             command=command,
         )
-    return returnCode, stdOut, stdErr
+    return returnCode, stdOut, stdErr, maintenanceMode
