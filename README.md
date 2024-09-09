@@ -22,7 +22,7 @@ Plugins and modules within a collection may be tested with only specific Ansible
 
 ## Supported nextcloud version
 
-This collection supports Nextcloud versions: `28`, `29`, `30 (latest)`
+This collection supports Nextcloud versions: `27`, `28`, `29(latest)`
 
 ## Included content
 
