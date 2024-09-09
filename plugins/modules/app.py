@@ -75,6 +75,12 @@ EXAMPLES = r"""
     name: contacts
     state: present
     nextcloud_path: /var/lib/www/nextcloud
+
+- name: Update calendar application
+  nextcloud.admin.app:
+    name: calendar
+    state: updated
+    nextcloud_path: /var/lib/www/nextcloud
 """
 
 RETURN = r"""
@@ -85,11 +91,13 @@ actions_taken:
   contains:
     state:
       description:
-        - Action taken and reported by the nextcloud server .
+        - Action taken and reported by the nextcloud server.
       returned: always
       type: string
-
-
+version:
+  description: App version present of updated on the server.
+  returned: always
+  type: str
 """
 
 from ansible.module_utils.basic import AnsibleModule
