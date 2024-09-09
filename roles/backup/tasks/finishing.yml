@@ -17,11 +17,10 @@
     state: absent
 
 - name: Leave maintenance mode
-  ansible.builtin.command: "php {{ nextcloud_webroot }}/occ maintenance:mode --off"
-  become_user: "{{ nextcloud_websrv_user }}"
+  nextcloud.admin.run_occ:
+    nextcloud_path: "{{ nextcloud_webroot }}"
+    command: maintenance:mode --off"
   become: true
-  become_method: "{{ occ_become_method }}"
-  become_flags: "{{ occ_become_flags }}"
   register: __leave_maintenance
   changed_when:
     - __leave_maintenance.stdout | regex_search('already') == none

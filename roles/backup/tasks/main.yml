@@ -10,11 +10,10 @@
   tags:
     - always
 - name: Enter maintenance mode
-  ansible.builtin.command: "php {{ nextcloud_webroot }}/occ maintenance:mode --on"
-  become_user: "{{ nextcloud_websrv_user }}"
+  nextcloud.admin.run_occ:
+    nextcloud_path: "{{ nextcloud_webroot }}"
+    command: maintenance:mode --on"
   become: true
-  become_method: "{{ occ_become_method }}"
-  become_flags: "{{ occ_become_flags }}"
   register: __goto_maintenance
   changed_when:
     - __goto_maintenance.stdout | regex_search('already') == none
