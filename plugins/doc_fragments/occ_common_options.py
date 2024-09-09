@@ -31,16 +31,18 @@ options:
   nextcloud_path:
     description:
       - Specify the nextcloud instance's location in the host.
-      - If not given, the module can't use the occ tool.
+      - Rollback to NEXTCLOUD_PATH environment variable on the ansible host
     type: str
     aliases:
       - path
       - nc_path
       - nc_dir
+    required: true
+
   php_runtime:
     description:
       - Specify the php runtime used to run the occ tool.
-      - Can be an absolute or relative path if the runtime is available in the PATH.
+      - Can be an absolute or relative path if the runtime is available in the remote host PATH.
     type: str
     default: php
     aliases:
