@@ -1,7 +1,7 @@
 ---
 - name: "Get the config.php content"
   become: true
-  nextcloud.admon.run_occ:
+  nextcloud.admin.run_occ:
     nextcloud_path: "{{ nextcloud_webroot }}"
     command: config:list
   register: _config_php

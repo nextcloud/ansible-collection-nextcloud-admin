@@ -62,7 +62,7 @@ nextcloud_redis_host: '/var/run/redis/redis.sock'
 nextcloud_redis_port: 0
 
 nextcloud_redis_settings:
-  - { name: 'redis host', value: '"{{ nextcloud_redis_host }}"' }
+  - { name: 'redis host', value: "{{ nextcloud_redis_host }}" }
   - { name: 'redis port', value: "{{ nextcloud_redis_port }}" }
   - { name: 'memcache.locking', value: '\OC\Memcache\Redis' }
 

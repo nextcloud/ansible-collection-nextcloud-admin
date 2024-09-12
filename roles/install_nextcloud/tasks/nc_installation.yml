@@ -104,8 +104,7 @@
     command: >-
       config:system:set
       {{ item.name }}
-      --value "{{ item.value }}"
-      {% if item.value | type_debug == 'bool' %}--type=boolean{% endif %}
+      --value {{ item.value }}{% if item.value | type_debug == 'bool' %} --type=boolean{% endif %}
   with_items:
     - "{{ nextcloud_config_settings }}"
 
@@ -115,8 +114,7 @@
     nextcloud_path: "{{ nextcloud_webroot }}"
     command: >-
       config:system:set {{ item.name }}
-      --value "{{ item.value }}"
-      {% if item.value | type_debug == 'bool' %}--type=boolean{% endif %}
+      --value {{ item.value }}{% if item.value | type_debug == 'bool' %} --type=boolean{% endif %}
   with_items:
     - "{{ nextcloud_redis_settings }}"
   when: (nextcloud_install_redis_server | bool)
