@@ -473,7 +473,7 @@ php_install_external_repos: true
 Install and use a custom version for PHP instead of the default one:
 
 ```yaml
-php_ver: '8.1'
+php_ver: '8.2'
 php_dir: "/etc/php/{{ php_ver }}"
 php_bin: "php-fpm{{ php_ver }}"
 php_pkg_spe:
