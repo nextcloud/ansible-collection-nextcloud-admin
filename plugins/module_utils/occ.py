@@ -24,7 +24,16 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
+from shlex import shlex
 
+def convert_string(command: str) -> list:
+    command_list = shlex(command, posix=True)
+    command_list.whitespace_split = True
+    if command_list.find("'") > 0:
+        command_list.quotes = "'"
+    elif command_list.find('"') > 0:
+        command_list.quotes = '"'
+    return list(command_list)
 
 def run_occ(
     module,
@@ -41,7 +50,7 @@ def run_occ(
     if isinstance(command, list):
         full_command = [cli_full_path] + command
     elif isinstance(command, str):
-        full_command = [cli_full_path] + command.split(" ")
+        full_command = [cli_full_path] + convert_string(command)
 
     returnCode, stdOut, stdErr = module.run_command([php_exec] + full_command)
 
