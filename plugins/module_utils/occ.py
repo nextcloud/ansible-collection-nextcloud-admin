@@ -27,13 +27,13 @@ import os
 from shlex import shlex
 
 def convert_string(command: str) -> list:
-    command_list = shlex(command, posix=True)
-    command_list.whitespace_split = True
-    if command_list.find("'") > 0:
-        command_list.quotes = "'"
-    elif command_list.find('"') > 0:
-        command_list.quotes = '"'
-    return list(command_list)
+    command_lex = shlex(command, posix=True)
+    command_lex.whitespace_split = True
+    if command.find("'") > 0:
+        command_lex.quotes = "'"
+    elif command.find('"') > 0:
+        command_lex.quotes = '"'
+    return list(command_lex)
 
 def run_occ(
     module,
