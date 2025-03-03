@@ -24,16 +24,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-from shlex import shlex
+import shlex
 
-def convert_string(command: str) -> list:
-    command_lex = shlex(command, posix=True)
-    command_lex.whitespace_split = True
-    if command.find("'") > 0:
-        command_lex.quotes = "'"
-    elif command.find('"') > 0:
-        command_lex.quotes = '"'
-    return list(command_lex)
 
 def run_occ(
     module,
@@ -50,18 +42,10 @@ def run_occ(
     if isinstance(command, list):
         full_command = [cli_full_path] + command
     elif isinstance(command, str):
-        full_command = [cli_full_path] + convert_string(command)
+        # Use shlex.split to handle quoted strings properly
+        full_command = [cli_full_path] + shlex.split(command)
 
     returnCode, stdOut, stdErr = module.run_command([php_exec] + full_command)
-
-    if "is in maintenance mode" in stdErr:
-        module.warn(" ".join(stdErr.splitlines()[0:1]))
-        maintenanceMode = True
-    else:
-        maintenanceMode = False
-
-    if "is not installed" in stdErr:
-        module.warn(stdErr.splitlines()[0])
 
     if returnCode != 0:
         module.fail_json(
@@ -72,4 +56,4 @@ def run_occ(
             stderr=stdErr,
             command=command,
         )
-    return returnCode, stdOut, stdErr, maintenanceMode
+    return returnCode, stdOut, stdErr
