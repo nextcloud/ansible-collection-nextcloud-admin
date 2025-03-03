@@ -49,9 +49,6 @@ def run_occ(
 
     if "is in maintenance mode" in stdErr:
         module.warn(" ".join(stdErr.splitlines()[0:1]))
-        maintenanceMode = True
-    else:
-        maintenanceMode = False
 
     if "is not installed" in stdErr:
         module.warn(stdErr.splitlines()[0])
@@ -65,4 +62,4 @@ def run_occ(
             stderr=stdErr,
             command=command,
         )
-    return returnCode, stdOut, stdErr, maintenanceMode
+    return returnCode, stdOut, stdErr
