@@ -26,14 +26,15 @@
 import os
 from shlex import shlex
 
+
 def convert_string(command: str) -> list:
-    command_lex = shlex(command, posix=True)
+    command_lex = shlex(command, posix=False)
     command_lex.whitespace_split = True
-    if command.find("'") > 0:
-        command_lex.quotes = "'"
-    elif command.find('"') > 0:
-        command_lex.quotes = '"'
-    return list(command_lex)
+    command_lex.commenters = ""
+    command_lex.escape = ""
+    command_lex.quotes = "\"'"
+    return [token if " " in token else token.strip("\"'") for token in command_lex]
+
 
 def run_occ(
     module,
