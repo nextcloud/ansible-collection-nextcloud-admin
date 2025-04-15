@@ -103,3 +103,7 @@ GitHub.sublime-settings
 
 # Environments
 .venv
+.vscode
+
+# ansible-test ouputs
+tests/output
