@@ -25,8 +25,8 @@
 
 
 class OccExceptions(Exception):
-    def __init__(self, message, rc=None, stdout=None, stderr=None):
-        super().__init__(message)
+    def __init__(self, msg="", rc=None, stdout=None, stderr=None):
+        super().__init__(msg)
         self.rc = rc
         self.stdout = stdout
         self.stderr = stderr

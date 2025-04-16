@@ -76,17 +76,17 @@ def run_occ(
 
     if result["rc"] != 0:
         error_msg = convert_string(result["stderr"].strip().splitlines()[0])
-        if all(x in error_msg for x in ["Command", "is", "not", "defined"]):
-            raise occ_exceptions.OccNoCommandsDefined("", **result)
+        if all(x in error_msg for x in ["Command", "is", "not", "defined."]):
+            raise occ_exceptions.OccNoCommandsDefined(**result)
         elif all(x in error_msg for x in ["Not", "enough", "arguments"]):
-            raise occ_exceptions.OccNotEnoughArguments("", **result)
-        elif all(x in error_msg for x in ["option", "does", "not", "exist"]):
-            raise occ_exceptions.OccOptionNotDefined("", **result)
-        elif all(x in error_msg for x in ["option", "requires", "value"]):
-            raise occ_exceptions.OccOptionRequiresValue("", **result)
+            raise occ_exceptions.OccNotEnoughArguments(**result)
+        elif all(x in error_msg for x in ["option", "does", "not", "exist."]):
+            raise occ_exceptions.OccOptionNotDefined(**result)
+        elif all(x in error_msg for x in ["option", "requires", "value."]):
+            raise occ_exceptions.OccOptionRequiresValue(**result)
         else:
             raise occ_exceptions.OccExceptions(
-                "Failure when executing occ command.", **result
+                msg="Failure when executing occ command.", **result
             )
 
     return result["rc"], result["stdout"], result["stderr"], maintenanceMode
