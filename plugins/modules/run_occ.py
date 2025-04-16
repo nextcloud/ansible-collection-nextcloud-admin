@@ -106,7 +106,7 @@ from ansible_collections.nextcloud.admin.plugins.module_utils.occ import run_occ
 from ansible_collections.nextcloud.admin.plugins.module_utils.occ_args_common import (
     args_spec,
 )
-
+import ansible_collections.nextcloud.admin.plugins.module_utils.occ_exceptions as occ_exceptions
 
 module_arg_spec = dict(
     command=dict(
@@ -124,25 +124,29 @@ def main():
         supports_check_mode=False,
     )
     command = module.params.get("command")
-    returnCode, stdOut, stdErr, maintenanceMode = run_occ(module, command)
-    result = dict(
-        command=command,
-        rc=returnCode,
-        stdout=stdOut,
-        stderr=stdErr,
-    )
-    if returnCode != 0:
+    result = dict(command=command)
+    try:
+        returnCode, stdOut, stdErr = run_occ(module, command)[0:3]
+        result.update(
+            dict(
+                rc=returnCode,
+                stdout=stdOut,
+                stderr=stdErr,
+            )
+        )
+    except occ_exceptions.OccExceptions as e:
         module.fail_json(
-            msg="Failure when executing occ command. Exited {0}.\nstdout: {1}\nstderr: {2}".format(
-                returnCode, stdOut, stdErr
-            ),
+            msg=str(e),
+            exception_class=type(e).__name__,
             **result,
+            rc=e.rc,
+            stdout=e.stdout,
+            stderr=e.stderr,
         )
-    else:
-        module.exit_json(
-            changed=True,
-            **result,
-        )
+    module.exit_json(
+        changed=True,
+        **result,
+    )
 
 
 if __name__ == "__main__":

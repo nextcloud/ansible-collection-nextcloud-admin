@@ -2,8 +2,9 @@ from ansible_collections.nextcloud.admin.plugins.module_utils.occ import (
     convert_string,
     run_occ,
 )
+import ansible_collections.nextcloud.admin.plugins.module_utils.occ_exceptions as occ_exceptions
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, patch
 
 
 class TestConvertString(unittest.TestCase):
@@ -51,24 +52,27 @@ class TestConvertString(unittest.TestCase):
 
 class TestRunOcc(unittest.TestCase):
 
+    def setUp(self):
+        # Mock the module object with necessary parameters
+        self.module = MagicMock()
+        self.module.params = {
+            "nextcloud_path": "/path/to/nextcloud",
+            "php_runtime": "/usr/bin/php",
+        }
+
     @patch("os.stat")
     @patch("os.getuid")
     @patch("os.setgid")
     @patch("os.setuid")
     def test_run_occ_success(self, mock_setuid, mock_setgid, mock_getuid, mock_stat):
         # Setup mocks
-        mock_module = Mock()
-        mock_module.params = {
-            "nextcloud_path": "/path/to/nextcloud",
-            "php_runtime": "php",
-        }
         mock_stat.return_value.st_uid = 1000
         mock_stat.return_value.st_gid = 1000
         mock_getuid.return_value = 1001
-        mock_module.run_command.return_value = (0, "Success", "")
+        self.module.run_command.return_value = (0, "Success", "")
 
         # Call the function
-        returnCode, stdOut, stdErr, maintenanceMode = run_occ(mock_module, "status")
+        returnCode, stdOut, stdErr, maintenanceMode = run_occ(self.module, "status")
 
         # Assertions
         self.assertEqual(returnCode, 0)
@@ -82,94 +86,122 @@ class TestRunOcc(unittest.TestCase):
     @patch("os.getuid")
     def test_run_occ_maintenance_mode(self, mock_getuid, mock_stat):
         # Setup mocks
-        mock_module = Mock()
-        mock_module.params = {
-            "nextcloud_path": "/path/to/nextcloud",
-            "php_runtime": "php",
-        }
         mock_stat.return_value.st_uid = 1000
         mock_stat.return_value.st_gid = 1000
         mock_getuid.return_value = 1000
-        mock_module.run_command.return_value = (
-            1,
+        self.module.run_command.return_value = (
+            0,
             "",
-            "Nextcloud is in maintenance mode",
+            "Nextcloud is in maintenance mode, no apps are loaded.",
         )
 
         # Call the function
-        returnCode, stdOut, stdErr, maintenanceMode = run_occ(mock_module, "status")
+        returnCode, stdOut, stdErr, maintenanceMode = run_occ(self.module, "status")
 
         # Assertions
-        mock_module.warn.assert_called_once_with("Nextcloud is in maintenance mode")
-        self.assertEqual(returnCode, 1)
+        self.module.warn.assert_called_once_with(
+            "Nextcloud is in maintenance mode, no apps are loaded."
+        )
+        self.assertEqual(returnCode, 0)
         self.assertEqual(stdOut, "")
         self.assertIn("maintenance mode", stdErr)
         self.assertTrue(maintenanceMode)
 
     @patch("os.stat")
-    @patch("os.getuid")
-    def test_run_occ_not_installed(self, mock_getuid, mock_stat):
-        # Setup mocks
-        mock_module = Mock()
-        mock_module.params = {
-            "nextcloud_path": "/path/to/nextcloud",
-            "php_runtime": "php",
-        }
-        mock_stat.return_value.st_uid = 1000
-        mock_stat.return_value.st_gid = 1000
-        mock_getuid.return_value = 1000
-        mock_module.run_command.return_value = (1, "", "Nextcloud is not installed")
+    @patch("os.getuid", return_value=1000)
+    def test_file_not_found_exception(self, mock_getuid, mock_stat):
+        # Simulate FileNotFoundError when accessing the occ file
+        mock_stat.side_effect = FileNotFoundError
 
-        returnCode, stdOut, stdErr, maintenanceMode = run_occ(mock_module, "status")
-
-        # Check if the warning was issued
-        mock_module.warn.assert_called_once_with("Nextcloud is not installed")
-        mock_module.fail_json.assert_called_once_with(
-            msg="Failure when executing occ command. Exited 1.\nstdout: \nstderr: Nextcloud is not installed",
-            stdout=stdOut,
-            stderr=stdErr,
-            command="status",
-        )
-
-        # Verify the return values
-        self.assertEqual(returnCode, 1)
-        self.assertEqual(stdOut, "")
-        self.assertIn("not installed", stdErr)
-        self.assertFalse(maintenanceMode)
+        with self.assertRaises(occ_exceptions.OccFileNotFoundException):
+            run_occ(self.module, "status")
 
     @patch("os.stat")
-    @patch("os.getuid")
-    def test_run_occ_error_handling(self, mock_getuid, mock_stat):
-        # Setup mocks
-        mock_module = Mock()
-        mock_module.params = {
-            "nextcloud_path": "/path/to/nextcloud",
-            "php_runtime": "php",
-        }
+    @patch("os.setuid")
+    @patch("os.setgid")
+    @patch("os.getuid", return_value=1000)
+    def test_authentication_exception(
+        self, mock_getuid, mock_setgid, mock_setuid, mock_stat
+    ):
+        # Simulate PermissionError when trying to change user
+        mock_stat.return_value.st_uid = 2000
+        mock_stat.return_value.st_gid = 2000
+        mock_setuid.side_effect = PermissionError
+
+        with self.assertRaises(occ_exceptions.OccAuthenticationException):
+            run_occ(self.module, "status")
+
+    @patch("os.stat")
+    @patch("os.setuid")
+    @patch("os.setgid")
+    @patch("os.getuid", return_value=1000)
+    def test_no_commands_defined_exception(
+        self, mock_getuid, mock_setgid, mock_setuid, mock_stat
+    ):
+        # Mock successful stat call and simulate command execution error
         mock_stat.return_value.st_uid = 1000
         mock_stat.return_value.st_gid = 1000
-        mock_getuid.return_value = 1000
-        mock_module.run_command.return_value = (
+        self.module.run_command.return_value = (1, "", "Command 'foo' is not defined.")
+
+        with self.assertRaises(occ_exceptions.OccNoCommandsDefined):
+            run_occ(self.module, "foo")
+
+    @patch("os.stat")
+    @patch("os.setuid")
+    @patch("os.setgid")
+    @patch("os.getuid", return_value=1000)
+    def test_not_enough_arguments_exception(
+        self, mock_getuid, mock_setgid, mock_setuid, mock_stat
+    ):
+        # Mock successful stat call and simulate command execution error
+        mock_stat.return_value.st_uid = 1000
+        mock_stat.return_value.st_gid = 1000
+        self.module.run_command.return_value = (
             1,
             "",
-            "Some package is not installed\nAdditional info",
+            'Not enough arguments (missing: "bar").',
         )
 
-        returnCode, stdOut, stdErr, maintenanceMode = run_occ(mock_module, "status")
+        with self.assertRaises(occ_exceptions.OccNotEnoughArguments):
+            run_occ(self.module, "foo")
 
-        # Check if the error was issued
-        mock_module.fail_json.assert_called_once_with(
-            msg="Failure when executing occ command. Exited 1.\nstdout: \nstderr: Some package is not installed\nAdditional info",
-            stdout=stdOut,
-            stderr=stdErr,
-            command="status",
+    @patch("os.stat")
+    @patch("os.setuid")
+    @patch("os.setgid")
+    @patch("os.getuid", return_value=1000)
+    def test_option_not_defined_exception(
+        self, mock_getuid, mock_setgid, mock_setuid, mock_stat
+    ):
+        # Mock successful stat call and simulate command execution error
+        mock_stat.return_value.st_uid = 1000
+        mock_stat.return_value.st_gid = 1000
+        self.module.run_command.return_value = (
+            1,
+            "",
+            "The option '--baz' does not exist.",
         )
 
-        # Verify the return values
-        self.assertEqual(returnCode, 1)
-        self.assertEqual(stdOut, "")
-        self.assertIn("Some package", stdErr)
-        self.assertFalse(maintenanceMode)
+        with self.assertRaises(occ_exceptions.OccOptionNotDefined):
+            run_occ(self.module, "foo --baz")
+
+    @patch("os.stat")
+    @patch("os.setuid")
+    @patch("os.setgid")
+    @patch("os.getuid", return_value=1000)
+    def test_option_requires_value_exception(
+        self, mock_getuid, mock_setgid, mock_setuid, mock_stat
+    ):
+        # Mock successful stat call and simulate command execution error
+        mock_stat.return_value.st_uid = 1000
+        mock_stat.return_value.st_gid = 1000
+        self.module.run_command.return_value = (
+            1,
+            "",
+            "The option '--baz' requires a value.",
+        )
+
+        with self.assertRaises(occ_exceptions.OccOptionRequiresValue):
+            run_occ(self.module, "foo --baz")
 
 
 if __name__ == "__main__":
