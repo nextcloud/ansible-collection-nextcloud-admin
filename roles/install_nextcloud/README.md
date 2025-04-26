@@ -291,7 +291,7 @@ The port of redis server. Port 0 is for socket use. Default redis port is 6379.
 
 ```yaml
 nextcloud_redis_settings:
-  - { name: 'redis host', value: '"{{ nextcloud_redis_host }}"' }
+  - { name: 'redis host', value: "{{ nextcloud_redis_host }}" }
   - { name: 'redis port', value: "{{ nextcloud_redis_port }}" }
   - { name: 'memcache.locking', value: '\OC\Memcache\Redis' }
 ```
@@ -473,7 +473,7 @@ php_install_external_repos: true
 Install and use a custom version for PHP instead of the default one:
 
 ```yaml
-php_ver: '8.1'
+php_ver: '8.2'
 php_dir: "/etc/php/{{ php_ver }}"
 php_bin: "php-fpm{{ php_ver }}"
 php_pkg_spe:
@@ -685,4 +685,4 @@ We encourage you to contribute to this role! Please check out the
 
 ## License
 
-BSD 
+BSD

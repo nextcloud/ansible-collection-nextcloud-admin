@@ -35,22 +35,19 @@
         state: absent
 
     - name: nc_installation | Run occ installation command
-      become_user: "{{ nextcloud_websrv_user }}"
-      become_flags: "{{ ansible_become_flags | default(omit) }}"
       become: true
-      ansible.builtin.command: >
-          php occ maintenance:install
-          --database="{{ nextcloud_tmp_backend }}"
-          --database-host="{{ nextcloud_db_host }}"
-          --database-name="{{ nextcloud_db_name }}"
-          --database-user="{{ nextcloud_db_admin }}"
-          --database-pass="{{ nextcloud_db_pwd }}"
-          --admin-user="{{ nextcloud_admin_name }}"
-          --admin-pass="{{ nextcloud_admin_pwd }}"
-          --data-dir="{{ nextcloud_data_dir }}"
-      args:
-        chdir: "{{ nextcloud_webroot }}"
-        creates: "{{ nextcloud_webroot }}/config/config.php"
+      nextcloud.admin.run_occ:
+        nextcloud_path: "{{ nextcloud_webroot }}"
+        command: >-
+          maintenance:install
+          --database {{ nextcloud_tmp_backend }}
+          --database-host {{ nextcloud_db_host }}
+          --database-name {{ nextcloud_db_name }}
+          --database-user {{ nextcloud_db_admin }}
+          --database-pass {{ nextcloud_db_pwd }}
+          --admin-user {{ nextcloud_admin_name }}
+          --admin-pass {{ nextcloud_admin_pwd }}
+          --data-dir {{ nextcloud_data_dir }}
       vars:
         # mariadb is equal to mysql for occ
         nextcloud_tmp_backend: "{{ 'mysql' if nextcloud_db_backend == 'mariadb' else nextcloud_db_backend }}"
@@ -81,48 +78,46 @@
       failed_when: true
 
 - name: nc_installation | Set Trusted Domains
-  become_user: "{{ nextcloud_websrv_user }}"
-  become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: true
-  ansible.builtin.command: php occ config:system:set trusted_domains {{ item.0 }} --value="{{ item.1 | ansible.utils.ipwrap }}"
-  args:
-    chdir: "{{ nextcloud_webroot }}"
+  nextcloud.admin.run_occ:
+    nextcloud_path: "{{ nextcloud_webroot }}"
+    command: >-
+      config:system:set
+      trusted_domains {{ item.0 }}
+      --value={{ item.1 | ansible.utils.ipwrap }}
   with_indexed_items: "{{ nextcloud_trusted_domain }}"
-  changed_when: true
 
 - name: nc_installation | Set Trusted Proxies
-  become_user: "{{ nextcloud_websrv_user }}"
-  become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: true
-  ansible.builtin.command: php occ config:system:set trusted_proxies {{ item.0 }} --value="{{ item.1 }}"
-  args:
-    chdir: "{{ nextcloud_webroot }}"
+  nextcloud.admin.run_occ:
+    nextcloud_path: "{{ nextcloud_webroot }}"
+    command: >-
+       config:system:set
+       trusted_proxies {{ item.0 }}
+       --value={{ item.1 }}
   with_indexed_items: "{{ nextcloud_trusted_proxies }}"
-  changed_when: true
 
 - name: nc_installation | Set Nextcloud settings in config.php
-  become_user: "{{ nextcloud_websrv_user }}"
-  become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: true
-  ansible.builtin.command: php occ config:system:set {{ item.name }} --value="{{ item.value }}" {% if item.value | type_debug == 'bool' %}--type=boolean{% endif %}
-  args:
-    chdir: "{{ nextcloud_webroot }}"
+  nextcloud.admin.run_occ:
+    nextcloud_path: "{{ nextcloud_webroot }}"
+    command: >-
+      config:system:set
+      {{ item.name }}
+      --value {{ item.value }}{% if item.value | type_debug == 'bool' %} --type=boolean{% endif %}
   with_items:
     - "{{ nextcloud_config_settings }}"
-  changed_when: true
 
 - name: nc_installation | Set Redis Server
-  become_user: "{{ nextcloud_websrv_user }}"
-  become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: true
-  ansible.builtin.command: php occ config:system:set {{ item.name }} --value="{{ item.value }}" {% if item.value | type_debug == 'bool' %}--type=boolean{% endif %}
-  args:
-    chdir: "{{ nextcloud_webroot }}"
+  nextcloud.admin.run_occ:
+    nextcloud_path: "{{ nextcloud_webroot }}"
+    command: >-
+      config:system:set {{ item.name }}
+      --value {{ item.value }}{% if item.value | type_debug == 'bool' %} --type=boolean{% endif %}
   with_items:
     - "{{ nextcloud_redis_settings }}"
   when: (nextcloud_install_redis_server | bool)
-  register: output
-  changed_when: "output.rc == 0"
 
 - name: nc_installation | Configure Cron
   when: (nextcloud_background_cron | bool)
@@ -141,15 +136,11 @@
         cron_file: "nextcloud"
 
 - name: nc_installation | Set Cron method to Crontab
-  become_user: "{{ nextcloud_websrv_user }}"
-  become_flags: "{{ ansible_become_flags | default(omit) }}"
   become: true
-  ansible.builtin.command: php occ background:cron
-  args:
-    chdir: "{{ nextcloud_webroot }}"
+  nextcloud.admin.run_occ:
+    nextcloud_path: "{{ nextcloud_webroot }}"
+    command: background:cron
   when: (nextcloud_background_cron | bool)
-  register: output
-  changed_when: "output.rc == 0"
 
 - name: nc_installation | Set Custom Mimetype
   ansible.builtin.copy:
@@ -181,14 +172,9 @@
     - updater
 
 - name: nc_installation | Disable Nextcloud apps
-  ansible.builtin.command: php occ app:disable "{{ item }}"
-  become_user: "{{ nextcloud_websrv_user }}"
-  become_flags: "{{ ansible_become_flags | default(omit) }}"
+  nextcloud.admin.app:
+    nextcloud_path: "{{ nextcloud_webroot }}"
+    state: disabled
+    name: "{{ item }}"
   become: true
-  register: _occ_app_disable_result
-  args:
-    chdir: "{{ nextcloud_webroot }}"
-  changed_when:
-    - "'disabled' in _occ_app_disable_result.stdout"
-    - "'No such app' not in _occ_app_disable_result.stdout"
   with_items: "{{ nextcloud_disable_apps }}"

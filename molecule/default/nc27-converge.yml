@@ -10,13 +10,17 @@
       when: ansible_os_family == 'Debian'
       changed_when: false
   vars:
+    nextcloud_install_db: false
+    nextcloud_db_name: nc
+    nextcloud_db_admin: nc
+    nextcloud_db_pwd: nc
     nextcloud_version_channel: "releases"
     nextcloud_get_latest: true
-    nextcloud_version_major: 26
+    nextcloud_version_major: 27
     nextcloud_apps:
       calendar:
       contacts:
-        source: "https://github.com/nextcloud-releases/contacts/releases/download/v5.0.2/contacts-v5.0.2.tar.gz"
+        source: ""
         conf:
           var_1: "no"
       passwords:

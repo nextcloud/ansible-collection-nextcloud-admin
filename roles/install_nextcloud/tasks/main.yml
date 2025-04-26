@@ -92,12 +92,10 @@
     - patch_user_saml_app
   block:
     - name: Lists the number of apps available in the instance
-      ansible.builtin.command: php occ app:list --output=json_pretty --no-warnings
-      args:
-        chdir: "{{ nextcloud_webroot }}"
-      become_user: "{{ nextcloud_websrv_user }}"
+      nextcloud.admin.run_occ:
+        command: app:list --output=json_pretty --no-warnings
+        nextcloud_path: "{{ nextcloud_webroot }}"
       become: true
-      become_flags: "{{ ansible_become_flags | default(omit) }}"
       changed_when: false
       check_mode: false
       register: nc_apps_list
@@ -116,12 +114,10 @@
 
 
 - name: Add indices
-  ansible.builtin.command: php occ db:add-missing-indices
-  args:
-    chdir: "{{ nextcloud_webroot }}"
-  become_user: "{{ nextcloud_websrv_user }}"
+  nextcloud.admin.run_occ:
+    nextcloud_path: "{{ nextcloud_webroot }}"
+    command: db:add-missing-indices
   become: true
-  become_flags: "{{ ansible_become_flags | default(omit) }}"
   register: nc_indices_cmd
   changed_when: '"Done" not in nc_indices_cmd.stdout'
   when: nextcloud_install_db

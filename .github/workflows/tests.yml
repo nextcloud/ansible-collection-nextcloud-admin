@@ -20,7 +20,7 @@ jobs:
     strategy:
       matrix:
         distro: [debian12, debian11, ubuntu2204, ubuntu2004]
-        nc_version: [latest, nc26, nc25]
+        nc_version: [latest, nc28, nc27]
 
     steps:
       - name: Check out the repository
@@ -40,7 +40,13 @@ jobs:
 
       - name: Install test dependencies
         run: |
-          python3 -m pip install --constraint=.github/workflows/constraints.txt ansible 'molecule-plugins[docker]' docker netaddr
+          python3 -m pip install --constraint=.github/workflows/constraints.txt ansible 'molecule-plugins[docker]' docker netaddr PyMySQL
+
+      - name: precreate mysql database
+        run: |
+          sudo systemctl start mysql.service
+          ansible localhost -m community.mysql.mysql_db -a "name=nc login_user=root login_password=root state=present"
+          ansible localhost -m community.mysql.mysql_user -a "name=nc password=nc priv=nc.*:ALL login_user=root login_password=root state=present"
 
       - name: Run Molecule tests
         run: molecule test
