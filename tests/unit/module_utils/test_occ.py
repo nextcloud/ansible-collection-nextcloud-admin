@@ -203,6 +203,25 @@ class TestRunOcc(unittest.TestCase):
         with self.assertRaises(occ_exceptions.OccOptionRequiresValue):
             run_occ(self.module, "foo --baz")
 
+    @patch("os.stat")
+    @patch("os.setuid")
+    @patch("os.setgid")
+    @patch("os.getuid", return_value=1000)
+    def test_empty_msg_exception(
+        self, mock_getuid, mock_setgid, mock_setuid, mock_stat
+    ):
+        # Mock successful stat call and simulate command execution error
+        mock_stat.return_value.st_uid = 1000
+        mock_stat.return_value.st_gid = 1000
+        self.module.run_command.return_value = (
+            1,
+            "",
+            "",
+        )
+
+        with self.assertRaises(occ_exceptions.OccExceptions):
+            run_occ(self.module, "foo --baz")
+
 
 if __name__ == "__main__":
     unittest.main()

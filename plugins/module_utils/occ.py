@@ -74,7 +74,7 @@ def run_occ(
     if "is not installed" in result["stderr"]:
         module.warn(result["stderr"].splitlines()[0])
 
-    if result["rc"] != 0:
+    if result["rc"] != 0 and result["stderr"]:
         error_msg = convert_string(result["stderr"].strip().splitlines()[0])
         if all(x in error_msg for x in ["Command", "is", "not", "defined."]):
             raise occ_exceptions.OccNoCommandsDefined(**result)
@@ -88,5 +88,9 @@ def run_occ(
             raise occ_exceptions.OccExceptions(
                 msg="Failure when executing occ command.", **result
             )
+    elif result["rc"] != 0:
+        raise occ_exceptions.OccExceptions(
+            msg="Failure when executing occ command.", **result
+        )
 
     return result["rc"], result["stdout"], result["stderr"], maintenanceMode
