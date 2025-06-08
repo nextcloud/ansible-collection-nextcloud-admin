@@ -42,3 +42,13 @@
       - mail
   roles:
     - role: nextcloud.admin.install_nextcloud
+  post_tasks:
+    - name: Get server Status.
+      nextcloud.admin.run_occ:
+        command: status
+        nextcloud_path: "{{ nextcloud_webroot }}"
+      changed_when: false
+      register: _server_status
+    - name: Display server Status.
+      ansible.builtin.debug:
+        var: _server_status
