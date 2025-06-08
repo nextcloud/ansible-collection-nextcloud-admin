@@ -9,6 +9,11 @@
         cache_valid_time: 600
       when: ansible_os_family == 'Debian'
       changed_when: false
+    - name: Install gpg-agent
+      ansible.builtin.package:
+        name: gpg-agent
+        state: present
+      when: ansible_distribution == 'Ubuntu'
   vars:
     nextcloud_install_db: false
     nextcloud_db_name: nc
