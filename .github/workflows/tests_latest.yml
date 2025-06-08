@@ -18,7 +18,7 @@ jobs:
 
     strategy:
       matrix:
-        distro: [debian12, debian11, ubuntu2204, ubuntu2004]
+        distro: [debian12, debian11, ubuntu2204, ubuntu2404]
         nc_version: [latest]
 
     steps:
