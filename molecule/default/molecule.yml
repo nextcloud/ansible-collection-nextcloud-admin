@@ -17,6 +17,8 @@ platforms:
 provisioner:
   name: ansible
   playbooks:
-    converge: "${MOLECULE_NC:-latest}-converge.yml"
+    converge: "converge.yml"
+  env:
+    MOLECULE_NC: "${MOLECULE_NC:-latest}"
 verifier:
   name: ansible
