@@ -3,6 +3,14 @@
   hosts: all
   become: true
   pre_tasks:
+    - name: Set parameter for a specific version of Nextcloud.
+      ansible.builtin.set_fact:
+        nextcloud_version_major: "{{ molecule_nc[2:] }}"
+      when:
+        - molecule_nc not in [ "", "latest" ]
+        - molecule_nc is match("nc[0-9]{2,3}")
+      vars:
+        molecule_nc: "{{ lookup('env', 'MOLECULE_NC') }}"
     - name: Update apt cache.
       ansible.builtin.apt:
         update_cache: true
@@ -21,7 +29,6 @@
     nextcloud_db_pwd: nc
     nextcloud_version_channel: "releases"
     nextcloud_get_latest: true
-    nextcloud_version_major: 28
     nextcloud_apps:
       calendar:
       contacts:
@@ -35,3 +42,13 @@
       - mail
   roles:
     - role: nextcloud.admin.install_nextcloud
+  post_tasks:
+    - name: Get server Status.
+      nextcloud.admin.run_occ:
+        command: status
+        nextcloud_path: "{{ nextcloud_webroot }}"
+      changed_when: false
+      register: _server_status
+    - name: Display server Status.
+      ansible.builtin.debug:
+        var: _server_status
