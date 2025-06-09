@@ -10,6 +10,7 @@
   ansible.builtin.package:
     name:
       - imagemagick
+      - libmagickcore-*-extra
       - smbclient
       - "php{{ php_ver }}-fpm"
       - "php{{ php_ver }}-gd"
