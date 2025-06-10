@@ -22,7 +22,8 @@ Plugins and modules within a collection may be tested with only specific Ansible
 
 ## Supported nextcloud version
 
-This collection supports Nextcloud versions: `27`, `28`, `29(latest)`
+This collection supports Nextcloud versions: `29`, `30`, `31(latest)`
+The community makes it's best efforts to keep tested versions updated with [Nextcloud release schedule](https://github.com/nextcloud/server/wiki/Maintenance-and-Release-Schedule).
 
 ## Included content
 
@@ -76,7 +77,7 @@ You can also include it in a `requirements.yml` file and install it via `ansible
 ---
 collections:
   - name: nextcloud.admin
-    version: 2.0.0
+    version: 2.2.1
 ```
 
 ### Using modules from the Nextcloud Collection in your playbooks
