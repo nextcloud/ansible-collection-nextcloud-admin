@@ -102,8 +102,8 @@ version:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.nextcloud.admin.plugins.module_utils.app import app
-from ansible_collections.nextcloud.admin.plugins.module_utils.occ_args_common import (
-    args_spec,
+from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import (
+    extend_nc_tools_args_spec,
 )
 
 module_args_spec = dict(
@@ -127,7 +127,7 @@ def main():
     global module
 
     module = AnsibleModule(
-        argument_spec=args_spec(module_args_spec),
+        argument_spec=extend_nc_tools_args_spec(module_args_spec),
         supports_check_mode=True,
     )
     app_name = module.params.get("name")

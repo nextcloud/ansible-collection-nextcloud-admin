@@ -24,8 +24,34 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-import ansible_collections.nextcloud.admin.plugins.module_utils.occ_exceptions as occ_exceptions
+import json
+from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
+    NextcloudException,
+    OccExceptions,
+    OccAuthenticationException,
+    OccFileNotFoundException,
+    OccNoCommandsDefined,
+    OccNotEnoughArguments,
+    OccOptionRequiresValue,
+    OccOptionNotDefined,
+)
 from shlex import shlex
+from textwrap import dedent
+import copy
+
+
+NC_TOOLS_ARGS_SPEC = dict(
+    nextcloud_path=dict(
+        type="str", required=True, aliases=["path", "nc_path", "nc_dir"]
+    ),
+    php_runtime=dict(type="str", required=False, default="php", aliases=["php"]),
+)
+
+
+def extend_nc_tools_args_spec(some_module_spec):
+    arg_spec = copy.deepcopy(NC_TOOLS_ARGS_SPEC)
+    arg_spec.update(some_module_spec)
+    return arg_spec
 
 
 def convert_string(command: str) -> list:
@@ -46,7 +72,7 @@ def run_occ(
     try:
         cli_stats = os.stat(cli_full_path)
     except FileNotFoundError:
-        raise occ_exceptions.OccFileNotFoundException()
+        raise OccFileNotFoundException()
 
     if os.getuid() != cli_stats.st_uid:
         module.debug(f"DEBUG: Switching user to id {cli_stats.st_uid}.")
@@ -54,7 +80,11 @@ def run_occ(
             os.setgid(cli_stats.st_gid)
             os.setuid(cli_stats.st_uid)
         except PermissionError:
-            raise occ_exceptions.OccAuthenticationException()
+            raise OccAuthenticationException(
+                msg="Insufficient permissions to switch to user id {}.".format(
+                    cli_stats.st_uid
+                )
+            )
 
     if isinstance(command, list):
         full_command = [cli_full_path] + ["--no-ansi"] + command
@@ -77,20 +107,16 @@ def run_occ(
     if result["rc"] != 0 and result["stderr"]:
         error_msg = convert_string(result["stderr"].strip().splitlines()[0])
         if all(x in error_msg for x in ["Command", "is", "not", "defined."]):
-            raise occ_exceptions.OccNoCommandsDefined(**result)
+            raise OccNoCommandsDefined(**result)
         elif all(x in error_msg for x in ["Not", "enough", "arguments"]):
-            raise occ_exceptions.OccNotEnoughArguments(**result)
+            raise OccNotEnoughArguments(**result)
         elif all(x in error_msg for x in ["option", "does", "not", "exist."]):
-            raise occ_exceptions.OccOptionNotDefined(**result)
+            raise OccOptionNotDefined(**result)
         elif all(x in error_msg for x in ["option", "requires", "value."]):
-            raise occ_exceptions.OccOptionRequiresValue(**result)
+            raise OccOptionRequiresValue(**result)
         else:
-            raise occ_exceptions.OccExceptions(
-                msg="Failure when executing occ command.", **result
-            )
+            raise OccExceptions(msg="Failure when executing occ command.", **result)
     elif result["rc"] != 0:
-        raise occ_exceptions.OccExceptions(
-            msg="Failure when executing occ command.", **result
-        )
+        raise OccExceptions(msg="Failure when executing occ command.", **result)
 
     return result["rc"], result["stdout"], result["stderr"], maintenanceMode

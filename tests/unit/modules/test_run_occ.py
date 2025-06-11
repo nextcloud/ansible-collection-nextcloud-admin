@@ -33,7 +33,7 @@ class TestRunOccModule(unittest.TestCase):
     @patch("ansible_collections.nextcloud.admin.plugins.modules.run_occ.run_occ")
     def test_command_execution_failure(self, mock_run_occ):
         # Mock the return value of run_occ to simulate an error
-        mock_run_occ.side_effect = run_occ.occ_exceptions.OccExceptions(
+        mock_run_occ.side_effect = run_occ.OccExceptions(
             "Error occurred", rc=1, stdout="", stderr="Error"
         )
 

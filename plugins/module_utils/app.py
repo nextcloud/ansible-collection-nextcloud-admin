@@ -25,7 +25,10 @@
 
 import json
 from typing import Union
-from ansible_collections.nextcloud.admin.plugins.module_utils.occ import run_occ  # type: ignore
+from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
+    OccExceptions,
+)
+from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import run_occ  # type: ignore
 
 
 class app:
