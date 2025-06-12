@@ -109,7 +109,9 @@ class TestAppModule(TestCase):
     def test_toggle_app_exception_calls_fail_json(self, mock_app_class):
         mock_nc_app = MagicMock()
         mock_nc_app.state = "enabled"
-        mock_nc_app.toggle.side_effect = AppExceptions(msg="Failed toggle")
+        mock_nc_app.toggle.side_effect = AppExceptions(
+            msg="Failed toggle", app_name="files"
+        )
         mock_nc_app.version = "1.0.0"
         mock_app_class.return_value = mock_nc_app
 
@@ -131,7 +133,9 @@ class TestAppModule(TestCase):
     def test_install_app_exception_calls_fail_json(self, mock_app_class):
         mock_nc_app = MagicMock()
         mock_nc_app.state = "absent"
-        mock_nc_app.install.side_effect = AppExceptions(msg="Failed install")
+        mock_nc_app.install.side_effect = AppExceptions(
+            msg="Failed install", app_name="contacts"
+        )
         mock_nc_app.version = None
         mock_app_class.return_value = mock_nc_app
 
@@ -197,3 +201,99 @@ class TestAppModule(TestCase):
         mock_module.fail_json.assert_called_once()
         args, kwargs = mock_module.fail_json.call_args
         assert "Failed update" in kwargs["msg"]
+
+    @patch("ansible_collections.nextcloud.admin.plugins.modules.app.app")
+    def test_state_present_check_mode_keep_disabled(self, mock_app_class):
+        mock_nc_app = MagicMock()
+        mock_nc_app.state = "absent"
+        mock_nc_app.version = None
+        mock_app_class.return_value = mock_nc_app
+
+        mock_module = MagicMock(spec=basic.AnsibleModule)
+        mock_module.params = {"name": "contacts", "state": "disabled"}
+        mock_module.check_mode = True
+
+        with patch(
+            "ansible_collections.nextcloud.admin.plugins.modules.app.AnsibleModule",
+            return_value=mock_module,
+        ):
+            app_module.main()
+
+        mock_nc_app.install.assert_not_called()
+        mock_module.exit_json.assert_called_once_with(
+            actions_taken=["installed"],
+            version="undefined in check mode",
+            changed=True,
+        )
+
+    @patch("ansible_collections.nextcloud.admin.plugins.modules.app.app")
+    def test_state_present_check_mode_enable_app(self, mock_app_class):
+        mock_nc_app = MagicMock()
+        mock_nc_app.state = "absent"
+        mock_nc_app.version = None
+        mock_app_class.return_value = mock_nc_app
+
+        mock_module = MagicMock(spec=basic.AnsibleModule)
+        mock_module.params = {"name": "contacts", "state": "present"}
+        mock_module.check_mode = True
+
+        with patch(
+            "ansible_collections.nextcloud.admin.plugins.modules.app.AnsibleModule",
+            return_value=mock_module,
+        ):
+            app_module.main()
+
+        mock_nc_app.install.assert_not_called()
+        mock_module.exit_json.assert_called_once_with(
+            actions_taken=["installed", "enabled"],
+            version="undefined in check mode",
+            changed=True,
+        )
+
+    @patch("ansible_collections.nextcloud.admin.plugins.modules.app.app")
+    def test_state_disabled_check_mode_no_toggle(self, mock_app_class):
+        mock_nc_app = MagicMock()
+        mock_nc_app.state = "enabled"
+        mock_nc_app.version = "1.0.0"
+        mock_app_class.return_value = mock_nc_app
+
+        mock_module = MagicMock(spec=basic.AnsibleModule)
+        mock_module.params = {"name": "contacts", "state": "disabled"}
+        mock_module.check_mode = True
+
+        with patch(
+            "ansible_collections.nextcloud.admin.plugins.modules.app.AnsibleModule",
+            return_value=mock_module,
+        ):
+            app_module.main()
+
+        mock_nc_app.toggle.assert_not_called()
+        mock_module.exit_json.assert_called_once_with(
+            actions_taken=["disabled"],
+            version="1.0.0",
+            changed=True,
+        )
+
+    @patch("ansible_collections.nextcloud.admin.plugins.modules.app.app")
+    def test_state_absent_check_mode_no_remove(self, mock_app_class):
+        mock_nc_app = MagicMock()
+        mock_nc_app.state = "present"
+        mock_nc_app.version = "2.5.0"
+        mock_app_class.return_value = mock_nc_app
+
+        mock_module = MagicMock(spec=basic.AnsibleModule)
+        mock_module.params = {"name": "mail", "state": "absent"}
+        mock_module.check_mode = True
+
+        with patch(
+            "ansible_collections.nextcloud.admin.plugins.modules.app.AnsibleModule",
+            return_value=mock_module,
+        ):
+            app_module.main()
+
+        mock_nc_app.remove.assert_not_called()
+        mock_module.exit_json.assert_called_once_with(
+            actions_taken=["disabled", "removed"],
+            version="2.5.0",
+            changed=True,
+        )
