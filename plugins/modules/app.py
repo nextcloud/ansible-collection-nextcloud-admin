@@ -139,46 +139,48 @@ def main():
     app_name = module.params.get("name")
     target_state = module.params.get("state", "present")
     nc_app = app(module, app_name)
+    # case1: switch between enable/disable status
     if (target_state == "disabled" and nc_app.state == "enabled") or (
-        target_state == "enabled" and nc_app.state == "present"
+        target_state == "present" and nc_app.state == "disabled"
     ):
         if module.check_mode:
-            actions_taken = target_state
+            result["actions_taken"] = [target_state]
         else:
             try:
                 actions_taken = nc_app.toggle()
+                result["actions_taken"].append(actions_taken)
             except AppExceptions as e:
                 e.fail_json(module, **result)
-
-        result["actions_taken"].append(actions_taken)
-
-    elif target_state in ["present", "enabled", "updated"] and nc_app.state == "absent":
-        enable = target_state in ["enabled", "updated"]
+    # case2: install and maybe enable the application
+    elif (
+        target_state in ["present", "updated", "disabled"] and nc_app.state == "absent"
+    ):
+        enable = target_state != "disabled"
         if module.check_mode:
-            version = "undefined in check mode"
-            actions_taken = ["installed"]
+            result["version"] = "undefined in check mode"
+            result["actions_taken"] = ["installed"]
             if enable:
-                actions_taken.append("enabled")
+                result["actions_taken"].append("enabled")
         else:
             try:
                 version, actions_taken = nc_app.install(enable=enable)
+                if isinstance(actions_taken, list):
+                    result["actions_taken"].extend(actions_taken)
+                else:
+                    result["actions_taken"].append(actions_taken)
+                    result["version"] = version
             except AppExceptions as e:
                 e.fail_json(module, **result)
-            if isinstance(actions_taken, list):
-                result["actions_taken"].extend(actions_taken)
-            else:
-                result["actions_taken"].append(actions_taken)
-            result["version"] = version
-
+    # case3: remove the application
     elif target_state in ["absent", "removed"] and nc_app.state in [
         "disabled",
         "present",
     ]:
         if module.check_mode:
-            removed_version = nc_app.version
-            actions_taken = ["removed"]
+            result["version"] = nc_app.version
+            result["actions_taken"] = ["removed"]
             if nc_app.state == "present":
-                actions_taken.insert(0, "disabled")
+                result["actions_taken"].insert(0, "disabled")
         else:
             try:
                 actions_taken, removed_version = nc_app.remove()
@@ -189,10 +191,13 @@ def main():
                 result["version"] = removed_version
             except AppExceptions as e:
                 e.fail_json(module, **result)
-
+    # case3: update the application if posible
     elif target_state == "updated" and nc_app.state in ["enabled", "present"]:
         if nc_app.update_available:
-            if not module.check_mode:
+            if module.check_mode:
+                result["actions_taken"].append("updated")
+                result["version"] = nc_app.update_version_available
+            else:
                 try:
                     result["version"] = nc_app.update()
                     result["actions_taken"].append("updated")
