@@ -25,38 +25,124 @@
 
 
 class NextcloudException(Exception):
-    """Base class for all Nextcloud-related exceptions"""
+    """
+    Base class for all Nextcloud-related exceptions
 
-    pass
+    Attributes:
+        msg (str): Human-readable message describing the error.
+        rc (int, optional): Return code of the command that caused the exception, if applicable.
+        stdout (str, optional): Standard output from the command.
+        stderr (str, optional): Standard error output from the command.
+    """
 
-
-class OccExceptions(NextcloudException):
-    def __init__(self, msg="", rc=None, stdout=None, stderr=None):
+    def __init__(self, msg="", rc=None, stdout=None, stderr=None, **kwargs):
         super().__init__(msg)
         self.rc = rc
         self.stdout = stdout
         self.stderr = stderr
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    def fail_json(self, module, **result):
+        """
+        Fail the Ansible module with relevant debug information.
+
+        Args:
+            module: The AnsibleModule instance.
+            result: Any extra result data to include.
+        """
+        module.fail_json(
+            msg=str(self),
+            exception_class=type(self).__name__,
+            **result,
+            **self.__dict__,
+        )
+
+
+class OccExceptions(NextcloudException):
+    """
+    Exception raised for errors related to occ command execution.
+
+    Attributes:
+        occ_cmd (str): The occ command that triggered the error.
+    """
+
+    def __init__(self, occ_cmd=None, **kwargs):
+        if "msg" not in kwargs:
+            kwargs["msg"] = f"Failure when executing provided occ command."
+        super().__init__(**kwargs)
+        if occ_cmd:
+            self.occ_cmd = occ_cmd
 
 
 class OccFileNotFoundException(OccExceptions):
+    """Raised when the occ command file is not found."""
+
     pass
 
 
 class OccNoCommandsDefined(OccExceptions):
+    """Raised when the command passed to occ is not defined in the Nextcloud instance."""
+
     pass
 
 
 class OccOptionNotDefined(OccExceptions):
+    """Raised when an invalid option is passed to an occ command."""
+
     pass
 
 
 class OccNotEnoughArguments(OccExceptions):
+    """Raised when not enough arguments are supplied to an occ command."""
+
     pass
 
 
 class OccOptionRequiresValue(OccExceptions):
+    """Raised when an option passed to occ requires a value but none was provided."""
+
     pass
 
 
 class OccAuthenticationException(OccExceptions):
+    """Raised when authentication fails during occ command execution."""
+
     pass
+
+
+class AppExceptions(NextcloudException):
+    """
+    Base exception for app-related errors in Nextcloud.
+
+    Attributes:
+        app_name (str): The name of the app that triggered the error.
+    """
+
+    def __init__(self, **kwargs):
+        if "app_name" not in kwargs:
+            raise KeyError("Missing required 'app_name' for AppExceptions")
+        app_name = kwargs["app_name"]
+        if "msg" not in kwargs:
+            if "dft_msg" in kwargs:
+                base_msg = kwargs.pop("dft_msg")
+                err_full_msg = f"{base_msg} for app '{app_name}'"
+            else:
+                err_full_msg = f"Unexpected error for app '{app_name}'"
+            super().__init__(msg=err_full_msg, **kwargs)
+        else:
+            super().__init__(**kwargs)
+
+
+class AppFormNotAvailable(AppExceptions):
+    """Raised when an app does not expose an admin form via its Settings API."""
+
+    def __init__(self, **kwargs):
+        super().__init__(dft_msg=f"Admin form not available", **kwargs)
+
+
+class AppFormInvalidJson(AppExceptions):
+    """Raised when an app's getForm() method returns invalid JSON."""
+
+    def __init__(self, **kwargs):
+        super().__init__(dft_msg=f"Invalid JSON returned by getForm()", **kwargs)

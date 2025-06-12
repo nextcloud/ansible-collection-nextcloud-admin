@@ -102,6 +102,9 @@ version:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.nextcloud.admin.plugins.module_utils.app import app
+from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
+    AppExceptions,
+)
 from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import (
     extend_nc_tools_args_spec,
 )
@@ -125,7 +128,10 @@ module_args_spec = dict(
 
 def main():
     global module
-
+    result = dict(
+        actions_taken=[],
+        version=None,
+    )
     module = AnsibleModule(
         argument_spec=extend_nc_tools_args_spec(module_args_spec),
         supports_check_mode=True,
@@ -133,17 +139,69 @@ def main():
     app_name = module.params.get("name")
     target_state = module.params.get("state", "present")
     nc_app = app(module, app_name)
-    if target_state in ["present", "enabled"]:
-        result = nc_app.install()
-    elif target_state in ["absent", "removed"]:
-        result = nc_app.remove()
-    elif target_state == "updated":
-        result = nc_app.update()
-    elif target_state == "disabled":
-        if nc_app.state in ["present", "disabled"]:
-            result = nc_app.change_status("disable")
+    if (target_state == "disabled" and nc_app.state == "enabled") or (
+        target_state == "enabled" and nc_app.state == "present"
+    ):
+        if module.check_mode:
+            actions_taken = target_state
         else:
-            result = nc_app.install(enable=False)
+            try:
+                actions_taken = nc_app.toggle()
+            except AppExceptions as e:
+                e.fail_json(module, **result)
+
+        result["actions_taken"].append(actions_taken)
+
+    elif target_state in ["present", "enabled", "updated"] and nc_app.state == "absent":
+        enable = target_state in ["enabled", "updated"]
+        if module.check_mode:
+            version = "undefined in check mode"
+            actions_taken = ["installed"]
+            if enable:
+                actions_taken.append("enabled")
+        else:
+            try:
+                version, actions_taken = nc_app.install(enable=enable)
+            except AppExceptions as e:
+                e.fail_json(module, **result)
+            if isinstance(actions_taken, list):
+                result["actions_taken"].extend(actions_taken)
+            else:
+                result["actions_taken"].append(actions_taken)
+            result["version"] = version
+
+    elif target_state in ["absent", "removed"] and nc_app.state in [
+        "disabled",
+        "present",
+    ]:
+        if module.check_mode:
+            removed_version = nc_app.version
+            actions_taken = ["removed"]
+            if nc_app.state == "present":
+                actions_taken.insert(0, "disabled")
+        else:
+            try:
+                actions_taken, removed_version = nc_app.remove()
+                if isinstance(actions_taken, list):
+                    result["actions_taken"].extend(actions_taken)
+                else:
+                    result["actions_taken"].append(actions_taken)
+                result["version"] = removed_version
+            except AppExceptions as e:
+                e.fail_json(module, **result)
+
+    elif target_state == "updated" and nc_app.state in ["enabled", "present"]:
+        if nc_app.update_available:
+            if not module.check_mode:
+                try:
+                    result["version"] = nc_app.update()
+                    result["actions_taken"].append("updated")
+                except AppExceptions as e:
+                    e.fail_json(module, **result)
+
+    result.update(changed=bool(result["actions_taken"]))
+    if not result["version"]:
+        result["version"] = nc_app.version
     module.exit_json(**result)
 
 

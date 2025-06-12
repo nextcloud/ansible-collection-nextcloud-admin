@@ -137,14 +137,8 @@ def main():
             )
         )
     except OccExceptions as e:
-        module.fail_json(
-            msg=str(e),
-            exception_class=type(e).__name__,
-            **result,
-            rc=e.rc,
-            stdout=e.stdout,
-            stderr=e.stderr,
-        )
+        e.fail_json(module, **result)
+
     module.exit_json(
         changed=True,
         **result,

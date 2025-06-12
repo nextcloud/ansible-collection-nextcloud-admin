@@ -34,7 +34,11 @@ class TestRunOccModule(unittest.TestCase):
     def test_command_execution_failure(self, mock_run_occ):
         # Mock the return value of run_occ to simulate an error
         mock_run_occ.side_effect = run_occ.OccExceptions(
-            "Error occurred", rc=1, stdout="", stderr="Error"
+            msg="Error occurred",
+            rc=1,
+            stdout="",
+            stderr="Error",
+            occ_cmd="invalid-command",
         )
 
         # Create a mock AnsibleModule object
@@ -52,6 +56,7 @@ class TestRunOccModule(unittest.TestCase):
             msg="Error occurred",
             exception_class="OccExceptions",
             command="invalid-command",
+            occ_cmd="invalid-command",
             rc=1,
             stdout="",
             stderr="Error",
