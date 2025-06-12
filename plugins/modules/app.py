@@ -42,17 +42,19 @@ extends_documentation_fragment:
 
 options:
   name:
-    description: manage the following application.
+    description:
+      - Manage the following nextcloud application from the [nextcloud app store](https://apps.nextcloud.com/).
+      - Attention! Use the application `technical` name (available at the end of the app's page url).
     type: str
     required: true
 
   state:
     description:
       - The desired state for the application.
-      - If set to `present`, the application is installed and set to enabled
+      - If set to `present`, the application is installed and set to enabled.
       - If set to `absent` or `removed`, the application will be removed.
-      - If set to `disabled` while the application _is not installed_, the module will install it _but won't enable it_.
-      - `updated` will update the app if possible. It is equivalent to `install` if the app is not present.
+      - If set to `disabled`, disable the application if it is present or else install it _but do not enable it_.
+      - If set to `updated`, equivalent to `present` if the app is absent or update to the version proposed by the server.
     type: str
     choices:
     - "present"
@@ -115,7 +117,7 @@ module_args_spec = dict(
         type="str",
         required=False,
         default="present",
-        choices=["present", "absent", "removed", "enabled", "disabled", "updated"],
+        choices=["present", "absent", "removed", "disabled", "updated"],
         version=dict(
             type="str",
             required=False,
