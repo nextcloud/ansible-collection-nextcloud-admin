@@ -51,6 +51,7 @@ options:
       - The string passed directly to the occ command line.
       - Shell variable expansion is not available.
       - Shell pipelining is not supported.
+    required: true
     type: str
     aliases:
       - args
@@ -76,7 +77,7 @@ RETURN = r"""
 command:
   description: The complete line of arguments given to the occ tool.
   returned: always
-  type: string
+  type: str
 rc:
   description: The return code given by the occ tool.
   returned: always
@@ -114,6 +115,7 @@ module_args_spec = dict(
     command=dict(
         type="str",
         required=True,
+        aliases=["args"],
     ),
 )
 

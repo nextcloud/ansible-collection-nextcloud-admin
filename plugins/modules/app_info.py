@@ -73,14 +73,14 @@ nextcloud_application:
         - Either `present`, `disabled` or `absent` when the application is installed and enabled, installed and disabled or not installed.
         - If `absent`, other fields are not returned.
       returned: always
-      type: string
+      type: str
     is_shipped:
       description: If the application was shipped with the nextcloud server initially.
-      type: boolean
+      type: bool
       returned: success
     version:
       description: Current version Installed for this application.
-      type: string
+      type: str
       returned: success
     update_available:
       description: If the application has an available update.
@@ -88,11 +88,11 @@ nextcloud_application:
       returned: success
     version_available:
       description: What is the version proposed for update.
-      type: string
+      type: str
       returned: success
     app_path:
       description: The full path to the application folder.
-      type: string
+      type: str
       returned: success
 """
 
