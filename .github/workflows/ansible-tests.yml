@@ -1,0 +1,59 @@
+---
+name: Run Ansible Tests
+env:
+  PYTHON_VERSION:  '3.12'
+"on":
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  release:
+    types:
+      - published
+jobs:
+  units-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          path: ./code/ansible_collections/nextcloud/admin/
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible pytest
+
+      - name: Run units tests
+        run: |
+          ansible-test units -v --requirements --python ${{ env.PYTHON_VERSION }}
+        working-directory: ./code/ansible_collections/nextcloud/admin/
+
+  sanity-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          path: ./code/ansible_collections/nextcloud/admin/
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible pytest
+      - name: Run sanity tests
+        run: |
+          ansible-test sanity -v --requirements --python ${{ env.PYTHON_VERSION }}
+        working-directory: ./code/ansible_collections/nextcloud/admin/
