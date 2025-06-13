@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright: (c) 2024, Marc Crébassa <aalaesar@gmail.com>
@@ -131,7 +131,8 @@ class app:
         return (actions_taken, removed_version)
 
     def toggle(self) -> str:
-        assert self.state in ["enabled", "disabled"]
+        if self.state == "absent":
+            raise AssertionError("Cannot enable/disable an absent application")
         if self.state == "disabled":
             new_state = "enable"
         else:
@@ -149,7 +150,7 @@ class app:
 
     def update(self) -> str:
         try:
-            run_occ(self.module, [f"app:update", self.app_name])
+            run_occ(self.module, ["app:update", self.app_name])
         except OccExceptions as e:
             raise AppExceptions(
                 msg=f"Error while updating {self.app_name}.",

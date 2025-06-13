@@ -95,7 +95,7 @@ actions_taken:
       description:
         - Action taken and reported by the nextcloud server.
       returned: always
-      type: string
+      type: str
 version:
   description: App version present of updated on the server.
   returned: always
@@ -118,11 +118,6 @@ module_args_spec = dict(
         required=False,
         default="present",
         choices=["present", "absent", "removed", "disabled", "updated"],
-        version=dict(
-            type="str",
-            required=False,
-            default=None,
-        ),
         aliases=["status"],
     ),
 )

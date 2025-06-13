@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright: (c) 2025, Marc Crébassa <aalaesar@gmail.com>
@@ -69,7 +69,7 @@ class OccExceptions(NextcloudException):
 
     def __init__(self, occ_cmd=None, **kwargs):
         if "msg" not in kwargs:
-            kwargs["msg"] = f"Failure when executing provided occ command."
+            kwargs["msg"] = "Failure when executing provided occ command."
         super().__init__(**kwargs)
         if occ_cmd:
             self.occ_cmd = occ_cmd
@@ -138,11 +138,11 @@ class AppFormNotAvailable(AppExceptions):
     """Raised when an app does not expose an admin form via its Settings API."""
 
     def __init__(self, **kwargs):
-        super().__init__(dft_msg=f"Admin form not available", **kwargs)
+        super().__init__(dft_msg="Admin form not available", **kwargs)
 
 
 class AppFormInvalidJson(AppExceptions):
     """Raised when an app's getForm() method returns invalid JSON."""
 
     def __init__(self, **kwargs):
-        super().__init__(dft_msg=f"Invalid JSON returned by getForm()", **kwargs)
+        super().__init__(dft_msg="Invalid JSON returned by getForm()", **kwargs)
