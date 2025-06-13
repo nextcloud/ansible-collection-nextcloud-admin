@@ -24,9 +24,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-import json
 from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
-    NextcloudException,
     OccExceptions,
     OccAuthenticationException,
     OccFileNotFoundException,
@@ -36,7 +34,6 @@ from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import 
     OccOptionNotDefined,
 )
 from shlex import shlex
-from textwrap import dedent
 import copy
 
 

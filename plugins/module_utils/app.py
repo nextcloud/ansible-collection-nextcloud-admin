@@ -150,7 +150,7 @@ class app:
 
     def update(self) -> str:
         try:
-            run_occ(self.module, [f"app:update", self.app_name])
+            run_occ(self.module, ["app:update", self.app_name])
         except OccExceptions as e:
             raise AppExceptions(
                 msg=f"Error while updating {self.app_name}.",
