@@ -4,7 +4,7 @@
 
 # Ansible collection for nextcloud administration
 
-This repository hosts the `nextcloud.admin`  Ansible Collection (formerly the role `aalaesar.install_nextcloud`).
+This repository hosts the `nextcloud.admin`  Ansible Collection.
 
 The collection includes a variety of Ansible content to help automate the management of nextcloud, as well as provisioning and maintenance of instances of nextcloud.
 
@@ -39,8 +39,8 @@ nextcloud.admin.app | Manage nextcloud external applications (install, remove, d
 
 Name | Description
 --- | ---
-nextcloud.admin.backup (**beta**)|Create a backup of a Nextcloud server - formerly `aalaesar.backup_nextcloud`
-nextcloud.admin.install_nextcloud | Install and configure an Nextcloud instance for a Debian/Ubuntu server - formerly `aalaesar.install_nextcloud`
+nextcloud.admin.backup (**beta**)|Create a backup of a Nextcloud server
+nextcloud.admin.install_nextcloud | Install and configure an Nextcloud instance for a Debian/Ubuntu server
 
 <!--end collection content-->
 
@@ -77,7 +77,7 @@ You can also include it in a `requirements.yml` file and install it via `ansible
 ---
 collections:
   - name: nextcloud.admin
-    version: 2.2.1
+    version: 2.2.2
 ```
 
 ### Using modules from the Nextcloud Collection in your playbooks
@@ -111,8 +111,6 @@ If upgrading older playbooks from <2.0.0, you can minimise your changes by defin
     - name: deploy nextcloud and dependencies
       include_role:
         name: install_nextcloud
-        # previously:
-        # name: aalaesar.install_nextcloud
 ```
 
 For documentation on how to use:
