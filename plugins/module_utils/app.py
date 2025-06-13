@@ -27,6 +27,7 @@ import json
 from typing import Union
 from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
     OccExceptions,
+    AppExceptions,
 )
 from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import run_occ  # type: ignore
 
@@ -52,6 +53,7 @@ class app:
             self.version = self.all_present_apps["disabled"][app_name].split()[0]
         else:
             self.state = "absent"
+            self.version = None
         self.shipped = app_name in [
             s
             for a in self.all_shipped_apps.keys()
@@ -95,95 +97,63 @@ class app:
             result.update(app_path=self.path)
         return result
 
-    def install(self, enable: bool = True) -> dict:
-        result = {}
-        if self.state == "absent":
-            occ_args = ["app:install", self.app_name]
-            if not enable:
-                occ_args.insert(1, "--keep-disabled")
-            if self.module.check_mode:
-                result.update(version="undefined in check mode")
-                fake_actions_taken = ["installed"]
-                if enable:
-                    fake_actions_taken.append("enabled")
-                result.update(actions_taken=fake_actions_taken)
-            else:
-                action_stdout = run_occ(self.module, occ_args)[1].splitlines()
-                result.update(version=action_stdout[0].split()[1])
-                result.update(actions_taken=[a.split()[-1] for a in action_stdout])
-            result.update(changed=True)
-        elif self.state == "disabled" and enable:
-            result.update(self.change_status("enable"))
-        else:
-            result.update(version=self.version)
-            result.update(actions_taken=[])
-            result.update(changed=False)
-        return result
+    def install(self, enable: bool = True) -> tuple:
+        occ_args = ["app:install", self.app_name]
+        if not enable:
+            occ_args.insert(1, "--keep-disabled")
+        try:
+            action_stdout = run_occ(self.module, occ_args)[1].splitlines()
+        except OccExceptions as e:
+            raise AppExceptions(
+                msg=f"Error during {self.app_name} installation.",
+                app_name=self.app_name,
+                **e.__dict__,
+            )
 
-    def remove(self) -> dict:
-        result = {}
+        version = action_stdout[0].split()[1]
+        actions_taken = [a.split()[-1] for a in action_stdout]
+
+        return version, actions_taken
+
+    def remove(self) -> tuple:
         occ_args = ["app:remove", self.app_name]
-        if self.state != "absent":
-            if self.module.check_mode:
-                removed_version = self.version
-                actions_taken = ["removed"]
-                if self.state == "present":
-                    actions_taken.insert(0, "disabled")
-            else:
-                action_stdout = run_occ(self.module, command=occ_args)[1].splitlines()
-                removed_version = action_stdout[-1].split()[1]
-                actions_taken = [a.split()[-1] for a in action_stdout]
-            result.update(
-                dict(
-                    version=removed_version,
-                    actions_taken=actions_taken,
-                    changed=True,
-                )
-            )
-        else:
-            result.update(
-                dict(
-                    changed=False,
-                    actions_taken=[],
-                    version=None,
-                )
+        try:
+            action_stdout = run_occ(self.module, command=occ_args)[1].splitlines()
+        except OccExceptions as e:
+            raise AppExceptions(
+                msg=f"Error while removing {self.app_name}.",
+                app_name=self.app_name,
+                **e.__dict__,
             )
 
-        return result
+        removed_version = action_stdout[-1].split()[1]
+        actions_taken = [a.split()[-1] for a in action_stdout]
+        return (actions_taken, removed_version)
 
-    def change_status(self, status: str) -> dict:
-        result = {}
-        trgt_status = status == "enable"
-        app_status = self.state == "present"
-        if trgt_status == app_status:
-            result.update(actions_taken=[])
-            result.update(changed=False)
+    def toggle(self) -> str:
+        assert self.state in ["enabled", "disabled"]
+        if self.state == "disabled":
+            new_state = "enable"
         else:
-            if self.module.check_mode:
-                action_stdout = "enabled" if trgt_status else "disabled"
-            else:
-                action_stdout = run_occ(self.module, [f"app:{status}", self.app_name])[
-                    1
-                ]
-            result.update(actions_taken=action_stdout.splitlines()[0].split()[-1])
-            result.update(changed=True)
-        return result
-
-    def update(self) -> dict:
-        result = {}
-        if self.state == "absent":
-            result.update(self.install())
-        elif self.update_version_available:
-            if not self.module.check_mode:
-                run_occ(self.module, [f"app:update", self.app_name])
-
-            result.update(
-                dict(
-                    changed=True,
-                    version=self.update_version_available,
-                    actions_taken=["updated"],
-                )
+            new_state = "disable"
+        try:
+            action_stdout = run_occ(self.module, [f"app:{new_state}", self.app_name])[1]
+            actions_taken = action_stdout.splitlines()[0].split()[-1]
+            return actions_taken
+        except OccExceptions as e:
+            raise AppExceptions(
+                msg=f"Error while trying to {new_state} {self.app_name}.",
+                app_name=self.app_name,
+                **e.__dict__,
             )
-        else:
-            result.update(dict(changed=False, version=self.version, actions_taken=[]))
-        return result
+
+    def update(self) -> str:
+        try:
+            run_occ(self.module, [f"app:update", self.app_name])
+        except OccExceptions as e:
+            raise AppExceptions(
+                msg=f"Error while updating {self.app_name}.",
+                app_name=self.app_name,
+                **e.__dict__,
+            )
+        return self.update_version_available

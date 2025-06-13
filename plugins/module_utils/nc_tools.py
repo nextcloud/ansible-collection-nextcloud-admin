@@ -104,19 +104,20 @@ def run_occ(
     if "is not installed" in result["stderr"]:
         module.warn(result["stderr"].splitlines()[0])
 
-    if result["rc"] != 0 and result["stderr"]:
-        error_msg = convert_string(result["stderr"].strip().splitlines()[0])
+    output = result["stderr"] or result["stdout"]
+    if result["rc"] != 0 and output:
+        error_msg = convert_string(output.strip().splitlines()[0])
         if all(x in error_msg for x in ["Command", "is", "not", "defined."]):
-            raise OccNoCommandsDefined(**result)
+            raise OccNoCommandsDefined(full_command, **result)
         elif all(x in error_msg for x in ["Not", "enough", "arguments"]):
-            raise OccNotEnoughArguments(**result)
+            raise OccNotEnoughArguments(full_command, **result)
         elif all(x in error_msg for x in ["option", "does", "not", "exist."]):
-            raise OccOptionNotDefined(**result)
+            raise OccOptionNotDefined(full_command, **result)
         elif all(x in error_msg for x in ["option", "requires", "value."]):
-            raise OccOptionRequiresValue(**result)
+            raise OccOptionRequiresValue(full_command, **result)
         else:
-            raise OccExceptions(msg="Failure when executing occ command.", **result)
+            raise OccExceptions(full_command, **result)
     elif result["rc"] != 0:
-        raise OccExceptions(msg="Failure when executing occ command.", **result)
+        raise OccExceptions(full_command, **result)
 
     return result["rc"], result["stdout"], result["stderr"], maintenanceMode

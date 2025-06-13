@@ -42,17 +42,19 @@ extends_documentation_fragment:
 
 options:
   name:
-    description: manage the following application.
+    description:
+      - Manage the following nextcloud application from the [nextcloud app store](https://apps.nextcloud.com/).
+      - Attention! Use the application `technical` name (available at the end of the app's page url).
     type: str
     required: true
 
   state:
     description:
       - The desired state for the application.
-      - If set to `present`, the application is installed and set to enabled
+      - If set to `present`, the application is installed and set to enabled.
       - If set to `absent` or `removed`, the application will be removed.
-      - If set to `disabled` while the application _is not installed_, the module will install it _but won't enable it_.
-      - `updated` will update the app if possible. It is equivalent to `install` if the app is not present.
+      - If set to `disabled`, disable the application if it is present or else install it _but do not enable it_.
+      - If set to `updated`, equivalent to `present` if the app is absent or update to the version proposed by the server.
     type: str
     choices:
     - "present"
@@ -102,6 +104,9 @@ version:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.nextcloud.admin.plugins.module_utils.app import app
+from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
+    AppExceptions,
+)
 from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import (
     extend_nc_tools_args_spec,
 )
@@ -112,7 +117,7 @@ module_args_spec = dict(
         type="str",
         required=False,
         default="present",
-        choices=["present", "absent", "removed", "enabled", "disabled", "updated"],
+        choices=["present", "absent", "removed", "disabled", "updated"],
         version=dict(
             type="str",
             required=False,
@@ -125,7 +130,10 @@ module_args_spec = dict(
 
 def main():
     global module
-
+    result = dict(
+        actions_taken=[],
+        version=None,
+    )
     module = AnsibleModule(
         argument_spec=extend_nc_tools_args_spec(module_args_spec),
         supports_check_mode=True,
@@ -133,17 +141,74 @@ def main():
     app_name = module.params.get("name")
     target_state = module.params.get("state", "present")
     nc_app = app(module, app_name)
-    if target_state in ["present", "enabled"]:
-        result = nc_app.install()
-    elif target_state in ["absent", "removed"]:
-        result = nc_app.remove()
-    elif target_state == "updated":
-        result = nc_app.update()
-    elif target_state == "disabled":
-        if nc_app.state in ["present", "disabled"]:
-            result = nc_app.change_status("disable")
+    # case1: switch between enable/disable status
+    if (target_state == "disabled" and nc_app.state == "enabled") or (
+        target_state == "present" and nc_app.state == "disabled"
+    ):
+        if module.check_mode:
+            result["actions_taken"] = [target_state]
         else:
-            result = nc_app.install(enable=False)
+            try:
+                actions_taken = nc_app.toggle()
+                result["actions_taken"].append(actions_taken)
+            except AppExceptions as e:
+                e.fail_json(module, **result)
+    # case2: install and maybe enable the application
+    elif (
+        target_state in ["present", "updated", "disabled"] and nc_app.state == "absent"
+    ):
+        enable = target_state != "disabled"
+        if module.check_mode:
+            result["version"] = "undefined in check mode"
+            result["actions_taken"] = ["installed"]
+            if enable:
+                result["actions_taken"].append("enabled")
+        else:
+            try:
+                version, actions_taken = nc_app.install(enable=enable)
+                if isinstance(actions_taken, list):
+                    result["actions_taken"].extend(actions_taken)
+                else:
+                    result["actions_taken"].append(actions_taken)
+                    result["version"] = version
+            except AppExceptions as e:
+                e.fail_json(module, **result)
+    # case3: remove the application
+    elif target_state in ["absent", "removed"] and nc_app.state in [
+        "disabled",
+        "present",
+    ]:
+        if module.check_mode:
+            result["version"] = nc_app.version
+            result["actions_taken"] = ["removed"]
+            if nc_app.state == "present":
+                result["actions_taken"].insert(0, "disabled")
+        else:
+            try:
+                actions_taken, removed_version = nc_app.remove()
+                if isinstance(actions_taken, list):
+                    result["actions_taken"].extend(actions_taken)
+                else:
+                    result["actions_taken"].append(actions_taken)
+                result["version"] = removed_version
+            except AppExceptions as e:
+                e.fail_json(module, **result)
+    # case3: update the application if posible
+    elif target_state == "updated" and nc_app.state in ["enabled", "present"]:
+        if nc_app.update_available:
+            if module.check_mode:
+                result["actions_taken"].append("updated")
+                result["version"] = nc_app.update_version_available
+            else:
+                try:
+                    result["version"] = nc_app.update()
+                    result["actions_taken"].append("updated")
+                except AppExceptions as e:
+                    e.fail_json(module, **result)
+
+    result.update(changed=bool(result["actions_taken"]))
+    if not result["version"]:
+        result["version"] = nc_app.version
     module.exit_json(**result)
 
 
