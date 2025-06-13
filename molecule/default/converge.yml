@@ -30,12 +30,10 @@
     nextcloud_version_channel: "releases"
     nextcloud_get_latest: true
     nextcloud_apps:
-      calendar:
       contacts:
         source: ""
         conf:
           var_1: "no"
-      passwords:
   roles:
     - role: nextcloud.admin.install_nextcloud
   post_tasks:
