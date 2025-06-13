@@ -131,7 +131,8 @@ class app:
         return (actions_taken, removed_version)
 
     def toggle(self) -> str:
-        assert self.state in ["enabled", "disabled"]
+        if self.state == "absent":
+            raise AssertionError("Cannot enable/disable an absent application")
         if self.state == "disabled":
             new_state = "enable"
         else:
