@@ -1,8 +1,8 @@
-from ansible_collections.nextcloud.admin.plugins.module_utils.occ import (
+from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import (
     convert_string,
     run_occ,
 )
-import ansible_collections.nextcloud.admin.plugins.module_utils.occ_exceptions as occ_exceptions
+import ansible_collections.nextcloud.admin.plugins.module_utils.exceptions as occ_exceptions
 import unittest
 from unittest.mock import MagicMock, patch
 

@@ -102,13 +102,15 @@ stderr_lines:
 """
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nextcloud.admin.plugins.module_utils.occ import run_occ
-from ansible_collections.nextcloud.admin.plugins.module_utils.occ_args_common import (
-    args_spec,
+from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import (
+    run_occ,
+    extend_nc_tools_args_spec,
 )
-import ansible_collections.nextcloud.admin.plugins.module_utils.occ_exceptions as occ_exceptions
+from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
+    OccExceptions,
+)
 
-module_arg_spec = dict(
+module_args_spec = dict(
     command=dict(
         type="str",
         required=True,
@@ -120,7 +122,7 @@ def main():
     global module
 
     module = AnsibleModule(
-        argument_spec=args_spec(module_arg_spec),
+        argument_spec=extend_nc_tools_args_spec(module_args_spec),
         supports_check_mode=False,
     )
     command = module.params.get("command")
@@ -134,7 +136,7 @@ def main():
                 stderr=stdErr,
             )
         )
-    except occ_exceptions.OccExceptions as e:
+    except OccExceptions as e:
         module.fail_json(
             msg=str(e),
             exception_class=type(e).__name__,

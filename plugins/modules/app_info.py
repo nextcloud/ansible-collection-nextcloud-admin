@@ -98,8 +98,8 @@ nextcloud_application:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.nextcloud.admin.plugins.module_utils.app import app
-from ansible_collections.nextcloud.admin.plugins.module_utils.occ_args_common import (
-    args_spec,
+from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import (
+    extend_nc_tools_args_spec,
 )
 
 module_arg_spec = dict(
@@ -111,7 +111,7 @@ def main():
     global module
 
     module = AnsibleModule(
-        argument_spec=args_spec(module_arg_spec),
+        argument_spec=extend_nc_tools_args_spec(module_arg_spec),
         supports_check_mode=True,
     )
     nc_app = app(module, module.params.get("name"))

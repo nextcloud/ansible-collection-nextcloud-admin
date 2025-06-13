@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2024, Marc Crébassa <aalaesar@gmail.com>
+# Copyright: (c) 2025, Marc Crébassa <aalaesar@gmail.com>
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 
@@ -24,7 +24,13 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-class OccExceptions(Exception):
+class NextcloudException(Exception):
+    """Base class for all Nextcloud-related exceptions"""
+
+    pass
+
+
+class OccExceptions(NextcloudException):
     def __init__(self, msg="", rc=None, stdout=None, stderr=None):
         super().__init__(msg)
         self.rc = rc
