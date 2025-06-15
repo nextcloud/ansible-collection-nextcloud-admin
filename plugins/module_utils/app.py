@@ -90,7 +90,7 @@ class app:
         self._path = result
         return self._path
 
-    def get_facts(self) -> dict[str, str | bool]:
+    def get_facts(self) -> dict[str, any]:
         facts = dict(
             state=self.state,
             is_shipped=self.shipped,
