@@ -46,6 +46,12 @@ options:
     description: Collect informations for a specified nextcloud application.
     type: str
     required: true
+    aliases: ["id"]
+  show_settings:
+    description: Display application settings - default values and current values.
+    type: bool
+    required: false
+    default: false
 
 requirements:
   - "python >=3.6"
@@ -94,6 +100,21 @@ nextcloud_application:
       description: The full path to the application folder.
       type: str
       returned: success
+    appInfos:
+      description: Infos exposed by the application's manifest.
+      type: dict
+      returned: success
+    default_settings:
+      description: All the application setting and their default values.
+      type: dict
+      returned: show_settings
+    current_settings:
+      description:
+        - The app config returned by the server.
+        - Content depends on the implementation of nextcloud AppConfig APIs by the developpers.
+      type: dict
+      returned: show_settings
+
 """
 
 from ansible.module_utils.basic import AnsibleModule
@@ -101,9 +122,13 @@ from ansible_collections.nextcloud.admin.plugins.module_utils.app import app
 from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import (
     extend_nc_tools_args_spec,
 )
+from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
+    AppExceptions,
+)
 
 module_arg_spec = dict(
-    name=dict(type="str", required=True),
+    name=dict(type="str", required=True, aliases=["id"]),
+    show_settings=dict(type="bool", required=False, default=False),
 )
 
 
@@ -114,8 +139,34 @@ def main():
         argument_spec=extend_nc_tools_args_spec(module_arg_spec),
         supports_check_mode=True,
     )
+    info_keys = [
+        "id",
+        "name",
+        "summary",
+        "description",
+        "licence",
+        "author",
+        "bugs",
+        "category",
+        "types",
+        "dependencies",
+    ]
+    result = dict(AppInfos={})
     nc_app = app(module, module.params.get("name"))
-    result = nc_app.infos()
+    result.update(nc_app.get_facts())
+    # Display all appInfo if in debug or only a small list of usefull infos.
+    try:
+        if module._debug or module._verbosity >= 3:
+            result["AppInfos"].update(nc_app.infos)
+        else:
+            result["AppInfos"].update({k: nc_app.infos.get(k) for k in info_keys})
+
+        if module.params.get("show_settings"):
+            result["default_settings"] = nc_app.default_settings
+            result["current_settings"] = nc_app.current_settings
+    except AppExceptions as e:
+        e.fail_json(module, **result)
+
     module.exit_json(changed=False, **result)
 
 

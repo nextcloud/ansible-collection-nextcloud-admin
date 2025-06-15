@@ -111,6 +111,24 @@ class OccAuthenticationException(OccExceptions):
     pass
 
 
+class PhpInlineExceptions(NextcloudException):
+    """Base exception for php run in the nextcloud server."""
+
+    pass
+
+
+class PhpScriptException(PhpInlineExceptions):
+    """Raised when a php script return an error."""
+
+    pass
+
+
+class PhpResultJsonException(PhpInlineExceptions):
+    """Exception raised for php script results failing python's json deserialization."""
+
+    pass
+
+
 class AppExceptions(NextcloudException):
     """
     Base exception for app-related errors in Nextcloud.
@@ -134,15 +152,15 @@ class AppExceptions(NextcloudException):
             super().__init__(**kwargs)
 
 
-class AppFormNotAvailable(AppExceptions):
-    """Raised when an app does not expose an admin form via its Settings API."""
+class AppPSR4InfosUnavailable(AppExceptions):
+    """Raised when an app does not expose proper PSR4 Infos"""
 
     def __init__(self, **kwargs):
-        super().__init__(dft_msg="Admin form not available", **kwargs)
+        super().__init__(dft_msg="PSR-4 infos not available", **kwargs)
 
 
-class AppFormInvalidJson(AppExceptions):
+class AppPSR4InfosNotReadable(AppExceptions):
     """Raised when an app's getForm() method returns invalid JSON."""
 
     def __init__(self, **kwargs):
-        super().__init__(dft_msg="Invalid JSON returned by getForm()", **kwargs)
+        super().__init__(dft_msg="PSR-4 infos are invalid JSON", **kwargs)

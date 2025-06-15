@@ -28,13 +28,19 @@ from typing import Union
 from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
     OccExceptions,
     AppExceptions,
+    PhpInlineExceptions,
+    PhpResultJsonException,
+    AppPSR4InfosNotReadable,
+    AppPSR4InfosUnavailable,
 )
-from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import run_occ  # type: ignore
+from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import run_occ, run_php_inline  # type: ignore
 
 
 class app:
-    _update_version_available = "unchecked"
+    _update_version_available = ""
     _path = None
+    _autoloaded_infos = None
+    _current_settings = None
 
     def __init__(self, module, app_name: str):
         self.module = module
@@ -62,14 +68,14 @@ class app:
 
     @property
     def update_version_available(self) -> Union[str, None]:
-        if self._update_version_available == "unchecked":
+        if self._update_version_available == "":
             _check_app_update = run_occ(
                 self.module, ["app:update", "--showonly", self.app_name]
             )[1]
-            if _check_app_update != "":
-                result = _check_app_update.split()[-1]
-            else:
+            if _check_app_update == "" or "up-to-date" in _check_app_update:
                 result = None
+            else:
+                result = _check_app_update.split()[-1]
             self._update_version_available = result
         return self._update_version_available
 
@@ -84,18 +90,95 @@ class app:
         self._path = result
         return self._path
 
-    def infos(self):
-        result = dict(
-            name=self.app_name,
+    def get_facts(self) -> dict[str, str | bool]:
+        facts = dict(
             state=self.state,
             is_shipped=self.shipped,
         )
         if self.state != "absent":
-            result.update(update_available=self.update_available)
-            result.update(version=self.version)
-            result.update(version_available=self.update_version_available)
-            result.update(app_path=self.path)
-        return result
+            facts.update(update_available=self.update_available)
+            facts.update(version=self.version)
+            facts.update(version_available=self.update_version_available)
+            facts.update(app_path=self.path)
+        return facts
+
+    @property
+    def autoloaded_infos(self) -> dict:
+        if self._autoloaded_infos is None:
+            self._autoloaded_infos = self._get_autoloaded_infos()
+        return self._autoloaded_infos
+
+    @property
+    def infos(self) -> dict:
+        return self.autoloaded_infos.get("appInfo")
+
+    @property
+    def default_settings(self) -> dict:
+        return self.autoloaded_infos["settings"]
+
+    def _get_autoloaded_infos(self) -> dict:
+        """
+        Run inline php script that use the server autoloading system to inspect the app.
+        return a dict that contains keys: appInfo, settings.
+        setting can contain admin and personal default settings if any is available.
+        """
+        php_script = f"""
+        $appId = '{self.app_name}';
+        // Get App PSR-4 infos
+        $appManager = \\OC::$server->getAppManager();
+        $appInfo = $appManager->getAppInfo($appId);
+        $result = array(
+        'appInfo' => $appInfo,
+        'settings' => array()
+        );
+        if ($appInfo['settings']['admin']) {{
+        // get admin settings and their default values
+        $admin_settings = (\\OC::$server->get($appInfo['settings']['admin'][0]))->getForm()->getparams();
+        $result['settings']['admin'] = $admin_settings;
+        }}
+        if ($appInfo['settings']['personal']) {{
+        // get personal settings and their default values
+        $personal_settings = (\\OC::$server->get($appInfo['settings']['personal'][0]))->getForm()->getparams();
+        $result['settings']['personal'] = $personal_settings;
+        }}
+        """
+        try:
+            result = run_php_inline(self.module, php_script)
+            return result
+        except PhpResultJsonException as e:
+            raise AppPSR4InfosNotReadable(app_name=self.app_name, **e.__dict__)
+        except PhpInlineExceptions as e:
+            raise AppPSR4InfosUnavailable(app_name=self.app_name, **e.__dict__)
+
+    @property
+    def current_settings(self) -> dict[str, any]:
+        if self._current_settings is None:
+            self._current_settings = self._get_current_settings()
+        return self._current_settings
+
+    def _get_current_settings(self) -> dict[str, any]:
+        """
+        Returns the current configured settings for the app, using `occ config:list <app>`.
+        """
+        non_informative = ["installed_version", "enabled", "types"]
+        try:
+            raw_config = (
+                json.loads(run_occ(self.module, ["config:list", self.app_name])[1])
+                .get("apps", {})
+                .get(self.app_name, {})
+            )
+            return {k: v for k, v in raw_config.items() if k not in non_informative}
+        except OccExceptions as e:
+            self.module.warn(
+                f"Failed to get current config for {self.app_name}: {e.stderr}"
+            )
+            return {}
+        except Exception as e:
+            raise AppExceptions(
+                msg="Unexpected error in reading configured values.",
+                app_name=self.app_name,
+                **e.__dict__,
+            )
 
     def install(self, enable: bool = True):
         occ_args = ["app:install", self.app_name]

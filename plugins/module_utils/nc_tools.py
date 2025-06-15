@@ -25,6 +25,8 @@
 
 import os
 from multiprocessing import Process, Pipe
+import json
+from textwrap import dedent
 from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
     OccExceptions,
     OccAuthenticationException,
@@ -33,6 +35,9 @@ from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import 
     OccNotEnoughArguments,
     OccOptionRequiresValue,
     OccOptionNotDefined,
+    PhpInlineExceptions,
+    PhpScriptException,
+    PhpResultJsonException,
 )
 from shlex import shlex
 import copy
@@ -164,3 +169,52 @@ def run_occ(
         raise OccExceptions(full_command, **result)
 
     return result["rc"], result["stdout"], result["stderr"], maintenanceMode
+
+
+def run_php_inline(module, php_code: list | str) -> dict | None:
+    """
+    Interface with Nextcloud server through ad-hoc php scripts.
+    The script must define the var $result that will be exported into a python dict
+    """
+    if isinstance(php_code, list):
+        php_code = "\n".join(php_code)
+    elif isinstance(php_code, str):
+        php_code = dedent(php_code).strip()
+    else:
+        raise Exception("php_code must be a list or a string")
+
+    full_code = f"""
+    require_once 'lib/base.php';
+    {php_code}
+    if (!isset($result)) {{
+        $result = null;
+    }}
+    echo json_encode($result, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    """
+    rc, stdout, stderr = module.run_command(
+        [module.params.get("php_runtime"), "-r", full_code],
+        cwd=module.params.get("nextcloud_path"),
+    )
+    if rc != 0:
+        raise PhpScriptException(
+            msg="Failed to run the given php script.",
+            stderr=stderr,
+            stdout=stdout,
+            rc=rc,
+            php_script=full_code,
+        )
+
+    stdout = stdout.strip()
+    try:
+        result = json.loads(stdout) if stdout and stdout != "null" else None
+        return result
+    except json.JSONDecodeError as e:
+        raise PhpResultJsonException(
+            msg="Failed to decode JSON from php script stdout",
+            stderr=stderr,
+            stdout=stdout,
+            rc=rc,
+            JSONDecodeError=str(e),
+        )
+    except Exception:
+        raise PhpInlineExceptions(stderr=stderr, stdout=stdout, rc=rc)
