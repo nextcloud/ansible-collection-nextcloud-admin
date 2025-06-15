@@ -162,12 +162,12 @@ class app:
         """
         non_informative = ["installed_version", "enabled", "types"]
         try:
-            raw_config = (
-                json.loads(run_occ(self.module, ["config:list", self.app_name])[1])
-                .get("apps", {})
-                .get(self.app_name, {})
-            )
-            return {k: v for k, v in raw_config.items() if k not in non_informative}
+            raw_config = run_occ(self.module, ["config:list", self.app_name])[1]
+            occ_config = json.loads(raw_config).get("apps", {}).get(self.app_name, {})
+            if isinstance(occ_config, list) and not occ_config:
+                return {}
+            else:
+                return {k: v for k, v in occ_config.items() if k not in non_informative}
         except OccExceptions as e:
             self.module.warn(
                 f"Failed to get current config for {self.app_name}: {e.stderr}"
@@ -175,7 +175,7 @@ class app:
             return {}
         except Exception as e:
             raise AppExceptions(
-                msg="Unexpected error in reading configured values.",
+                msg=f"Unexpected error in reading configured values. {str(e)}",
                 app_name=self.app_name,
                 **e.__dict__,
             )
