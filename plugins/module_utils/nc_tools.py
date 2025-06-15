@@ -171,7 +171,7 @@ def run_occ(
     return result["rc"], result["stdout"], result["stderr"], maintenanceMode
 
 
-def run_php_inline(module, php_code: list | str) -> dict | None:
+def run_php_inline(module, php_code: str) -> dict:
     """
     Interface with Nextcloud server through ad-hoc php scripts.
     The script must define the var $result that will be exported into a python dict
