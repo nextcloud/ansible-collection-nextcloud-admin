@@ -11,14 +11,14 @@ The collection includes a variety of Ansible content to help automate the manage
 <!--start requires_ansible-->
 ## Ansible version compatibility
 
-This collection has been tested against following Ansible versions: **>=2.14.0**.
+This collection has been tested against following Ansible versions: **>=2.15.0**.
 
 Plugins and modules within a collection may be tested with only specific Ansible versions.
 <!--end requires_ansible-->
 
 ## Python Support
 
-* Collection tested on 3.11+
+* Collection tested on 3.12+
 
 ## Supported nextcloud version
 
@@ -77,7 +77,7 @@ You can also include it in a `requirements.yml` file and install it via `ansible
 ---
 collections:
   - name: nextcloud.admin
-    version: 2.2.2
+    version: 2.2.3
 ```
 
 ### Using modules from the Nextcloud Collection in your playbooks
