@@ -1,17 +1,17 @@
 ---
 repos:
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.35.1
+    rev: v1.37.1
     hooks:
       - id: yamllint
         args: ["-c=.yamllint.yml", "."]
   - repo: https://github.com/ansible-community/ansible-lint.git
-    rev: v24.5.0
+    rev: v25.6.1
     hooks:
       - id: ansible-lint
         files: \.(yaml|yml)$
   - repo: https://github.com/psf/black
-    rev: 24.4.2
+    rev: 25.1.0
     hooks:
       - id: black
-        language_version: python3.10
+        language_version: python3.13
