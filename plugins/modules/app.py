@@ -137,7 +137,7 @@ def main():
     target_state = module.params.get("state", "present")
     nc_app = app(module, app_name)
     # case1: switch between enable/disable status
-    if (target_state == "disabled" and nc_app.state == "enabled") or (
+    if (target_state == "disabled" and nc_app.state == "present") or (
         target_state == "present" and nc_app.state == "disabled"
     ):
         if module.check_mode:
@@ -189,7 +189,7 @@ def main():
             except AppExceptions as e:
                 e.fail_json(module, **result)
     # case3: update the application if posible
-    elif target_state == "updated" and nc_app.state in ["enabled", "present"]:
+    elif target_state == "updated" and nc_app.state == "present":
         if nc_app.update_available:
             if module.check_mode:
                 result["actions_taken"].append("updated")
