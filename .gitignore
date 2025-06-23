@@ -108,3 +108,5 @@ GitHub.sublime-settings
 # ansible-test ouputs
 tests/output
 .ansible
+ansible.cfg
+collections/
