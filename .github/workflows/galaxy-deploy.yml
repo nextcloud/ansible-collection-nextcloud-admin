@@ -1,0 +1,36 @@
+---
+name: Release
+env:
+  PYTHON_VERSION:  '3.12'
+"on":
+  workflow_call:
+
+jobs:
+  galaxy_deploy:
+    name: Push to ansible-galaxy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Upgrade pip
+        run: |
+          pip install --constraint=.github/workflows/constraints.txt pip
+          pip --version
+
+      - name: Release to Ansible Galaxy.
+        env:
+          ANSIBLE_GALAXY_TOKEN: ${{ secrets.GALAXY_TOKEN }}
+        run: >-
+          ansible-playbook -i 'localhost,' galaxy-deploy.yml
+          -e "github_tag=$(cat galaxy.yml|grep version:|cut -d' ' -f2)"
+          -e "ansible_namespace=$(echo ${{ github.repository }}
+          | cut -d/ -f1)"
+          -e "collection=admin"

@@ -1,26 +1,26 @@
 ---
-name: Tests latest
-
+name: molecule tests
+env:
+  PYTHON_VERSION:  '3.12'
 "on":
-  push:
-    branches:
-      - main
-  pull_request:
+  workflow_call:
+    inputs:
+      distro:
+        required: true
+        description: a debian based distribution
+        type: string
+      nc_version:
+        required: true
+        description: a nextcloud server version
+        type: string
 
 defaults:
   run:
     working-directory: "nextcloud.ansible-collection-nextcloud-admin"
 
 jobs:
-  molecule:
-    name: Molecule
+  install_nextcloud:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        distro: [debian12, debian11, ubuntu2204, ubuntu2404]
-        nc_version: [latest]
-
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -30,7 +30,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Upgrade pip
         run: |
@@ -52,5 +52,5 @@ jobs:
         env:
           PY_COLORS: "1"
           ANSIBLE_FORCE_COLOR: "1"
-          MOLECULE_DISTRO: ${{ matrix.distro }}
-          MOLECULE_NC: ${{ matrix.nc_version }}
+          MOLECULE_DISTRO: ${{ inputs.distro }}
+          MOLECULE_NC: ${{ inputs.nc_version }}

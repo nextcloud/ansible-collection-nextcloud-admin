@@ -1,19 +1,43 @@
 ---
-name: Run Ansible Tests
+name: Ansible tests
 env:
   PYTHON_VERSION:  '3.12'
 "on":
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-  release:
-    types:
-      - published
+  workflow_call:
+
 jobs:
+  lint:
+    name: ansible-lint & yaml-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@v25
+
+      - name: Set up Python 3.
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Upgrade pip
+        run: |
+          pip install --constraint=.github/workflows/constraints.txt pip
+          pip --version
+
+      - name: Upgrade yamllint
+        run: |
+          pip install --constraint=.github/workflows/constraints.txt yamllint
+
+      - name: Lint code.
+        run: |
+          yamllint -c .yamllint.yml .
+
   units-tests:
+    name: Collection unit tests
+    needs:
+      - lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -33,10 +57,13 @@ jobs:
 
       - name: Run units tests
         run: |
-          ansible-test units -v --requirements --python ${{ env.PYTHON_VERSION }}
+          ansible-test units --requirements --python ${{ env.PYTHON_VERSION }}
         working-directory: ./code/ansible_collections/nextcloud/admin/
 
   sanity-tests:
+    name: Collection's sanity tests
+    needs:
+      - lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -55,5 +82,5 @@ jobs:
           pip install ansible pytest
       - name: Run sanity tests
         run: |
-          ansible-test sanity -v --requirements --python ${{ env.PYTHON_VERSION }}
+          ansible-test sanity --requirements --python ${{ env.PYTHON_VERSION }}
         working-directory: ./code/ansible_collections/nextcloud/admin/
