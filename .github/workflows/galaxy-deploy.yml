@@ -7,7 +7,7 @@ env:
 
 jobs:
   galaxy_deploy:
-    name: Push to ansible-galaxy
+    name: Galaxy deployment
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository

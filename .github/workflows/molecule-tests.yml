@@ -20,6 +20,7 @@ defaults:
 
 jobs:
   install_nextcloud:
+    name: install_nextcloud
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository

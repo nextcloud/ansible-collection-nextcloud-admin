@@ -1,6 +1,5 @@
 ---
-name: Release
-
+name: Release-managment
 "on":
   push:
     branches:
@@ -8,7 +7,7 @@ name: Release
 
 jobs:
   check_version_change:
-    name: Check if the version in galaxy.yml has been updated
+    name: check-new-version
     runs-on: ubuntu-latest
     outputs:
       new_version: ${{ steps.check-parent-commit.outputs.new_version }}
@@ -35,11 +34,11 @@ jobs:
           else echo "::set-output name=new_version::false"; fi
 
   ansible_tests:
-    name: Collection plugins tests
+    name: test-plugins
     uses: ./.github/workflows/ansible-tests.yml
 
   full_molecule_tests:
-    name: Collection roles tests in large scope
+    name: molecule-large
     uses: ./.github/workflows/molecule-tests.yml
     needs: check_version_change
     if: ${{ needs.check_version_change.outputs.new_version and }}

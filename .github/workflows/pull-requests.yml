@@ -8,11 +8,11 @@ on:
 
 jobs:
   ansible_tests:
-    name: Collection plugins tests
+    name: plugins
     uses: ./.github/workflows/ansible-tests.yml
 
   molecule_tests:
-    name: Collection roles tests
+    name: molecule-small
     uses: ./.github/workflows/molecule-tests.yml
     needs: ansible_tests
     strategy:
