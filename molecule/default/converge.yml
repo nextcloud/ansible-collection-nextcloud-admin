@@ -29,11 +29,6 @@
     nextcloud_db_pwd: nc
     nextcloud_version_channel: "releases"
     nextcloud_get_latest: true
-    nextcloud_apps:
-      contacts:
-        source: ""
-        conf:
-          var_1: "no"
   roles:
     - role: nextcloud.admin.install_nextcloud
   post_tasks:
