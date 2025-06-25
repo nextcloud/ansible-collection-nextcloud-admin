@@ -1,0 +1,122 @@
+---
+name: collection-tests
+"on":
+  workflow_call:
+    inputs:
+      distros:
+        required: false
+        description: a list of debian based distribution
+        type: string
+        default: "['debian12', 'ubuntu2404']"
+      nc_versions:
+        required: false
+        description: a list of nextcloud server version
+        type: string
+        default: "['latest']"
+env:
+  PYTHON_VERSION: '3.12'
+jobs:
+  lint:
+    name: linters
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@v25
+
+      - name: Set up Python 3.
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Upgrade pip
+        run: |
+          pip install --constraint=.github/workflows/constraints.txt pip
+          pip --version
+
+      - name: Upgrade yamllint
+        run: |
+          pip install --constraint=.github/workflows/constraints.txt yamllint
+
+      - name: Lint code.
+        run: |
+          yamllint -c .yamllint.yml .
+
+  ansible-tests:
+    name: ansible-tests
+    needs:
+      - lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./code/ansible_collections/nextcloud/admin/
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          path: ./code/ansible_collections/nextcloud/admin/
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --constraint=.github/workflows/constraints.txt --upgrade pip
+          pip install --constraint=.github/workflows/constraints.txt ansible pytest
+
+      - name: Run units tests
+        run: |
+          ansible-test units --requirements --docker
+
+      - name: Run sanity tests
+        run: |
+          ansible-test sanity --requirements --docker
+
+  molecule_test:
+    defaults:
+      run:
+        working-directory: "nextcloud.ansible-collection-nextcloud-admin"
+    name: molecule-test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        distros: ${{ fromJson(inputs.distros)}}
+        nc_versions: ${{ fromJson(inputs.nc_versions)}}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+        with:
+          path: "nextcloud.ansible-collection-nextcloud-admin"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Upgrade pip
+        run: |
+          python3 -m pip install --constraint=.github/workflows/constraints.txt pip
+          python3 -m pip --version
+
+      - name: Install test dependencies
+        run: |
+          python3 -m pip install --constraint=.github/workflows/constraints.txt ansible 'molecule-plugins[docker]' docker netaddr PyMySQL
+
+      - name: precreate mysql database
+        run: |
+          sudo systemctl start mysql.service
+          ansible localhost -m community.mysql.mysql_db -a "name=nc login_user=root login_password=root state=present"
+          ansible localhost -m community.mysql.mysql_user -a "name=nc password=nc priv=nc.*:ALL login_user=root login_password=root state=present"
+
+      - name: Run Molecule tests
+        run: molecule test
+        env:
+          PY_COLORS: "1"
+          ANSIBLE_FORCE_COLOR: "1"
+          MOLECULE_DISTRO: ${{ matrix.distros }}
+          MOLECULE_NC: ${{ matrix.nc_versions }}
