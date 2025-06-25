@@ -35,7 +35,7 @@ class TestAppModule(TestCase):
     @patch("ansible_collections.nextcloud.admin.plugins.modules.app.app")
     def test_state_disabled_toggles_app(self, mock_app_class):
         mock_nc_app = MagicMock()
-        mock_nc_app.state = "enabled"
+        mock_nc_app.state = "present"
         mock_nc_app.toggle.return_value = "disabled"
         mock_nc_app.version = "1.0.1"
         mock_app_class.return_value = mock_nc_app
@@ -83,7 +83,7 @@ class TestAppModule(TestCase):
     @patch("ansible_collections.nextcloud.admin.plugins.modules.app.app")
     def test_state_updated_performs_update(self, mock_app_class):
         mock_nc_app = MagicMock()
-        mock_nc_app.state = "enabled"
+        mock_nc_app.state = "present"
         mock_nc_app.update_available = True
         mock_nc_app.update.return_value = "3.0.0"
         mock_nc_app.version = "2.9.0"
@@ -108,7 +108,7 @@ class TestAppModule(TestCase):
     @patch("ansible_collections.nextcloud.admin.plugins.modules.app.app")
     def test_toggle_app_exception_calls_fail_json(self, mock_app_class):
         mock_nc_app = MagicMock()
-        mock_nc_app.state = "enabled"
+        mock_nc_app.state = "present"
         mock_nc_app.toggle.side_effect = AppExceptions(
             msg="Failed toggle", app_name="files"
         )
@@ -180,7 +180,7 @@ class TestAppModule(TestCase):
     @patch("ansible_collections.nextcloud.admin.plugins.modules.app.app")
     def test_update_app_exception_calls_fail_json(self, mock_app_class):
         mock_nc_app = MagicMock()
-        mock_nc_app.state = "enabled"
+        mock_nc_app.state = "present"
         mock_nc_app.update_available = True
         mock_nc_app.update.side_effect = AppExceptions(
             msg="Failed update", app_name="deck"
@@ -253,7 +253,7 @@ class TestAppModule(TestCase):
     @patch("ansible_collections.nextcloud.admin.plugins.modules.app.app")
     def test_state_disabled_check_mode_no_toggle(self, mock_app_class):
         mock_nc_app = MagicMock()
-        mock_nc_app.state = "enabled"
+        mock_nc_app.state = "present"
         mock_nc_app.version = "1.0.0"
         mock_app_class.return_value = mock_nc_app
 

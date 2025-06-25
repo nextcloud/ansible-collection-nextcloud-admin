@@ -1,7 +1,9 @@
 ---
 ## Ansible Galaxy yamllint rules: https://github.com/ansible/galaxy/blob/devel/galaxy/importer/linters/yamllint.yaml
 extends: default
-
+ignore: |
+  .ansible
+  collections
 rules:
   braces: {max-spaces-inside: 1, level: error}
   brackets: {max-spaces-inside: 1, level: error}
