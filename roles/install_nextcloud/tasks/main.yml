@@ -8,6 +8,7 @@
 
 - name: Install PHP packages
   ansible.builtin.include_tasks: php_install.yml
+  when: nextcloud_install_php
   tags:
     - install_apps
 

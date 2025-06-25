@@ -461,10 +461,15 @@ Before the installation and configuration will start, the local 'apt' packages-c
 upgrade_packages_first: true
 ```
 **_WARNING: Current Nextcloud requires php v8.0 or later. This role is tested and installs by default the recommended version through third party repos. See more details below._**
+To skip required php setup set to false:
+```yaml
+nextcloud_install_php: true
+```
+You will need to manage required php modules and configuration by your self.
 
 Nextcloud's [supported version of php](https://docs.nextcloud.com/server/25/admin_manual/installation/system_requirements.html#server) can often not be available in your distro official repository. `php_install_external_repos` will use [geerlingguy.php-versions](https://github.com/geerlingguy/ansible-role-php-versions) role to add the appropriate third party for your distribution version.
 
-If you do not want to install the third party repository, you can set the following  variable to false, but you'll have to install php on your own before running this role.
+If you do not want to install the third party repository, you can set the following variable to false, but you have to ensure a suitable version of php is installable on your system before running this role.
 
 ```yaml
 php_install_external_repos: true

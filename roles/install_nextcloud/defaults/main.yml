@@ -21,6 +21,7 @@ nextcloud_archive_format: "zip"  # zip/tar.bz2
 # [PHP CONFIG AND EXTENSIONS]
 # PHP configs
 # by default, use references stored in defaults/php_configs.yml
+nextcloud_install_php: true
 php_install_external_repos: true
 php_ver: "8.2"
 php_dir: "/etc/php/{{ php_ver }}"
