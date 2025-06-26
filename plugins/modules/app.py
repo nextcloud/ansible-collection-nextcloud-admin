@@ -47,6 +47,8 @@ options:
       - Attention! Use the application `technical` name (available at the end of the app's page url).
     type: str
     required: true
+    aliases:
+      - "id"
 
   state:
     description:
@@ -74,7 +76,7 @@ requirements:
 EXAMPLES = r"""
 - name: Enable preinstalled contact application
   nextcloud.admin.app:
-    name: contacts
+    id: contacts
     state: present
     nextcloud_path: /var/lib/www/nextcloud
 
@@ -97,9 +99,17 @@ actions_taken:
       returned: always
       type: str
 version:
-  description: App version present of updated on the server.
+  description: App version present or updated on the server.
   returned: always
   type: str
+miscellaneous:
+  description: Informative messages sent by the server during app operation.
+  returned: when not empty
+  type: list
+  contains:
+    misc:
+      description: Something reported by the server.
+      type: str
 """
 
 from ansible.module_utils.basic import AnsibleModule
@@ -112,7 +122,7 @@ from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import (
 )
 
 module_args_spec = dict(
-    name=dict(type="str", required=True),
+    name=dict(type="str", aliases=["id"], required=True),
     state=dict(
         type="str",
         required=False,
