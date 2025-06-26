@@ -146,7 +146,7 @@ def main():
         else:
             try:
                 actions_taken, misc_msg = nc_app.toggle()
-                result["actions_taken"].append(actions_taken)
+                result["actions_taken"].extend(actions_taken)
             except AppExceptions as e:
                 e.fail_json(module, **result)
     # case2: install and maybe enable the application
@@ -162,11 +162,8 @@ def main():
         else:
             try:
                 actions_taken, misc_msg = nc_app.install(enable=enable)
-                if isinstance(actions_taken, list):
-                    result["actions_taken"].extend(actions_taken)
-                else:
-                    result["actions_taken"].append(actions_taken)
-                    result["version"] = self.version
+                result["actions_taken"].extend(actions_taken)
+                result["version"] = nc_app.version
             except AppExceptions as e:
                 e.fail_json(module, **result)
     # case3: remove the application
@@ -182,10 +179,7 @@ def main():
         else:
             try:
                 actions_taken, misc_msg = nc_app.remove()
-                if isinstance(actions_taken, list):
-                    result["actions_taken"].extend(actions_taken)
-                else:
-                    result["actions_taken"].append(actions_taken)
+                result["actions_taken"].extend(actions_taken)
             except AppExceptions as e:
                 e.fail_json(module, **result)
     # case3: update the application if posible

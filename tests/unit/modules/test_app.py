@@ -12,7 +12,7 @@ class TestAppModule(TestCase):
     def test_state_present_installs_app(self, mock_app_class):
         mock_nc_app = MagicMock()
         mock_nc_app.state = "absent"
-        mock_nc_app.install.return_value = ("1.0.0", ["installed", "enabled"])
+        mock_nc_app.install.return_value = (["installed", "enabled"], [])
         mock_nc_app.version = "1.0.0"
         mock_app_class.return_value = mock_nc_app
 
@@ -36,7 +36,7 @@ class TestAppModule(TestCase):
     def test_state_disabled_toggles_app(self, mock_app_class):
         mock_nc_app = MagicMock()
         mock_nc_app.state = "present"
-        mock_nc_app.toggle.return_value = "disabled"
+        mock_nc_app.toggle.return_value = (["disabled"], [])
         mock_nc_app.version = "1.0.1"
         mock_app_class.return_value = mock_nc_app
 
@@ -60,7 +60,7 @@ class TestAppModule(TestCase):
     def test_state_absent_removes_app(self, mock_app_class):
         mock_nc_app = MagicMock()
         mock_nc_app.state = "present"
-        mock_nc_app.remove.return_value = (["disabled", "removed"], "2.0.0")
+        mock_nc_app.remove.return_value = (["disabled", "removed"], [])
         mock_nc_app.version = "2.0.0"
         mock_app_class.return_value = mock_nc_app
 
@@ -85,7 +85,7 @@ class TestAppModule(TestCase):
         mock_nc_app = MagicMock()
         mock_nc_app.state = "present"
         mock_nc_app.update_available = True
-        mock_nc_app.update.return_value = "3.0.0"
+        mock_nc_app.update.return_value = ("2.9.0", "3.0.0")
         mock_nc_app.version = "2.9.0"
         mock_app_class.return_value = mock_nc_app
 
