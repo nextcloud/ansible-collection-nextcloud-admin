@@ -48,14 +48,11 @@ class TestAppInfoModuleWithoutSettings(TestCase):
         self.mock_module._debug = False
         self.mock_module._verbosity = 0
         self.app_infos_mock = testAppInfos
-        # Patch the AnsibleModule class and start it before each test
         self.module_patcher = patch(
             "ansible_collections.nextcloud.admin.plugins.modules.app_info.AnsibleModule"
         )
         self.mock_module_class = self.module_patcher.start()
         self.mock_module_class.return_value = self.mock_module
-
-        # Patch the App class and start it before each test
         self.app_patcher = patch(
             "ansible_collections.nextcloud.admin.plugins.modules.app_info.app"
         )
@@ -68,35 +65,39 @@ class TestAppInfoModuleWithoutSettings(TestCase):
         self.app_patcher.stop()
 
     def test_app_absent(self):
+        """
+        Test the behavior of the app_info module when the app is absent.
+        The expected result is that the module exits properly with a state indicating
+        the app is not present.
+        """
         # Mocking app instance with state 'absent'
         mock_app_instance = self.mock_app_class.return_value
         mock_app_instance.get_facts.return_value = {"state": "absent"}
         mock_app_instance.state = "absent"
 
-        # Running the module's main function
         app_info.main()
 
-        # Assert the result was as expected
         self.mock_module.exit_json.assert_called_with(
             **self.expected_result, state="absent"
         )
 
     def test_app_present_with_low_verbosity(self):
-        # Mocking app instance with state 'present' and other details
+        """
+        Test the behavior of the app_info module when the app is present
+        and the requested verbosity is not high.
+        The expected result is that the module exits properly with a state indicating
+        the app is present and display only a subset of the appInfos.
+        """
         mock_app_instance = self.mock_app_class.return_value
         mock_app_instance.get_facts.return_value = self.facts_collected
         app_info.main()
 
-        # Assert the result was as expected
         self.mock_module.exit_json.assert_called_with(
             **self.expected_result,
             **self.facts_collected,
-            AppInfos=ANY,  # Ignore the contents of AppInfos
+            AppInfos=ANY,  # Ignore the contents of AppInfos here
         )
-        # check the keys of AppInfos separately:
-        actual_args = self.mock_module.exit_json.call_args[
-            1
-        ]  # Get the keyword arguments
+        actual_args = self.mock_module.exit_json.call_args[1]
         app_infos = actual_args["AppInfos"]
         expected_keys = {
             "id",
@@ -115,7 +116,12 @@ class TestAppInfoModuleWithoutSettings(TestCase):
         )  # Check if all expected keys are present
 
     def test_app_present_with_verbosity_3_or_more(self):
-        # Mocking app instance with state 'present' and other details
+        """
+        Test the behavior of the app_info module when the app is present
+        and the requested verbosity is high.
+        The expected result is that the module exits properly with a state indicating
+        the app is present and display all the appInfos available.
+        """
         self.mock_module._debug = False
         self.mock_module._verbosity = 3
         mock_app_instance = self.mock_app_class.return_value
@@ -123,7 +129,6 @@ class TestAppInfoModuleWithoutSettings(TestCase):
 
         app_info.main()
 
-        # Assert the result was as expected
         self.mock_module.exit_json.assert_called_with(
             **self.expected_result,
             **self.facts_collected,
@@ -133,8 +138,13 @@ class TestAppInfoModuleWithoutSettings(TestCase):
 
 class TestAppInfoModuleWithSettings(TestAppInfoModuleWithoutSettings):
     def setUp(self):
+        """
+        This is just a slight variation of the normal tests when the arg show_settings
+        is set to true.
+        Adjust expected results and facts accordingly
+        """
         super().setUp(show_settings=True)
         self.mock_app_class.return_value.current_settings = {}
         self.expected_result.update(current_settings={})
-        self.mock_app_class.return_value.default_settings = []
-        self.facts_collected.update(default_settings=[])
+        self.mock_app_class.return_value.default_settings = {}
+        self.facts_collected.update(default_settings={})
