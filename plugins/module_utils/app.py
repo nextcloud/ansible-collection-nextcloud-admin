@@ -131,15 +131,22 @@ class app:
         'appInfo' => $appInfo,
         'settings' => array()
         );
-        if ($appInfo['settings']['admin']) {{
-        // get admin settings and their default values
-        $admin_settings = (\\OC::$server->get($appInfo['settings']['admin'][0]))->getForm()->getparams();
-        $result['settings']['admin'] = $admin_settings;
-        }}
-        if ($appInfo['settings']['personal']) {{
-        // get personal settings and their default values
-        $personal_settings = (\\OC::$server->get($appInfo['settings']['personal'][0]))->getForm()->getparams();
-        $result['settings']['personal'] = $personal_settings;
+        foreach (['admin', 'personal'] as $section) {{
+            if (!empty($appInfo['settings'][$section])) {{
+                $className = $appInfo['settings'][$section][0];
+                if (class_exists($className)) {{
+                    $settingsInstance = \\OC::$server->get($className);
+                    $form = $settingsInstance->getForm();
+
+                    if (method_exists($form, 'getParams')) {{
+                        $result['settings'][$section] = $form->getParams();
+                    }} else {{
+                        $result['settings'][$section] = 'Unavailable';
+                        }}
+                }} else {{
+                    $result['settings'][$section] = 'Settings not currently loaded';
+                }}
+            }}
         }}
         """
         try:
