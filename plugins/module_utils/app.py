@@ -97,7 +97,7 @@ class app:
             result.update(app_path=self.path)
         return result
 
-    def install(self, enable: bool = True) -> tuple:
+    def install(self, enable: bool = True):
         occ_args = ["app:install", self.app_name]
         if not enable:
             occ_args.insert(1, "--keep-disabled")
@@ -109,13 +109,18 @@ class app:
                 app_name=self.app_name,
                 **e.__dict__,
             )
+        actions_msg = [a for a in action_stdout if self.app_name in a]
+        misc_msg = [a for a in action_stdout if self.app_name not in a]
+        version = [a.split()[1] for a in actions_msg if "installed" in a][0]
+        actions_taken = [a.split()[-1] for a in actions_msg]
+        self.version = version
+        if enable:
+            self.state = "present"
+        else:
+            self.state = "disabled"
+        return actions_taken, misc_msg
 
-        version = action_stdout[0].split()[1]
-        actions_taken = [a.split()[-1] for a in action_stdout]
-
-        return version, actions_taken
-
-    def remove(self) -> tuple:
+    def remove(self):
         occ_args = ["app:remove", self.app_name]
         try:
             action_stdout = run_occ(self.module, command=occ_args)[1].splitlines()
@@ -125,12 +130,14 @@ class app:
                 app_name=self.app_name,
                 **e.__dict__,
             )
+        actions_msg = [a for a in action_stdout if self.app_name in a]
+        misc_msg = [a for a in action_stdout if self.app_name not in a]
+        actions_taken = [a.split()[-1] for a in actions_msg]
+        self.version = None
+        self.state = "absent"
+        return actions_taken, misc_msg
 
-        removed_version = action_stdout[-1].split()[1]
-        actions_taken = [a.split()[-1] for a in action_stdout]
-        return (actions_taken, removed_version)
-
-    def toggle(self) -> str:
+    def toggle(self):
         if self.state == "absent":
             raise AssertionError("Cannot enable/disable an absent application")
         if self.state == "disabled":
@@ -138,17 +145,26 @@ class app:
         else:
             new_state = "disable"
         try:
-            action_stdout = run_occ(self.module, [f"app:{new_state}", self.app_name])[1]
-            actions_taken = action_stdout.splitlines()[0].split()[-1]
-            return actions_taken
+            action_stdout = run_occ(self.module, [f"app:{new_state}", self.app_name])[
+                1
+            ].splitlines()
         except OccExceptions as e:
             raise AppExceptions(
                 msg=f"Error while trying to {new_state} {self.app_name}.",
                 app_name=self.app_name,
                 **e.__dict__,
             )
+        actions_msg = [a for a in action_stdout if self.app_name in a]
+        misc_msg = [a for a in action_stdout if self.app_name not in a]
+        actions_taken = [a.split()[-1] for a in actions_msg]
+        if new_state == "disable":
+            self.state = "disabled"
+        else:
+            self.state = "present"
+        return actions_taken, misc_msg
 
-    def update(self) -> str:
+    def update(self):
+        old_version = self.version
         try:
             run_occ(self.module, ["app:update", self.app_name])
         except OccExceptions as e:
@@ -157,4 +173,5 @@ class app:
                 app_name=self.app_name,
                 **e.__dict__,
             )
-        return self.update_version_available
+        self.version = self.update_version_available
+        return old_version, self.version

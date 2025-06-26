@@ -125,6 +125,7 @@ module_args_spec = dict(
 
 def main():
     global module
+    misc_msg = []
     result = dict(
         actions_taken=[],
         version=None,
@@ -144,8 +145,8 @@ def main():
             result["actions_taken"] = [target_state]
         else:
             try:
-                actions_taken = nc_app.toggle()
-                result["actions_taken"].append(actions_taken)
+                actions_taken, misc_msg = nc_app.toggle()
+                result["actions_taken"].extend(actions_taken)
             except AppExceptions as e:
                 e.fail_json(module, **result)
     # case2: install and maybe enable the application
@@ -160,12 +161,9 @@ def main():
                 result["actions_taken"].append("enabled")
         else:
             try:
-                version, actions_taken = nc_app.install(enable=enable)
-                if isinstance(actions_taken, list):
-                    result["actions_taken"].extend(actions_taken)
-                else:
-                    result["actions_taken"].append(actions_taken)
-                    result["version"] = version
+                actions_taken, misc_msg = nc_app.install(enable=enable)
+                result["actions_taken"].extend(actions_taken)
+                result["version"] = nc_app.version
             except AppExceptions as e:
                 e.fail_json(module, **result)
     # case3: remove the application
@@ -173,19 +171,15 @@ def main():
         "disabled",
         "present",
     ]:
+        result["version"] = nc_app.version
         if module.check_mode:
-            result["version"] = nc_app.version
             result["actions_taken"] = ["removed"]
             if nc_app.state == "present":
                 result["actions_taken"].insert(0, "disabled")
         else:
             try:
-                actions_taken, removed_version = nc_app.remove()
-                if isinstance(actions_taken, list):
-                    result["actions_taken"].extend(actions_taken)
-                else:
-                    result["actions_taken"].append(actions_taken)
-                result["version"] = removed_version
+                actions_taken, misc_msg = nc_app.remove()
+                result["actions_taken"].extend(actions_taken)
             except AppExceptions as e:
                 e.fail_json(module, **result)
     # case3: update the application if posible
@@ -196,11 +190,12 @@ def main():
                 result["version"] = nc_app.update_version_available
             else:
                 try:
-                    result["version"] = nc_app.update()
+                    previous_version, result["version"] = nc_app.update()
                     result["actions_taken"].append("updated")
                 except AppExceptions as e:
                     e.fail_json(module, **result)
-
+    if misc_msg:
+        result.update(miscellaneous=misc_msg)
     result.update(changed=bool(result["actions_taken"]))
     if not result["version"]:
         result["version"] = nc_app.version
