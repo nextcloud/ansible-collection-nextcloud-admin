@@ -1,7 +1,4 @@
 from unittest import TestCase
-from unittest.mock import patch, MagicMock
-
-from unittest import TestCase
 from unittest.mock import patch, MagicMock, ANY
 from ansible_collections.nextcloud.admin.plugins.modules import app_info
 from ansible.module_utils import basic
@@ -39,9 +36,15 @@ testAppInfos = {
 
 class TestAppInfoModuleWithoutSettings(TestCase):
 
-    def setUp(self):
+    def setUp(self, show_settings=False):
         self.mock_module = MagicMock(spec=basic.AnsibleModule)
-        self.mock_module.params = {"name": "photos", "show_settings": False}
+        self.expected_result = {"changed": False}
+        self.facts_collected = {
+            "state": "present",
+            "is_shipped": True,
+            "version": "1.2.3",
+        }
+        self.mock_module.params = {"name": "photos", "show_settings": show_settings}
         self.mock_module._debug = False
         self.mock_module._verbosity = 0
         self.app_infos_mock = testAppInfos
@@ -74,25 +77,20 @@ class TestAppInfoModuleWithoutSettings(TestCase):
         app_info.main()
 
         # Assert the result was as expected
-        self.mock_module.exit_json.assert_called_with(changed=False, state="absent")
+        self.mock_module.exit_json.assert_called_with(
+            **self.expected_result, state="absent"
+        )
 
     def test_app_present_with_low_verbosity(self):
         # Mocking app instance with state 'present' and other details
         mock_app_instance = self.mock_app_class.return_value
-        mock_app_instance.get_facts.return_value = {
-            "state": "present",
-            "is_shipped": True,
-            "version": "1.2.3",
-        }
-
+        mock_app_instance.get_facts.return_value = self.facts_collected
         app_info.main()
 
         # Assert the result was as expected
         self.mock_module.exit_json.assert_called_with(
-            changed=False,
-            state="present",
-            is_shipped=True,
-            version="1.2.3",
+            **self.expected_result,
+            **self.facts_collected,
             AppInfos=ANY,  # Ignore the contents of AppInfos
         )
         # check the keys of AppInfos separately:
@@ -121,19 +119,22 @@ class TestAppInfoModuleWithoutSettings(TestCase):
         self.mock_module._debug = False
         self.mock_module._verbosity = 3
         mock_app_instance = self.mock_app_class.return_value
-        mock_app_instance.get_facts.return_value = {
-            "state": "present",
-            "is_shipped": True,
-            "version": "1.2.3",
-        }
+        mock_app_instance.get_facts.return_value = self.facts_collected
 
         app_info.main()
 
         # Assert the result was as expected
         self.mock_module.exit_json.assert_called_with(
-            changed=False,
-            state="present",
-            is_shipped=True,
-            version="1.2.3",
+            **self.expected_result,
+            **self.facts_collected,
             AppInfos=testAppInfos,
         )
+
+
+class TestAppInfoModuleWithSettings(TestAppInfoModuleWithoutSettings):
+    def setUp(self):
+        super().setUp(show_settings=True)
+        self.mock_app_class.return_value.current_settings = {}
+        self.expected_result.update(current_settings={})
+        self.mock_app_class.return_value.default_settings = []
+        self.facts_collected.update(default_settings=[])
