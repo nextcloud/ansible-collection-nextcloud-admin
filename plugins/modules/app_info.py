@@ -48,7 +48,9 @@ options:
     required: true
     aliases: ["id"]
   show_settings:
-    description: Display application settings - default values and current values.
+    description:
+      - EXPERIMENTAL.
+      - Display application settings - default values and current values.
     type: bool
     required: false
     default: false
