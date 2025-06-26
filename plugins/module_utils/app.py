@@ -152,6 +152,9 @@ class app:
         """
         try:
             result = run_php_inline(self.module, php_script)
+            # force the 'settings' key to be dict if it is empty
+            if isinstance(result["settings"], list) and not result["settings"]:
+                result["settings"] = {}
             return result
         except PhpResultJsonException as e:
             raise AppPSR4InfosNotReadable(app_name=self.app_name, **e.__dict__)
