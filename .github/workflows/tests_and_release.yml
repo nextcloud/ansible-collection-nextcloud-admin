@@ -16,7 +16,7 @@ jobs:
       new_version: ${{ steps.check-galaxy-version.outputs.new_version }}
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 2
       - name: 'Get Previous tag'
@@ -96,7 +96,7 @@ jobs:
     needs: tag_release
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
