@@ -20,7 +20,7 @@ jobs:
     name: linters
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Run ansible-lint
@@ -54,7 +54,7 @@ jobs:
         working-directory: ./code/ansible_collections/nextcloud/admin/
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: ./code/ansible_collections/nextcloud/admin/
           fetch-depth: 0
@@ -89,7 +89,7 @@ jobs:
         nc_versions: ${{ fromJson(inputs.nc_versions)}}
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: "nextcloud.ansible-collection-nextcloud-admin"
 
