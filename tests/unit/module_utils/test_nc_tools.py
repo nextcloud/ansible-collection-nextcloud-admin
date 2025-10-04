@@ -1,5 +1,6 @@
 from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import (
     convert_string,
+    execute_occ_command,
     run_occ,
 )
 import ansible_collections.nextcloud.admin.plugins.module_utils.exceptions as occ_exceptions
@@ -50,6 +51,82 @@ class TestConvertString(unittest.TestCase):
         )
 
 
+class TestExecuteOccCommand(unittest.TestCase):
+    def setUp(self):
+        self.mock_conn = MagicMock()
+        self.module = MagicMock()
+        self.mock_stat = patch("os.stat").start()
+        self.mock_getuid = patch("os.getuid").start()
+        self.mock_getgid = patch("os.getgid").start()
+        self.mock_setuid = patch("os.setuid").start()
+        self.mock_setgid = patch("os.setgid").start()
+        self.mock_stat.return_value.st_uid = 1234
+        self.mock_stat.return_value.st_gid = 1234
+        self.mock_getuid.return_value = 1234
+        self.mock_getgid.return_value = 1234
+        self.addCleanup(patch.stopall)
+        self.module.run_command.return_value = (0, "output", "")
+
+    def test_execute_occ_command_success(self):
+        execute_occ_command(
+            self.mock_conn, self.module, "/path/to/php", ["/path/to/occ", "command"]
+        )
+
+        self.mock_conn.send.assert_called_once_with(
+            {"rc": 0, "stdout": "output", "stderr": ""}
+        )
+
+    def test_change_uid_execute_occ_command_success(self):
+        self.mock_getuid.return_value = 0
+        self.mock_getgid.return_value = 0
+
+        execute_occ_command(
+            self.mock_conn, self.module, "/path/to/php", ["/path/to/occ", "command"]
+        )
+
+        self.mock_conn.send.assert_called_once_with(
+            {"rc": 0, "stdout": "output", "stderr": ""}
+        )
+        self.mock_setuid.assert_called_with(1234)
+        self.mock_setgid.assert_called_with(1234)
+
+    def test_occ_command_FileNotFoundError(self):
+        self.mock_stat.side_effect = FileNotFoundError
+
+        execute_occ_command(
+            self.mock_conn, self.module, "/path/to/php", ["/path/to/occ", "command"]
+        )
+
+        self.mock_conn.send.assert_called_once_with(
+            {"exception": "OccFileNotFoundException"}
+        )
+
+    def test_occ_command_PermissionError(self):
+        self.mock_getuid.return_value = 0
+        self.mock_getgid.return_value = 0
+        self.mock_setuid.side_effect = PermissionError
+
+        execute_occ_command(
+            self.mock_conn, self.module, "/path/to/php", ["/path/to/occ", "command"]
+        )
+
+        self.mock_conn.send.assert_called_once_with(
+            {
+                "exception": "OccAuthenticationException",
+                "msg": "Insufficient permissions to switch to user id 1234.",
+            }
+        )
+
+    def test_occ_command_AnyError(self):
+        self.mock_getuid.side_effect = Exception("TKIAL")
+
+        execute_occ_command(
+            self.mock_conn, self.module, "/path/to/php", ["/path/to/occ", "command"]
+        )
+
+        self.mock_conn.send.assert_called_once_with({"exception": "TKIAL"})
+
+
 class TestRunOcc(unittest.TestCase):
 
     def setUp(self):
@@ -60,16 +137,29 @@ class TestRunOcc(unittest.TestCase):
             "php_runtime": "/usr/bin/php",
         }
 
-    @patch("os.stat")
-    @patch("os.getuid")
-    @patch("os.setgid")
-    @patch("os.setuid")
-    def test_run_occ_success(self, mock_setuid, mock_setgid, mock_getuid, mock_stat):
-        # Setup mocks
-        mock_stat.return_value.st_uid = 1000
-        mock_stat.return_value.st_gid = 1000
-        mock_getuid.return_value = 1001
-        self.module.run_command.return_value = (0, "Success", "")
+        self.mock_process = patch(
+            "ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools.Process"
+        ).start()
+        self.mock_instance = self.mock_process.return_value
+        self.mock_instance.start.return_value = None
+        self.mock_instance.join.return_value = None
+
+        self.mock_pipe_parent, self.mock_pipe_child = MagicMock(), MagicMock()
+        patcher_pipe = patch(
+            "ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools.Pipe",
+            return_value=(self.mock_pipe_parent, self.mock_pipe_child),
+        )
+        patcher_pipe.start()
+
+        self.mock_pipe_parent.recv.return_value = {
+            "rc": 0,
+            "stdout": "Success",
+            "stderr": "",
+        }
+
+        self.addCleanup(patch.stopall)
+
+    def test_run_occ_success(self):
 
         # Call the function
         returnCode, stdOut, stdErr, maintenanceMode = run_occ(self.module, "status")
@@ -79,21 +169,14 @@ class TestRunOcc(unittest.TestCase):
         self.assertEqual(stdOut, "Success")
         self.assertEqual(stdErr, "")
         self.assertFalse(maintenanceMode)
-        mock_setgid.assert_called_once_with(1000)
-        mock_setuid.assert_called_once_with(1000)
 
-    @patch("os.stat")
-    @patch("os.getuid")
-    def test_run_occ_maintenance_mode(self, mock_getuid, mock_stat):
+    def test_run_occ_maintenance_mode(self):
         # Setup mocks
-        mock_stat.return_value.st_uid = 1000
-        mock_stat.return_value.st_gid = 1000
-        mock_getuid.return_value = 1000
-        self.module.run_command.return_value = (
-            0,
-            "",
-            "Nextcloud is in maintenance mode, no apps are loaded.",
-        )
+        self.mock_pipe_parent.recv.return_value = {
+            "rc": 0,
+            "stdout": "",
+            "stderr": "Nextcloud is in maintenance mode, no apps are loaded.",
+        }
 
         # Call the function
         returnCode, stdOut, stdErr, maintenanceMode = run_occ(self.module, "status")
@@ -107,117 +190,69 @@ class TestRunOcc(unittest.TestCase):
         self.assertIn("maintenance mode", stdErr)
         self.assertTrue(maintenanceMode)
 
-    @patch("os.stat")
-    @patch("os.getuid", return_value=1000)
-    def test_file_not_found_exception(self, mock_getuid, mock_stat):
+    def test_file_not_found_exception(self):
         # Simulate FileNotFoundError when accessing the occ file
-        mock_stat.side_effect = FileNotFoundError
+        self.mock_pipe_parent.recv.return_value = {
+            "exception": "OccFileNotFoundException",
+            "msg": "",
+        }
 
         with self.assertRaises(occ_exceptions.OccFileNotFoundException):
             run_occ(self.module, "status")
 
-    @patch("os.stat")
-    @patch("os.setuid")
-    @patch("os.setgid")
-    @patch("os.getuid", return_value=1000)
-    def test_authentication_exception(
-        self, mock_getuid, mock_setgid, mock_setuid, mock_stat
-    ):
+    def test_authentication_exception(self):
         # Simulate PermissionError when trying to change user
-        mock_stat.return_value.st_uid = 2000
-        mock_stat.return_value.st_gid = 2000
-        mock_setuid.side_effect = PermissionError
+        self.mock_pipe_parent.recv.return_value = {
+            "exception": "OccAuthenticationException",
+            "msg": "",
+        }
 
         with self.assertRaises(occ_exceptions.OccAuthenticationException):
             run_occ(self.module, "status")
 
-    @patch("os.stat")
-    @patch("os.setuid")
-    @patch("os.setgid")
-    @patch("os.getuid", return_value=1000)
-    def test_no_commands_defined_exception(
-        self, mock_getuid, mock_setgid, mock_setuid, mock_stat
-    ):
-        # Mock successful stat call and simulate command execution error
-        mock_stat.return_value.st_uid = 1000
-        mock_stat.return_value.st_gid = 1000
-        self.module.run_command.return_value = (1, "", "Command 'foo' is not defined.")
+    def test_no_commands_defined_exception(self):
+        # simulate command execution error
+        self.mock_pipe_parent.recv.return_value = {
+            "rc": 1,
+            "stdout": "",
+            "stderr": "Command 'foo' is not defined.",
+        }
 
         with self.assertRaises(occ_exceptions.OccNoCommandsDefined):
             run_occ(self.module, "foo")
 
-    @patch("os.stat")
-    @patch("os.setuid")
-    @patch("os.setgid")
-    @patch("os.getuid", return_value=1000)
-    def test_not_enough_arguments_exception(
-        self, mock_getuid, mock_setgid, mock_setuid, mock_stat
-    ):
-        # Mock successful stat call and simulate command execution error
-        mock_stat.return_value.st_uid = 1000
-        mock_stat.return_value.st_gid = 1000
-        self.module.run_command.return_value = (
-            1,
-            "",
-            'Not enough arguments (missing: "bar").',
-        )
-
+    def test_not_enough_arguments_exception(self):
+        # simulate command execution error
+        self.mock_pipe_parent.recv.return_value = {
+            "rc": 1,
+            "stdout": "",
+            "stderr": 'Not enough arguments (missing: "bar").',
+        }
         with self.assertRaises(occ_exceptions.OccNotEnoughArguments):
             run_occ(self.module, "foo")
 
-    @patch("os.stat")
-    @patch("os.setuid")
-    @patch("os.setgid")
-    @patch("os.getuid", return_value=1000)
-    def test_option_not_defined_exception(
-        self, mock_getuid, mock_setgid, mock_setuid, mock_stat
-    ):
-        # Mock successful stat call and simulate command execution error
-        mock_stat.return_value.st_uid = 1000
-        mock_stat.return_value.st_gid = 1000
-        self.module.run_command.return_value = (
-            1,
-            "",
-            "The option '--baz' does not exist.",
-        )
+    def test_option_not_defined_exception(self):
+        self.mock_pipe_parent.recv.return_value = {
+            "rc": 1,
+            "stdout": "",
+            "stderr": "The option '--baz' does not exist.",
+        }
 
         with self.assertRaises(occ_exceptions.OccOptionNotDefined):
             run_occ(self.module, "foo --baz")
 
-    @patch("os.stat")
-    @patch("os.setuid")
-    @patch("os.setgid")
-    @patch("os.getuid", return_value=1000)
-    def test_option_requires_value_exception(
-        self, mock_getuid, mock_setgid, mock_setuid, mock_stat
-    ):
-        # Mock successful stat call and simulate command execution error
-        mock_stat.return_value.st_uid = 1000
-        mock_stat.return_value.st_gid = 1000
-        self.module.run_command.return_value = (
-            1,
-            "",
-            "The option '--baz' requires a value.",
-        )
+    def test_option_requires_value_exception(self):
+        self.mock_pipe_parent.recv.return_value = {
+            "rc": 1,
+            "stdout": "",
+            "stderr": "The option '--baz' requires a value.",
+        }
 
         with self.assertRaises(occ_exceptions.OccOptionRequiresValue):
             run_occ(self.module, "foo --baz")
 
-    @patch("os.stat")
-    @patch("os.setuid")
-    @patch("os.setgid")
-    @patch("os.getuid", return_value=1000)
-    def test_empty_msg_exception(
-        self, mock_getuid, mock_setgid, mock_setuid, mock_stat
-    ):
-        # Mock successful stat call and simulate command execution error
-        mock_stat.return_value.st_uid = 1000
-        mock_stat.return_value.st_gid = 1000
-        self.module.run_command.return_value = (
-            1,
-            "",
-            "",
-        )
+    def test_empty_msg_exception(self):
+        self.mock_pipe_parent.recv.return_value = {"rc": 1, "stdout": "", "stderr": ""}
 
         with self.assertRaises(occ_exceptions.OccExceptions):
             run_occ(self.module, "foo --baz")
