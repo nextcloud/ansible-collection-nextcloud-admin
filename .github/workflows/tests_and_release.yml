@@ -62,7 +62,7 @@ jobs:
     if: (needs.check_version_change.outputs.new_version == true) && (github.ref_name == 'main')
     with:
       distros: "['debian12', 'debian11', 'ubuntu2204', 'ubuntu2404']"
-      nc_versions: "['latest', 'nc30', 'nc29']"
+      nc_versions: "['latest', 'nc31', 'nc30']"
 
   collection_tests:
     name: normal tests
