@@ -77,7 +77,7 @@ You can also include it in a `requirements.yml` file and install it via `ansible
 ---
 collections:
   - name: nextcloud.admin
-    version: 2.2.3
+    version: 2.2.4
 ```
 
 ### Using modules from the Nextcloud Collection in your playbooks

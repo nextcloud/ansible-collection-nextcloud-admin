@@ -46,7 +46,8 @@ jobs:
             return 1
           }
           set -x
-          galaxy_version=$(git diff HEAD~ HEAD -- galaxy.yml | grep 'version:' || true | awk '{ print $2}')
+          [ "$current_version" -eq "9.9.9.9" ] && unset current_version
+          galaxy_version=$(git diff HEAD~ HEAD -- galaxy.yml | grep 'version:' | awk '{ print $2}' || true)
           if [ -z "$galaxy_version" ]; then
             echo "new_version=false" >> $GITHUB_OUTPUT
           elif $(compare_semver "$galaxy_version" "$current_version"); then
