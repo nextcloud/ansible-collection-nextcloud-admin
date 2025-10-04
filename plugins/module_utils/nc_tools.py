@@ -118,7 +118,7 @@ def run_occ(
     elif isinstance(command, str):
         full_command = [cli_full_path, "--no-ansi"] + convert_string(command)
 
-    ## execute the occ command in a child process to keep current privileges
+    # execute the occ command in a child process to keep current privileges
     module_conn, occ_conn = Pipe()
     p = Process(
         target=execute_occ_command, args=(occ_conn, module, php_exec, full_command)
@@ -132,11 +132,11 @@ def run_occ(
         exception_type = result["exception"]
         # raise the proper exception.
         if exception_type == "OccFileNotFoundException":
-            raise FileNotFoundError("The specified file was not found.")
+            raise OccFileNotFoundException(full_command)
         elif exception_type == "OccAuthenticationException":
-            raise PermissionError(result.get("msg", "Authentication failed."))
+            raise OccAuthenticationException(full_command, **result)
         else:
-            raise Exception(f"An unknown error occurred: {exception_type}")
+            raise OccExceptions(f"An unknown error occurred: {exception_type}")
 
     if "is in maintenance mode" in result["stderr"]:
         module.warn(" ".join(result["stderr"].splitlines()[0:1]))
