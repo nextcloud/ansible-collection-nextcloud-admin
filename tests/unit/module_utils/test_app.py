@@ -1,0 +1,98 @@
+from unittest import TestCase
+from unittest.mock import patch, MagicMock, ANY
+from ansible_collections.nextcloud.admin.plugins.module_utils import app, exceptions
+from ansible.module_utils import basic
+import unittest.main
+import json
+
+
+class TestApp(TestCase):
+
+    def setUp(self):
+        self.app_name = "test_app"
+        self.app_version = "1.0.0"
+        self.mock_run_occ = MagicMock()
+        self.run_occ_patcher = patch(
+            "ansible_collections.nextcloud.admin.plugins.module_utils.app.run_occ",
+            self.mock_run_occ,
+        )
+        self.run_occ_patcher.start()
+
+        self.mock_ansible_module = MagicMock()
+        self.module_patcher = patch(
+            "ansible.module_utils.basic.AnsibleModule", self.mock_ansible_module
+        )
+        self.module_patcher.start()
+        self.mock_ansible_module.params = {
+            "nextcloud_path": "/path/to/nextcloud",
+            "php_runtime": "/usr/bin/php",
+            "id": self.app_name,
+        }
+        self.app_instance = self._init_app()
+
+    def tearDown(self):
+        self.run_occ_patcher.stop()
+        self.module_patcher.stop()
+
+    def _init_app(
+        self, shipped: bool = False, enabled: bool = True, present: bool = True
+    ):
+        # init values
+        shipped_app_list = {
+            "enabled": {"enabled_shipped_app": "0.5.5"},
+            "disabled": {"disabled_shipped_app": "0.5.0"},
+        }
+        ext_app_list = {
+            "enabled": {"enabled_external_app": "0.6.6"},
+            "disabled": {"disabled_external_app": "0.6.0"},
+        }
+
+        status = "enabled" if enabled else "disabled"
+        if present or shipped:
+            if shipped:
+                shipped_app_list[status][self.app_name] = self.app_version
+            else:
+                ext_app_list[status][self.app_name] = self.app_version
+        app_list = {
+            "enabled": {**shipped_app_list["enabled"], **ext_app_list["enabled"]},
+            "disabled": {**shipped_app_list["disabled"], **ext_app_list["disabled"]},
+        }
+        self.mock_run_occ.side_effect = [
+            (0, json.dumps(shipped_app_list)),
+            (0, json.dumps(app_list)),
+        ]
+        return app.app(self.mock_ansible_module, self.app_name)
+
+    def test_init_app_shipped_and_enabled(self):
+        app_instance = self._init_app(shipped=True, enabled=True)
+        self.assertEqual(app_instance.state, "present")
+        self.assertEqual(app_instance.version, "1.0.0")
+        self.assertTrue(app_instance.shipped)
+
+    def test_init_app_shipped_and_disabled_(self):
+        app_instance = self._init_app(shipped=True, enabled=False)
+        self.assertEqual(app_instance.state, "disabled")
+        self.assertEqual(app_instance.version, "1.0.0")
+        self.assertTrue(app_instance.shipped)
+
+    def test_init_app_external_and_absent(self):
+        app_instance = self._init_app(present=False)
+        self.assertEqual(app_instance.state, "absent")
+        self.assertEqual(app_instance.version, None)
+        self.assertFalse(app_instance.shipped)
+
+    def test_init_app_external_and_disabled_(self):
+        app_instance = self._init_app(enabled=False)
+        self.assertEqual(app_instance.state, "disabled")
+        self.assertEqual(app_instance.version, "1.0.0")
+        self.assertFalse(app_instance.shipped)
+
+    def test_init_app_external_and_enabled(self):
+        app_instance = self._init_app()
+        self.assertEqual(app_instance.state, "present")
+        self.assertEqual(app_instance.version, "1.0.0")
+        self.assertFalse(app_instance.shipped)
+
+
+if __name__ == "__main__":
+    unittest.main()
