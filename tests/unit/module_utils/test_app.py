@@ -37,6 +37,26 @@ class TestApp(TestCase):
     def _init_app(
         self, shipped: bool = False, enabled: bool = True, present: bool = True
     ):
+        """
+        Generate a mocked app object to make unit tests on, based on the provided parameters.
+
+        It simulate some context within a Nextcloud server instance used by the app constructor
+        by planning the mock behavior of run_occ module_util during _init_ phase.
+        It prepares two lists of apps (enabled and disabled): one for shipped apps
+        and another for external apps.
+        The fake test_app is inserted into the proper list before combining thoses to form
+        a complete representation of the app environment.
+
+        Args:
+            shipped (bool): Indicates whether the app is shipped with Nextcloud.
+                            Defaults to False.
+            enabled (bool): Indicates whether the app should be enabled. Defaults to True.
+            present (bool): Indicates whether the app is present in the system.
+                            Defaults to True.
+
+        Returns:
+            The mocked app object to test on.
+        """
         # init values
         shipped_app_list = {
             "enabled": {"enabled_shipped_app": "0.5.5"},
