@@ -2,10 +2,18 @@ from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import (
     convert_string,
     execute_occ_command,
     run_occ,
+    run_php_inline,
 )
 import ansible_collections.nextcloud.admin.plugins.module_utils.exceptions as occ_exceptions
 import unittest
 from unittest.mock import MagicMock, patch
+
+# Mock the module object with necessary parameters
+mocked_module = MagicMock()
+mocked_module.params = {
+    "nextcloud_path": "/path/to/nextcloud",
+    "php_runtime": "/usr/bin/php",
+}
 
 
 class TestConvertString(unittest.TestCase):
@@ -130,13 +138,6 @@ class TestExecuteOccCommand(unittest.TestCase):
 class TestRunOcc(unittest.TestCase):
 
     def setUp(self):
-        # Mock the module object with necessary parameters
-        self.module = MagicMock()
-        self.module.params = {
-            "nextcloud_path": "/path/to/nextcloud",
-            "php_runtime": "/usr/bin/php",
-        }
-
         self.mock_process = patch(
             "ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools.Process"
         ).start()
@@ -162,7 +163,7 @@ class TestRunOcc(unittest.TestCase):
     def test_run_occ_success(self):
 
         # Call the function
-        returnCode, stdOut, stdErr, maintenanceMode = run_occ(self.module, "status")
+        returnCode, stdOut, stdErr, maintenanceMode = run_occ(mocked_module, "status")
 
         # Assertions
         self.assertEqual(returnCode, 0)
@@ -179,10 +180,10 @@ class TestRunOcc(unittest.TestCase):
         }
 
         # Call the function
-        returnCode, stdOut, stdErr, maintenanceMode = run_occ(self.module, "status")
+        returnCode, stdOut, stdErr, maintenanceMode = run_occ(mocked_module, "status")
 
         # Assertions
-        self.module.warn.assert_called_once_with(
+        mocked_module.warn.assert_called_once_with(
             "Nextcloud is in maintenance mode, no apps are loaded."
         )
         self.assertEqual(returnCode, 0)
@@ -198,7 +199,7 @@ class TestRunOcc(unittest.TestCase):
         }
 
         with self.assertRaises(occ_exceptions.OccFileNotFoundException):
-            run_occ(self.module, "status")
+            run_occ(mocked_module, "status")
 
     def test_authentication_exception(self):
         # Simulate PermissionError when trying to change user
@@ -208,7 +209,7 @@ class TestRunOcc(unittest.TestCase):
         }
 
         with self.assertRaises(occ_exceptions.OccAuthenticationException):
-            run_occ(self.module, "status")
+            run_occ(mocked_module, "status")
 
     def test_no_commands_defined_exception(self):
         # simulate command execution error
@@ -219,7 +220,7 @@ class TestRunOcc(unittest.TestCase):
         }
 
         with self.assertRaises(occ_exceptions.OccNoCommandsDefined):
-            run_occ(self.module, "foo")
+            run_occ(mocked_module, "foo")
 
     def test_not_enough_arguments_exception(self):
         # simulate command execution error
@@ -229,7 +230,7 @@ class TestRunOcc(unittest.TestCase):
             "stderr": 'Not enough arguments (missing: "bar").',
         }
         with self.assertRaises(occ_exceptions.OccNotEnoughArguments):
-            run_occ(self.module, "foo")
+            run_occ(mocked_module, "foo")
 
     def test_option_not_defined_exception(self):
         self.mock_pipe_parent.recv.return_value = {
@@ -239,7 +240,7 @@ class TestRunOcc(unittest.TestCase):
         }
 
         with self.assertRaises(occ_exceptions.OccOptionNotDefined):
-            run_occ(self.module, "foo --baz")
+            run_occ(mocked_module, "foo --baz")
 
     def test_option_requires_value_exception(self):
         self.mock_pipe_parent.recv.return_value = {
@@ -249,13 +250,47 @@ class TestRunOcc(unittest.TestCase):
         }
 
         with self.assertRaises(occ_exceptions.OccOptionRequiresValue):
-            run_occ(self.module, "foo --baz")
+            run_occ(mocked_module, "foo --baz")
 
     def test_empty_msg_exception(self):
         self.mock_pipe_parent.recv.return_value = {"rc": 1, "stdout": "", "stderr": ""}
 
         with self.assertRaises(occ_exceptions.OccExceptions):
-            run_occ(self.module, "foo --baz")
+            run_occ(mocked_module, "foo --baz")
+
+
+class TestRunPhpInline(unittest.TestCase):
+
+    def test_run_php_inline_return_dict(self):
+        mocked_module.run_command.return_value = (0, '{"output": true}', "")
+        result = run_php_inline(mocked_module, "fu bar")
+        self.assertEqual(result, dict(output=True))
+
+    def test_run_php_inline_return_none(self):
+        mocked_module.run_command.return_value = (0, "null", "")
+        result = run_php_inline(mocked_module, "fu bar")
+        self.assertEqual(result, None)
+
+    def test_run_php_inline_php_error(self):
+        mocked_module.run_command.return_value = (1, "null", "")
+        with self.assertRaises(occ_exceptions.PhpScriptException):
+            result = run_php_inline(mocked_module, "fu bar")
+
+    def test_run_php_inline_json_decode_error(self):
+        mocked_module.run_command.return_value = (1, "not some json", "")
+        with self.assertRaises(occ_exceptions.PhpResultJsonException):
+            result = run_php_inline(mocked_module, "fu bar")
+
+    @patch("json.loads")
+    def test_run_php_inline_json_decode_error(self, mocked_json_loads):
+        mocked_module.run_command.return_value = (1, "{not null}", "")
+        mocked_json_loads.side_effect = KeyError
+        with self.assertRaises(occ_exceptions.PhpInlineExceptions):
+            result = run_php_inline(mocked_module, "fu bar")
+
+    def test_run_php_inline_refuse_bad_params(self):
+        with self.assertRaises(Exception):
+            result = run_php_inline(mocked_module, dict(fu=bar))
 
 
 if __name__ == "__main__":
