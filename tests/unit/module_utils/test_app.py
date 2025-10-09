@@ -136,6 +136,27 @@ class TestApp(TestCase):
         app_path = self.app_instance.path
         self.assertEqual(app_path, "/var/www/nextcloud/apps/test_app")
 
+    def test_get_facts_absent_app(self):
+        app_instance = self._init_app(present=False)
+        facts = app_instance.get_facts()
+        self.assertEqual(facts, {"state": "absent", "is_shipped": False})
+
+    def test_get_facts_present_app(self):
+        self.mock_run_occ.side_effect = [
+            (0, f"{self.app_name} new version available: 1.1.0"),
+            (0, "/var/www/nextcloud/apps/test_app"),
+        ]
+        expected_facts = dict(
+            state="present",
+            version=self.app_version,
+            is_shipped=False,
+            update_available=True,
+            version_available="1.1.0",
+            app_path="/var/www/nextcloud/apps/test_app",
+        )
+        facts = self.app_instance.get_facts()
+        self.assertEqual(facts, expected_facts)
+
     def test_current_settings(self):
         # Simulate JSON output from the run_occ function for config:list
         app_fake_config = {
