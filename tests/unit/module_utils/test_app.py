@@ -113,6 +113,41 @@ class TestApp(TestCase):
         self.assertEqual(app_instance.version, "1.0.0")
         self.assertFalse(app_instance.shipped)
 
+    def test_update_version_available(self):
+        # Simulate output from the run_occ function for app:update --showonly
+        self.mock_run_occ.side_effect = [
+            (0, f"{self.app_name} new version available: 1.1.0")
+        ]
+        update_version = self.app_instance.update_version_available
+        self.assertEqual(update_version, "1.1.0")
+        self.assertTrue(self.app_instance.update_available)
+
+    def test_no_update_available(self):
+        # Simulate output from the run_occ function for app:update --showonly
+        self.mock_run_occ.side_effect = [
+            (0, f"{self.app_name} is up-to-date or no updates could be found")
+        ]
+        update_version = self.app_instance.update_version_available
+        self.assertEqual(update_version, None)
+        self.assertFalse(self.app_instance.update_available)
+
+    def test_path(self):
+        # Simulate output from the run_occ function for app:getpath
+        self.mock_run_occ.side_effect = [(0, "/var/www/nextcloud/apps/test_app")]
+        app_path = self.app_instance.path
+        self.assertEqual(app_path, "/var/www/nextcloud/apps/test_app")
+
+    def test_current_settings(self):
+        # Simulate JSON output from the run_occ function for config:list
+        app_fake_config = {
+            "apps": {
+                f"{self.app_name}": {"key": "value"},
+            },
+        }
+        self.mock_run_occ.side_effect = [(0, json.dumps(app_fake_config))]
+        settings = self.app_instance.current_settings
+        self.assertEqual(settings, {"key": "value"})
+
 
 if __name__ == "__main__":
     unittest.main()
