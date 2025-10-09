@@ -111,10 +111,9 @@ class TestApp(TestCase):
         self.assertFalse(app_instance.shipped)
 
     def test_init_app_external_and_enabled(self):
-        app_instance = self._init_app()
-        self.assertEqual(app_instance.state, "present")
-        self.assertEqual(app_instance.version, "1.0.0")
-        self.assertFalse(app_instance.shipped)
+        self.assertEqual(self.app_instance.state, "present")
+        self.assertEqual(self.app_instance.version, "1.0.0")
+        self.assertFalse(self.app_instance.shipped)
 
     def test_update_version_available(self):
         # Simulate output from the run_occ function for app:update --showonly
