@@ -1,6 +1,10 @@
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 from ansible_collections.nextcloud.admin.plugins.module_utils import app
+from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
+    OccExceptions,
+    AppExceptions,
+)
 import unittest.main
 import json
 
@@ -167,6 +171,137 @@ class TestApp(TestCase):
         self.mock_run_occ.side_effect = [(0, json.dumps(app_fake_config))]
         settings = self.app_instance.current_settings
         self.assertEqual(settings, {"key": "value"})
+
+    def test_install_enabled_with_success(self):
+        self.mock_run_occ.side_effect = [
+            (
+                0,
+                f"{self.app_name} 1.0.0 installed\n{self.app_name} enabled\nmisc message",
+            )
+        ]
+        actions_taken, misc_msg = self.app_instance.install()
+        self.mock_run_occ.assert_called_with(
+            self.mock_ansible_module, ["app:install", self.app_name]
+        )
+        self.assertEqual(self.app_instance.version, "1.0.0")
+        self.assertEqual(self.app_instance.state, "present")
+        self.assertEqual(actions_taken, ["installed", "enabled"])
+        self.assertEqual(misc_msg, ["misc message"])
+
+    def test_install_disabled_with_success(self):
+        self.mock_run_occ.side_effect = [
+            (0, f"{self.app_name} 1.0.0 installed\nmisc message")
+        ]
+        actions_taken, misc_msg = self.app_instance.install(enable=False)
+        self.mock_run_occ.assert_called_with(
+            self.mock_ansible_module, ["app:install", "--keep-disabled", self.app_name]
+        )
+        self.assertEqual(self.app_instance.version, "1.0.0")
+        self.assertEqual(self.app_instance.state, "disabled")
+        self.assertEqual(actions_taken, ["installed"])
+        self.assertEqual(misc_msg, ["misc message"])
+
+    def test_install_with_failure(self):
+        execute_occ_command = [
+            f"{self.mock_ansible_module.params['nextcloud_path']}",
+            f"{self.mock_ansible_module.params['nextcloud_path']}/occ",
+            "app:install",
+            self.app_name,
+        ]
+        execute_occ_result = dict(
+            rc=1, stdout=f"{self.app_name} already installed", stderr=""
+        )
+        self.mock_run_occ.side_effect = [
+            OccExceptions(execute_occ_command, **execute_occ_result)
+        ]
+        with self.assertRaises(AppExceptions):
+            actions_taken, misc_msg = self.app_instance.install()
+
+    def test_remove_with_success(self):
+        self.mock_run_occ.side_effect = [
+            (
+                0,
+                f"misc message\n{self.app_name} disabled\n{self.app_name} 1.0.0 removed\n",
+            )
+        ]
+        actions_taken, misc_msg = self.app_instance.remove()
+        self.mock_run_occ.assert_called_with(
+            self.mock_ansible_module, command=["app:remove", self.app_name]
+        )
+        self.assertEqual(self.app_instance.version, None)
+        self.assertEqual(self.app_instance.state, "absent")
+        self.assertEqual(actions_taken, ["disabled", "removed"])
+        self.assertEqual(misc_msg, ["misc message"])
+
+    def test_remove_with_failure(self):
+        execute_occ_command = [
+            f"{self.mock_ansible_module.params['nextcloud_path']}",
+            f"{self.mock_ansible_module.params['nextcloud_path']}/occ",
+            "app:remove",
+            self.app_name,
+        ]
+        execute_occ_result = dict(
+            rc=1, stdout=f"{self.app_name} is not enabled", stderr=""
+        )
+        self.mock_run_occ.side_effect = [
+            OccExceptions(execute_occ_command, **execute_occ_result)
+        ]
+        with self.assertRaises(AppExceptions):
+            actions_taken, misc_msg = self.app_instance.install()
+
+    def test_toggle_from_enabled(self):
+        self.app_instance.state = "present"
+        self.mock_run_occ.side_effect = [
+            (0, f"misc message\n{self.app_name} 1.0.0 disabled\n")
+        ]
+        actions_taken, misc_msg = self.app_instance.toggle()
+        self.mock_run_occ.assert_called_with(
+            self.mock_ansible_module, [f"app:disable", self.app_name]
+        )
+        self.assertEqual(self.app_instance.state, "disabled")
+        self.assertEqual(actions_taken, ["disabled"])
+        self.assertEqual(misc_msg, ["misc message"])
+
+    def test_toggle_from_disabled(self):
+        self.app_instance.state = "disabled"
+        self.mock_run_occ.side_effect = [
+            (0, f"{self.app_name} 1.0.0 enabled\nmisc message\n")
+        ]
+        actions_taken, misc_msg = self.app_instance.toggle()
+        self.mock_run_occ.assert_called_with(
+            self.mock_ansible_module, [f"app:enable", self.app_name]
+        )
+        self.assertEqual(self.app_instance.state, "present")
+        self.assertEqual(actions_taken, ["enabled"])
+        self.assertEqual(misc_msg, ["misc message"])
+
+    def test_toggle_raise_exception(self):
+        self.app_instance.state = "disabled"
+        self.mock_run_occ.side_effect = [OccExceptions]
+        with self.assertRaises(AppExceptions):
+            actions_taken, misc_msg = self.app_instance.toggle()
+
+    def test_toggle_from_absent(self):
+        self.app_instance.state = "absent"
+        with self.assertRaises(AssertionError):
+            actions_taken, misc_msg = self.app_instance.toggle()
+
+    def test_update(self):
+        self.app_instance.version = "1.0.0"
+        self.app_instance._update_version_available = "1.1.0"
+        self.mock_run_occ.side_effect = [(0, "")]
+        old_version, new_version = self.app_instance.update()
+        self.mock_run_occ.assert_called_with(
+            self.mock_ansible_module, [f"app:update", self.app_name]
+        )
+        self.assertEqual(old_version, "1.0.0")
+        self.assertEqual(new_version, "1.1.0")
+
+    def test_update_raise_exception(self):
+        self.app_instance.version = "1.0.0"
+        self.mock_run_occ.side_effect = [OccExceptions]
+        with self.assertRaises(AppExceptions):
+            old_version, new_version = self.app_instance.update()
 
 
 if __name__ == "__main__":
