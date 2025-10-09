@@ -1,7 +1,6 @@
 from unittest import TestCase
-from unittest.mock import patch, MagicMock, ANY
-from ansible_collections.nextcloud.admin.plugins.module_utils import app, exceptions
-from ansible.module_utils import basic
+from unittest.mock import patch, MagicMock
+from ansible_collections.nextcloud.admin.plugins.module_utils import app
 import unittest.main
 import json
 
