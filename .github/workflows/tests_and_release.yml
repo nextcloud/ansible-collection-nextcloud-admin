@@ -16,20 +16,13 @@ jobs:
       new_version: ${{ steps.check-galaxy-version.outputs.new_version }}
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 2
-      - name: 'Get Previous tag'
-        id: previoustag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
-        with:
-          fallback: 9.9.9.9
 
       - name: Check if 'version' has changed in galaxy.yml
         id: check-galaxy-version
         shell: bash
-        env:
-          current_version: ${{ steps.previoustag.outputs.tag }}
         run: |
           compare_semver() {
             version_test=(${1//./ })
@@ -46,7 +39,8 @@ jobs:
             return 1
           }
           set -x
-          galaxy_version=$(git diff HEAD~ HEAD -- galaxy.yml | grep 'version:' || true | awk '{ print $2}')
+          current_version=$(git diff HEAD~ HEAD -- galaxy.yml | grep '\-version:' | awk '{ print $2}' || true)
+          galaxy_version=$(git diff HEAD~ HEAD -- galaxy.yml | grep '+version:' | awk '{ print $2}' || true)
           if [ -z "$galaxy_version" ]; then
             echo "new_version=false" >> $GITHUB_OUTPUT
           elif $(compare_semver "$galaxy_version" "$current_version"); then
@@ -59,22 +53,26 @@ jobs:
     name: release tests
     uses: ./.github/workflows/collection-tests.yml
     needs: check_version_change
-    if: (needs.check_version_change.outputs.new_version == true) && (github.ref_name == 'main')
+    if: (needs.check_version_change.outputs.new_version == 'true') && (github.ref_name == 'main')
     with:
       distros: "['debian12', 'debian11', 'ubuntu2204', 'ubuntu2404']"
-      nc_versions: "['latest', 'nc30', 'nc29']"
+      nc_versions: "['latest', 'nc31', 'nc30']"
 
   collection_tests:
     name: normal tests
     uses: ./.github/workflows/collection-tests.yml
     needs: check_version_change
-    if: (needs.check_version_change.outputs.new_version == false) || (github.ref_name != 'main')
+    if: (needs.check_version_change.outputs.new_version != 'true') || (github.ref_name != 'main')
 
   tag_release:
     name: new-tag
     runs-on: ubuntu-latest
     needs: large_collection_tests
     steps:
+      - name: Check out the repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
       - name: Detect and tag new version
         id: check-version
         uses: salsify/action-detect-and-tag-new-version@v2
@@ -96,12 +94,12 @@ jobs:
     needs: tag_release
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 

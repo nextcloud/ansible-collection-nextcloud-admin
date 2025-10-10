@@ -47,6 +47,8 @@ options:
       - Attention! Use the application `technical` name (available at the end of the app's page url).
     type: str
     required: true
+    aliases:
+      - "id"
 
   state:
     description:
@@ -74,7 +76,7 @@ requirements:
 EXAMPLES = r"""
 - name: Enable preinstalled contact application
   nextcloud.admin.app:
-    name: contacts
+    id: contacts
     state: present
     nextcloud_path: /var/lib/www/nextcloud
 
@@ -97,9 +99,17 @@ actions_taken:
       returned: always
       type: str
 version:
-  description: App version present of updated on the server.
+  description: App version present or updated on the server.
   returned: always
   type: str
+miscellaneous:
+  description: Informative messages sent by the server during app operation.
+  returned: when not empty
+  type: list
+  contains:
+    misc:
+      description: Something reported by the server.
+      type: str
 """
 
 from ansible.module_utils.basic import AnsibleModule
@@ -112,7 +122,7 @@ from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import (
 )
 
 module_args_spec = dict(
-    name=dict(type="str", required=True),
+    name=dict(type="str", aliases=["id"], required=True),
     state=dict(
         type="str",
         required=False,
@@ -125,6 +135,7 @@ module_args_spec = dict(
 
 def main():
     global module
+    misc_msg = []
     result = dict(
         actions_taken=[],
         version=None,
@@ -144,8 +155,8 @@ def main():
             result["actions_taken"] = [target_state]
         else:
             try:
-                actions_taken = nc_app.toggle()
-                result["actions_taken"].append(actions_taken)
+                actions_taken, misc_msg = nc_app.toggle()
+                result["actions_taken"].extend(actions_taken)
             except AppExceptions as e:
                 e.fail_json(module, **result)
     # case2: install and maybe enable the application
@@ -160,12 +171,9 @@ def main():
                 result["actions_taken"].append("enabled")
         else:
             try:
-                version, actions_taken = nc_app.install(enable=enable)
-                if isinstance(actions_taken, list):
-                    result["actions_taken"].extend(actions_taken)
-                else:
-                    result["actions_taken"].append(actions_taken)
-                    result["version"] = version
+                actions_taken, misc_msg = nc_app.install(enable=enable)
+                result["actions_taken"].extend(actions_taken)
+                result["version"] = nc_app.version
             except AppExceptions as e:
                 e.fail_json(module, **result)
     # case3: remove the application
@@ -173,19 +181,15 @@ def main():
         "disabled",
         "present",
     ]:
+        result["version"] = nc_app.version
         if module.check_mode:
-            result["version"] = nc_app.version
             result["actions_taken"] = ["removed"]
             if nc_app.state == "present":
                 result["actions_taken"].insert(0, "disabled")
         else:
             try:
-                actions_taken, removed_version = nc_app.remove()
-                if isinstance(actions_taken, list):
-                    result["actions_taken"].extend(actions_taken)
-                else:
-                    result["actions_taken"].append(actions_taken)
-                result["version"] = removed_version
+                actions_taken, misc_msg = nc_app.remove()
+                result["actions_taken"].extend(actions_taken)
             except AppExceptions as e:
                 e.fail_json(module, **result)
     # case3: update the application if posible
@@ -196,11 +200,12 @@ def main():
                 result["version"] = nc_app.update_version_available
             else:
                 try:
-                    result["version"] = nc_app.update()
+                    previous_version, result["version"] = nc_app.update()
                     result["actions_taken"].append("updated")
                 except AppExceptions as e:
                     e.fail_json(module, **result)
-
+    if misc_msg:
+        result.update(miscellaneous=misc_msg)
     result.update(changed=bool(result["actions_taken"]))
     if not result["version"]:
         result["version"] = nc_app.version
