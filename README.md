@@ -22,18 +22,20 @@ Plugins and modules within a collection may be tested with only specific Ansible
 
 ## Supported nextcloud version
 
-This collection supports Nextcloud versions: `29`, `30`, `31(latest)`
+This collection supports Nextcloud versions: `30`, `31`, `32(latest)`
 The community makes it's best efforts to keep tested versions updated with [Nextcloud release schedule](https://github.com/nextcloud/server/wiki/Maintenance-and-Release-Schedule).
 
 ## Included content
 
 <!--start collection content-->
 ### Modules
+
 Name | Description
 --- | ---
 nextcloud.admin.run_occ|Run the occ command line tool with given arguments.
 nextcloud.admin.app_info| Return state, version, updates and path of one external application.
 nextcloud.admin.app | Manage nextcloud external applications (install, remove, disable, etc)
+nextcloud.admin.user_list | List configured users on the server with optional user infos
 
 ### Roles
 

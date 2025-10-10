@@ -1,3 +1,4 @@
 plugins/modules/run_occ.py validate-modules:missing-gplv3-license
 plugins/modules/app_info.py validate-modules:missing-gplv3-license
 plugins/modules/app.py validate-modules:missing-gplv3-license
+plugins/modules/user_list.py validate-modules:missing-gplv3-license
