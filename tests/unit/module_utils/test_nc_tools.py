@@ -290,7 +290,7 @@ class TestRunPhpInline(unittest.TestCase):
 
     def test_run_php_inline_refuse_bad_params(self):
         with self.assertRaises(Exception):
-            result = run_php_inline(mocked_module, dict(fu=bar))
+            result = run_php_inline(mocked_module, dict(fu="bar"))
 
 
 if __name__ == "__main__":

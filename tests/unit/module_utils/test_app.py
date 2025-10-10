@@ -255,7 +255,7 @@ class TestApp(TestCase):
         ]
         actions_taken, misc_msg = self.app_instance.toggle()
         self.mock_run_occ.assert_called_with(
-            self.mock_ansible_module, [f"app:disable", self.app_name]
+            self.mock_ansible_module, ["app:disable", self.app_name]
         )
         self.assertEqual(self.app_instance.state, "disabled")
         self.assertEqual(actions_taken, ["disabled"])
@@ -268,7 +268,7 @@ class TestApp(TestCase):
         ]
         actions_taken, misc_msg = self.app_instance.toggle()
         self.mock_run_occ.assert_called_with(
-            self.mock_ansible_module, [f"app:enable", self.app_name]
+            self.mock_ansible_module, ["app:enable", self.app_name]
         )
         self.assertEqual(self.app_instance.state, "present")
         self.assertEqual(actions_taken, ["enabled"])
@@ -291,7 +291,7 @@ class TestApp(TestCase):
         self.mock_run_occ.side_effect = [(0, "")]
         old_version, new_version = self.app_instance.update()
         self.mock_run_occ.assert_called_with(
-            self.mock_ansible_module, [f"app:update", self.app_name]
+            self.mock_ansible_module, ["app:update", self.app_name]
         )
         self.assertEqual(old_version, "1.0.0")
         self.assertEqual(new_version, "1.1.0")
