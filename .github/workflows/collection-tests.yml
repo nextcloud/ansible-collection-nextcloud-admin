@@ -7,7 +7,7 @@ name: collection-tests
         required: false
         description: a list of debian based distribution
         type: string
-        default: "['debian12', 'ubuntu2404']"
+        default: "['debian13', 'debian12', 'ubuntu2404']"
       nc_versions:
         required: false
         description: a list of nextcloud server version
