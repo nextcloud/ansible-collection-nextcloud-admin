@@ -123,7 +123,7 @@ users:
   contains:
     <user_id>:
       description:
-        - If C(infos) is false, each key is a user_id and the value is a string representing the display name.
+        - If C(infos) is false, each key is a user_id and the value its display name.
         - If C(infos) is true, each key is a user_id and the value is a dictionary containing detailed user information (e.g. email, quota, last login, etc.).
       type: raw
   sample:
