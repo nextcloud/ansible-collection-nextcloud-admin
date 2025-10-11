@@ -119,9 +119,13 @@ def run_occ(
     cli_full_path = module.params.get("nextcloud_path") + "/occ"
     php_exec = module.params.get("php_runtime")
     if isinstance(command, list):
-        full_command = [cli_full_path, "--no-ansi"] + command
+        full_command = [cli_full_path, "--no-ansi", "--no-interaction"] + command
     elif isinstance(command, str):
-        full_command = [cli_full_path, "--no-ansi"] + convert_string(command)
+        full_command = [
+            cli_full_path,
+            "--no-ansi",
+            "--no-interaction",
+        ] + convert_string(command)
 
     # execute the occ command in a child process to keep current privileges
     module_conn, occ_conn = Pipe()
