@@ -145,3 +145,29 @@ class User(NCIdentity):
     def enable(self):
         self.__take_action__("enable")
         self.state = idState.PRESENT
+
+    def reset_password(self, password: str | None = None):
+        args = ["resetpassword"]
+        env = {}
+        if password:
+            args += ["--password-from-env"]
+            env = dict(NC_PASS=password)
+        self.__take_action__(*args, environ_update=env)
+
+    def edit_settings(
+        self,
+        key: str,
+        value: str | None = None,
+        error_if_not_exists: bool = False,
+        update_only: bool = False,
+    ):
+        command = ["user:setting"]
+        if error_if_not_exists:
+            command += ["--error-if-not-exists"]
+        if update_only:
+            command += ["--update-only"]
+        if value is None:
+            command += ["--delete", self.ident, "settings"]
+        else:
+            command += [self.ident, "settings", value]
+        run_occ(self.module, command)
