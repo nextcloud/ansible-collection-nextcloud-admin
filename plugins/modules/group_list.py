@@ -176,7 +176,7 @@ def main():
     global module
     module = AnsibleModule(
         argument_spec=extend_nc_tools_args_spec(module_args_spec),
-        supports_check_mode=False,
+        supports_check_mode=True,
     )
     limit = module.params.get("limit", 500)
     offset = module.params.get("offset", 0)
