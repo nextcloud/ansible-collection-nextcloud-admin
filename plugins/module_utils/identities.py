@@ -33,19 +33,45 @@ from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import ru
 
 
 class idState(Enum):
+    """
+    Enumeration representing the state of a NextCloud identity.
+    """
+
     PRESENT = "present"
     DISABLED = "disabled"
     ABSENT = "absent"
 
 
 class NCIdentity:
-    def __init__(self, module, domain, ident: str):
+    """
+    Base class for managing NextCloud identities such as users and groups.
+
+    Attributes:
+        ident (str): The identifier for the identity.
+        module: The Ansible module instance.
+        namespace (str): The NextCloud namespace for the identity.
+        infos (dict): A dictionary holding information about the identity.
+        state (idState): The current state of the identity.
+    """
+
+    def __init__(self, module, namespace, ident: str):
+        """
+        Initialize a new NextCloud identity instance.
+
+        Args:
+            module: The Ansible module instance.
+            namespace (str): The NextCloud namespace for the identity.
+            ident (str): The identifier for the identity.
+
+        Raises:
+            OccExceptions: If an error occurs while fetching information from NextCloud.
+        """
         self.ident = ident
         self.module = module
-        self.domain = domain
+        self.namespace = namespace
         try:
             stdout = run_occ(
-                self.module, [f"{self.domain}:info", "--output=json", self.ident]
+                self.module, [f"{self.namespace}:info", "--output=json", self.ident]
             )[1]
             self.infos = json.loads(stdout)
             if self.infos["enabled"]:
@@ -61,28 +87,67 @@ class NCIdentity:
                 raise e
 
     def __take_action__(self, action: str, *args, **kwargs):
-        command = [f"{self.domain}:{action}", "--no-interaction"] + list(args)
-        rc, stdout, stderr = run_occ(self.module, command + [self.ident], **kwargs)[0:3]
-        return rc, stdout, stderr
+        """
+        Internal method to execute a NextCloud OCC command with the given action.
+
+        Args:
+            action (str): The action to perform on the identity.
+            *args: Additional positional arguments for the OCC command.
+            **kwargs: Additional keyword arguments for the OCC command.
+        """
+        command = [f"{self.namespace}:{action}", "--no-interaction"] + list(args)
+        run_occ(self.module, command + [self.ident], **kwargs)[0:3]
 
     def add(self):
+        """
+        Add the identity to NextCloud.
+        """
         self.__take_action__("add")
         self.state = idState.PRESENT
 
     def delete(self):
+        """
+        Delete the identity from NextCloud.
+        """
         self.__take_action__("delete")
         self.state = idState.ABSENT
 
 
 class Group(NCIdentity):
+    """
+    Class for managing NextCloud groups.
+
+    Inherits from NCIdentity.
+    """
+
     def __init__(self, module, ident: str):
+        """
+        Initialize a new NextCloud group instance.
+
+        Args:
+            module: The Ansible module instance.
+            ident (str): The identifier for the group.
+        """
         super().__init__(module, "group", ident)
 
     def __user_mgnt__(self, action: str, user_id: str):
+        """
+        Internal method to manage group membership in NextCloud.
+
+        Args:
+            action (str): The action to perform (adduser or removeuser).
+            user_id (str): The user identifier to add or remove from the group.
+        """
         command = [f"group:{action}", "--no-interaction"]
         run_occ(self.module, command + [self.ident, user_id])[0:3]
 
     def add(self, display_name: str | None = None):
+        """
+        Add the group to NextCloud, optionally with a display name.
+
+        Args:
+            display_name (str | None): The display name for the group.
+        """
         if display_name:
             self.__take_action__("add", f"--display-name='{display_name}'")
         else:
@@ -90,14 +155,39 @@ class Group(NCIdentity):
         self.state = idState.PRESENT
 
     def add_user(self, user_id: str):
+        """
+        Add a user to the group.
+
+        Args:
+            user_id (str): The user identifier to add to the group.
+        """
         self.__user_mgnt__("adduser", user_id)
 
     def remove_user(self, user_id: str):
+        """
+        Remove a user from the group.
+
+        Args:
+            user_id (str): The user identifier to remove from the group.
+        """
         self.__user_mgnt__("removeuser", user_id)
 
 
 class User(NCIdentity):
+    """
+    Class for managing NextCloud users.
+
+    Inherits from NCIdentity.
+    """
+
     def __init__(self, module, ident: str):
+        """
+        Initialize a new NextCloud user instance.
+
+        Args:
+            module: The Ansible module instance.
+            ident (str): The identifier for the user.
+        """
         super().__init__(module, "user", ident)
 
     def add(
@@ -108,6 +198,19 @@ class User(NCIdentity):
         email: str | None = None,
         generate_password: bool = False,
     ):
+        """
+        Add the user to NextCloud with specified attributes.
+
+        Args:
+            password (str | None): The password for the user.
+            display_name (str | None): The display name for the user.
+            groups (list[str] | None): A list of groups to which the user will be added.
+            email (str | None): The email address for the user.
+            generate_password (bool): Whether to generate a password for the user.
+
+        Raises:
+            ValueError: If neither a password is provided nor password generation is requested.
+        """
         command = ["user:add", "--no-interaction"]
         env = {}
 
@@ -139,14 +242,26 @@ class User(NCIdentity):
         self.state = idState.PRESENT
 
     def disable(self):
+        """
+        Disable the user account in NextCloud.
+        """
         self.__take_action__("disable")
         self.state = idState.DISABLED
 
     def enable(self):
+        """
+        Enable the user account in NextCloud.
+        """
         self.__take_action__("enable")
         self.state = idState.PRESENT
 
     def reset_password(self, password: str | None = None):
+        """
+        Reset the password for the user.
+
+        Args:
+            password (str|None): The new password for the user. If not provided, the user will have to login to change its password.
+        """
         args = ["resetpassword"]
         env = {}
         if password:
@@ -161,6 +276,15 @@ class User(NCIdentity):
         error_if_not_exists: bool = False,
         update_only: bool = False,
     ):
+        """
+        Edit settings for the user.
+
+        Args:
+            key (str): The setting key to modify.
+            value (str | None): The new value for the setting. If None, the setting is deleted.
+            error_if_not_exists (bool): Whether to throw an error if the setting does not exist.
+            update_only (bool): Whether to only update the setting if it already exists.
+        """
         command = ["user:setting"]
         if error_if_not_exists:
             command += ["--error-if-not-exists"]
