@@ -23,48 +23,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# DOCUMENTATION = r"""
-
-# module: group_list
-
-# short_description: List configured groups on the server with optional group infos.
-
-# author:
-#   - "Marc Crébassa (@aalaesar)"
-
-# description:
-#   - Return the list of groups present in the server instance
-#   - Optionally recovery infos of one or more group
-#   - This module requires to be run with advanced privileges
-#     unless it is run as the group that own the occ tool.
-
-# extends_documentation_fragment:
-#   - nextcloud.admin.occ_common_options
-
-# options:
-#   infos:
-#     description:
-#       - Weither to fetch group infos or not
-#     aliases: ['show_details']
-#     type: bool
-
-#   limit:
-#     description:
-#       - Number of groups to retrieve
-#     required: false
-#     type: int
-#     default: 500
-
-#   offset:
-#     description:
-#       - Offset for retrieving groups
-#     required: false
-#     type: int
-#     default: 0
-
-# requirements:
-#   - "python >=3.12"
-# """
 
 DOCUMENTATION = r"""
 ---
