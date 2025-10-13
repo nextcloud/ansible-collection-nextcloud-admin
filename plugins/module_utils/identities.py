@@ -28,6 +28,7 @@ import json
 from enum import Enum
 from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
     OccExceptions,
+    IdentityNotPresent,
 )
 from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import run_occ  # type: ignore
 
@@ -137,7 +138,7 @@ class Group(NCIdentity):
     def __get_users__(self):
         stdout = run_occ(
             self.module, ["group:list", self.ident, "--output", "json_pretty"]
-        )
+        )[1]
         return json.loads(stdout)[self.ident]
 
     @property
@@ -155,7 +156,13 @@ class Group(NCIdentity):
             user_id (str): The user identifier to add or remove from the group.
         """
         command = [f"group:{action}", "--no-interaction"]
-        run_occ(self.module, command + [self.ident, user_id])[0:3]
+        try:
+            run_occ(self.module, command + [self.ident, user_id])
+        except OccExceptions as e:
+            if "not found" in e.stdout or "does not exist" in e.stdout:
+                raise IdentityNotPresent("user", user_id, **e.__dict__)
+            else:
+                raise e
 
     def add(self, display_name: str | None = None):
         """
@@ -169,7 +176,7 @@ class Group(NCIdentity):
         else:
             self.__take_action__("add")
         self.state = idState.PRESENT
-        self.__users__ += []
+        self.__users__ = []
 
     def add_user(self, user_id: str):
         """

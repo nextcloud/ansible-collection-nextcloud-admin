@@ -164,3 +164,12 @@ class AppPSR4InfosNotReadable(AppExceptions):
 
     def __init__(self, **kwargs):
         super().__init__(dft_msg="PSR-4 infos are invalid JSON", **kwargs)
+
+
+class IdentityNotPresent(OccExceptions):
+    """Raised when a user or group doesn't exist while it was expected to"""
+
+    def __init__(self, namespace: str, ident_id: str, **kwargs):
+        super().__init__(
+            msg=f"{namespace.capitalize()} {ident_id} not found.", **kwargs
+        )
