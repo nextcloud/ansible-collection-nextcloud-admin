@@ -3,3 +3,4 @@ plugins/modules/app_info.py validate-modules:missing-gplv3-license
 plugins/modules/app.py validate-modules:missing-gplv3-license
 plugins/modules/user_list.py validate-modules:missing-gplv3-license
 plugins/modules/group_list.py validate-modules:missing-gplv3-license
+plugins/modules/group.py validate-modules:missing-gplv3-license
