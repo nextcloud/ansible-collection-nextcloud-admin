@@ -54,14 +54,14 @@ options:
   display_name:
     description:
       - The display name for the group.
-    default: None
+    default: Null
     aliases: ['displayName']
     type: str
   users:
     description:
       - A list of usernames to be added or removed from the group.
       - When state is 'present', the module will match the exact list provided.
-    default: None
+    default: Null
     elements: str
     aliases: ['members']
     type: list
