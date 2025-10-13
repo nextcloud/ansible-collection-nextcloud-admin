@@ -120,6 +120,8 @@ class Group(NCIdentity):
     Inherits from NCIdentity.
     """
 
+    __users__ = None
+
     def __init__(self, module, ident: str):
         """
         Initialize a new NextCloud group instance.
@@ -129,6 +131,20 @@ class Group(NCIdentity):
             ident (str): The identifier for the group.
         """
         super().__init__(module, "group", ident)
+        if self.state is idState.PRESENT:
+            self.__users__ = self.__get_users__()
+
+    def __get_users__(self):
+        stdout = run_occ(
+            self.module, ["group:list", self.ident, "--output", "json_pretty"]
+        )
+        return json.loads(stdout)[self.ident]
+
+    @property
+    def users(self):
+        if self.__users__ is None:
+            self.__users__ = self.__get_users__()
+        return self.__users__
 
     def __user_mgnt__(self, action: str, user_id: str):
         """
@@ -153,6 +169,7 @@ class Group(NCIdentity):
         else:
             self.__take_action__("add")
         self.state = idState.PRESENT
+        self.__users__ += []
 
     def add_user(self, user_id: str):
         """
@@ -162,6 +179,7 @@ class Group(NCIdentity):
             user_id (str): The user identifier to add to the group.
         """
         self.__user_mgnt__("adduser", user_id)
+        self.__users__ += [user_id]
 
     def remove_user(self, user_id: str):
         """
@@ -171,6 +189,7 @@ class Group(NCIdentity):
             user_id (str): The user identifier to remove from the group.
         """
         self.__user_mgnt__("removeuser", user_id)
+        self.__users__.remove(user_id)
 
 
 class User(NCIdentity):
