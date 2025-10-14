@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import patch, MagicMock, ANY
+from unittest.mock import patch, MagicMock
 from ansible_collections.nextcloud.admin.plugins.modules import group
 from ansible.module_utils import basic
 from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
