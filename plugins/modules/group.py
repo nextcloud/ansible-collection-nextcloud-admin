@@ -242,9 +242,9 @@ def main():
             users_to_add = set(users_list) - set(nc_group.users)
             users_to_remove = set(nc_group.users) - set(users_list)
         elif users_mgnt == "append_users":
-            users_to_add = set(users_list) - set(nc_group.users)
+            users_to_add = set(users_list)
         elif users_mgnt == "remove_users":
-            users_to_remove = set(nc_group.users) - set(users_list)
+            users_to_remove = set(users_list)
 
         if not module.check_mode:
             try:
@@ -253,7 +253,7 @@ def main():
                     result["added_users"] += [a_user]
                     result["changed"] = True
                 for a_user in users_to_remove:
-                    nc_group.add_user(a_user)
+                    nc_group.remove_user(a_user)
                     result["removed_users"] += [a_user]
                     result["changed"] = True
             except IdentityNotPresent as e:
