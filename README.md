@@ -36,6 +36,9 @@ nextcloud.admin.run_occ|Run the occ command line tool with given arguments.
 nextcloud.admin.app_info| Return state, version, updates and path of one external application.
 nextcloud.admin.app | Manage nextcloud external applications (install, remove, disable, etc)
 nextcloud.admin.user_list | List configured users on the server with optional user infos
+nextcloud.admin.user | short_description: Manage a Nextcloud user.
+nextcloud.admin.group_list | List configured groups on the server with optional group infos
+nextcloud.admin.group | Manage Nextcloud groups.
 
 ### Roles
 
