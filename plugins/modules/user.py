@@ -137,16 +137,15 @@ EXAMPLES = r"""
   nextcloud.admin.user:
     nextcloud_path: /var/www/nextcloud
     id: "alice"
-    reset_password: True
+    reset_password: true
 
 - name: Change the user password
   nextcloud.admin.user:
     nextcloud_path: /var/www/nextcloud
     id: "alice"
-    reset_password: True
+    reset_password: true
     password: "new_password"
-  no_log: True
-
+  no_log: true
 """
 
 RETURN = r"""
