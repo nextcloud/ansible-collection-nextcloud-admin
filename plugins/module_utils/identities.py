@@ -216,13 +216,17 @@ class User(NCIdentity):
         """
         super().__init__(module, "user", ident)
 
+    @property
+    def groups(self):
+        return self.infos.get("groups", [])
+
     def add(
         self,
+        generate_password: bool = False,
         password: str | None = None,
         display_name: str | None = None,
         groups: list[str] | None = None,
         email: str | None = None,
-        generate_password: bool = False,
     ):
         """
         Add the user to NextCloud with specified attributes.
@@ -256,7 +260,7 @@ class User(NCIdentity):
             command += ["--group", group]
 
         rc, stdout, stderr = run_occ(
-            self.module, command + [self.user_id], environ_update=env
+            self.module, command + [self.ident], environ_update=env
         )[0:3]
 
         if display_name:
@@ -317,7 +321,7 @@ class User(NCIdentity):
         if update_only:
             command += ["--update-only"]
         if value is None:
-            command += ["--delete", self.ident, "settings"]
+            command += ["--delete", self.ident, "settings", key]
         else:
-            command += [self.ident, "settings", value]
+            command += [self.ident, "settings", key, value]
         run_occ(self.module, command)
