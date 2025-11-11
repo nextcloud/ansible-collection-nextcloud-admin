@@ -23,77 +23,35 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# DOCUMENTATION = r"""
-
-# module: user_list
-
-# short_description: List configured users on the server with optional user infos.
-
-# author:
-#   - "Marc Crébassa (@aalaesar)"
-
-# description:
-#   - Return the list of users present in the server instance
-#   - Optionally recovery infos of one or more user
-#   - This module requires to be run with advanced privileges
-#     unless it is run as the user that own the occ tool.
-
-# extends_documentation_fragment:
-#   - nextcloud.admin.occ_common_options
-
-# options:
-#   infos:
-#     description:
-#       - Weither to fetch user infos or not
-#     aliases: ['show_details']
-#     type: bool
-
-#   limit:
-#     description:
-#       - Number of users to retrieve
-#     required: false
-#     type: int
-#     default: 500
-
-#   offset:
-#     description:
-#       - Offset for retrieving users
-#     required: false
-#     type: int
-#     default: 0
-
-# requirements:
-#   - "python >=3.12"
-# """
 
 DOCUMENTATION = r"""
 ---
-module: user_list
-short_description: List configured users on the server with optional user infos.
+module: group_list
+short_description: List configured groups on the server with optional group infos.
 author:
   - Marc Crébassa (@aalaesar)
 description:
-  - Return the list of users present in the server instance.
-  - Optionally retrieve infos of one or more users.
-  - This module requires elevated privileges unless it is run as the user that owns the occ tool.
+  - Return the list of groups present in the server instance.
+  - Optionally retrieve more infos
+  - This module requires elevated privileges unless it is run as the group that owns the occ tool.
 extends_documentation_fragment:
   - nextcloud.admin.occ_common_options
 options:
   infos:
     description:
-      - Whether to fetch user infos or not.
+      - Whether to fetch group infos or not.
     aliases: [show_details]
     type: bool
     default: False
   limit:
     description:
-      - Number of users to retrieve.
+      - Number of groups to retrieve.
     required: false
     type: int
     default: 500
   offset:
     description:
-      - Offset for retrieving users.
+      - Offset for retrieving groups.
     required: false
     type: int
     default: 0
@@ -102,43 +60,44 @@ requirements:
 """
 
 EXAMPLES = r"""
-- name: get the list of configured users
-  nextcloud.admin.user_list:
+- name: get the list of configured groups
+  nextcloud.admin.group_list:
     nextcloud_path: /var/lib/www/nextcloud
-  register: nc_users
+  register: nc_groups
 
-- name: get infos of all users
-  nextcloud.admin.user_list:
+- name: get infos of all groups
+  nextcloud.admin.group_list:
     infos: true
     nextcloud_path: /var/lib/www/nextcloud
 """
 
 RETURN = r"""
-users:
+groups:
   description:
-    - Dictionary of users found in the Nextcloud instance.
+    - Dictionary of groups found in the Nextcloud instance.
     - The structure depends on the value of the C(infos) parameter.
   returned: always
   type: dict
   contains:
-    <user_id>:
+    <group_id>:
       description:
-        - If C(infos) is false, each key is a user_id and the value its display name.
-        - If C(infos) is true, each key is a user_id and the value is a dictionary containing detailed user information (e.g. email, quota, last login, etc.).
+        - If C(infos) is false, each key is a group_id and the value the list of members.
+        - If C(infos) is true, each key is a group_id and the value is a dictionary containing
+          detailed group information (e.g. displayNames, users, backend, etc.).
       type: raw
   sample:
     simple:
-      alice: "Alice Dupont"
-      bob: "Bob Martin"
+      admin: ["admin"]
+      users: ["bob", "alice"]
     detailed:
-      alice:
-        email: "alice@example.com"
-        displayname: "Alice Dupont"
-        quota: "1 GB"
-      bob:
-        email: "bob@example.com"
-        displayname: "Bob Martin"
-        quota: "500 MB"
+      admin:
+        displayName: "admin"
+        backends: ["Database"]
+        users: ["admin"]
+      users:
+        displayname: "Normal users"
+        backends: ["Database"]
+        users: ["bob", "alice"]
 """
 
 from ansible.module_utils.basic import AnsibleModule
@@ -185,7 +144,7 @@ def main():
         filter(
             None,
             [
-                "user:list",
+                "group:list",
                 "--output=json",
                 f"--offset={offset}",
                 f"--limit={limit}",
@@ -196,7 +155,7 @@ def main():
 
     try:
         stdout = run_occ(module, occ_command)[1]
-        users = json.loads(stdout)
+        groups = json.loads(stdout)
 
     except OccExceptions as e:
         e.fail_json(module)
@@ -205,7 +164,7 @@ def main():
 
     module.exit_json(
         changed=False,
-        users=users,
+        groups=groups,
     )
 
 

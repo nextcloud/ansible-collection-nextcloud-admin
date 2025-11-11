@@ -66,7 +66,7 @@ def convert_string(command: str) -> list:
     return [token if " " in token else token.strip("\"'") for token in command_lex]
 
 
-def execute_occ_command(conn, module, php_exec, command):
+def execute_occ_command(conn, module, php_exec, command, **kwargs):
     """
     Execute a given occ command using the PHP interpreter and handle user permissions.
 
@@ -95,7 +95,7 @@ def execute_occ_command(conn, module, php_exec, command):
             os.setgid(cli_stats.st_gid)
             os.setuid(cli_stats.st_uid)
 
-        rc, stdout, stderr = module.run_command([php_exec] + command)
+        rc, stdout, stderr = module.run_command([php_exec] + command, **kwargs)
         conn.send({"rc": rc, "stdout": stdout, "stderr": stderr})
     except FileNotFoundError:
         conn.send({"exception": "OccFileNotFoundException"})
@@ -112,10 +112,7 @@ def execute_occ_command(conn, module, php_exec, command):
         conn.close()
 
 
-def run_occ(
-    module,
-    command,
-):
+def run_occ(module, command, **kwargs):
     cli_full_path = module.params.get("nextcloud_path") + "/occ"
     php_exec = module.params.get("php_runtime")
     if isinstance(command, list):
@@ -130,7 +127,9 @@ def run_occ(
     # execute the occ command in a child process to keep current privileges
     module_conn, occ_conn = Pipe()
     p = Process(
-        target=execute_occ_command, args=(occ_conn, module, php_exec, full_command)
+        target=execute_occ_command,
+        args=(occ_conn, module, php_exec, full_command),
+        kwargs=kwargs,
     )
     p.start()
     result = module_conn.recv()
