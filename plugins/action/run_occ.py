@@ -12,11 +12,29 @@ class ActionModule(ActionBase):
     def run(self, tmp=None, task_vars=None):
         del tmp  # tmp no longer has any effect
         new_module_args = copy.deepcopy(self._task.args)
-        new_module_args["nextcloud_path"] = self._task.args.get(
-            "nextcloud_path", os.getenv("NEXTCLOUD_PATH")
+
+        # missing occ common arguments fallback
+        # argument value precedence: args > task_vars > environment
+        nextcloud_path = (
+            self._task.args.get("nextcloud_path")
+            or task_vars.get("nextcloud_path")
+            or os.getenv("NEXTCLOUD_PATH")
         )
-        if not new_module_args["nextcloud_path"]:
+        if nextcloud_path:
+            new_module_args["nextcloud_path"] = nextcloud_path
+        elif "nextcloud_path" in new_module_args:
             del new_module_args["nextcloud_path"]
+
+        # argument value precedence: args > task_vars > environment > default
+        php_runtime = (
+            self._task.args.get("php_runtime")
+            or task_vars.get("nextcloud_php_runtime")
+            or os.getenv("NEXTCLOUD_PHP_RUNTIME")
+        )
+        if php_runtime:
+            new_module_args["php_runtime"] = php_runtime
+        elif "php_runtime" in new_module_args:
+            del new_module_args["php_runtime"]
 
         return self._execute_module(
             module_name=self._task.action,
