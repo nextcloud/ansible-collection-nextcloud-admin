@@ -70,11 +70,20 @@ jobs:
 
       - name: Run units tests
         run: |
-          ansible-test units --requirements --docker
+          ansible-test units --coverage --docker
+      
+      - name: Generate coverage report
+        #if: github.ref_name == 'main'
+        run: |
+          ansible-test --requirements coverage xml
 
+      - name: Upload coverage report
+        #if: github.ref_name == 'main'
+        uses: codecov/codecov-action@v5
+        
       - name: Run sanity tests
         run: |
-          ansible-test sanity --requirements --docker
+          ansible-test sanity --docker
 
   molecule_test:
     defaults:
