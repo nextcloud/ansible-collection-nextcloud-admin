@@ -24,7 +24,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@v25
+        uses: ansible/ansible-lint@v26
 
       - name: Set up Python 3.
         uses: actions/setup-python@v6
