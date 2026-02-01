@@ -84,6 +84,7 @@ class NCIdentity:
         except OccExceptions as e:
             if "not found" in e.stdout or "does not exist" in e.stdout:
                 self.state = idState.ABSENT
+                self.infos = {}
             else:
                 raise e
 
