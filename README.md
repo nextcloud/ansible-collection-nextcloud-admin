@@ -1,6 +1,10 @@
-[![Lint status](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/lint.yml/badge.svg)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions?workflow=Lint)
-[![Tests for all supported versions](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/tests.yml/badge.svg)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions?workflow=Tests)
-[![Tests for latest](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/tests_latest.yml/badge.svg)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions?workflow=Tests%20latest)
+![GitHub License](https://img.shields.io/github/license/nextcloud/ansible-collection-nextcloud-admin)
+![GitHub Release](https://img.shields.io/github/v/release/nextcloud/ansible-collection-nextcloud-admin?logo=Github)
+![Ansible Collection Version](https://img.shields.io/ansible/collection/v/nextcloud/admin?logo=Ansible)
+![Ansible Collection Downloads](https://img.shields.io/ansible/collection/d/nextcloud/admin?logo=Ansible)
+[![Collection tests](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/tests_and_release.yml/badge.svg?branch=main)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/tests_and_release.yml)
+![Static Badge](https://img.shields.io/badge/Nextcloud_versions-32_%7C_31_%7C_30-green?logo=Nextcloud&logoColor=blue)
+[![codecov](https://codecov.io/gh/nextcloud/ansible-collection-nextcloud-admin/graph/badge.svg?token=6nF3Fx75mH)](https://codecov.io/gh/nextcloud/ansible-collection-nextcloud-admin)
 
 # Ansible collection for nextcloud administration
 
