@@ -70,16 +70,20 @@ jobs:
 
       - name: Run units tests
         run: |
-          ansible-test units --coverage --docker
+          ansible-test units --coverage --requirements
 
       - name: Generate coverage report
         #if: github.ref_name == 'main'
         run: |
-          ansible-test --requirements coverage xml
+          ansible-test coverage xml --requirements
 
       - name: Upload coverage report
         #if: github.ref_name == 'main'
         uses: codecov/codecov-action@v5
+        with:
+          fail_ci_if_error: True
+          disable_search: True
+          files: ./code/ansible_collections/nextcloud/admin/tests/output/reports/coverage.xml
 
       - name: Run sanity tests
         run: |
