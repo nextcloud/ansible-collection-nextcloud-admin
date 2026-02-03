@@ -4,7 +4,7 @@
 ![Ansible Collection Downloads](https://img.shields.io/ansible/collection/d/nextcloud/admin?logo=Ansible)
 [![Collection tests](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/tests_and_release.yml/badge.svg?branch=main)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/tests_and_release.yml)
 ![Static Badge](https://img.shields.io/badge/Nextcloud_versions-32_%7C_31_%7C_30-green?logo=Nextcloud&logoColor=blue)
-
+[![codecov](https://codecov.io/gh/nextcloud/ansible-collection-nextcloud-admin/graph/badge.svg?token=6nF3Fx75mH)](https://codecov.io/gh/nextcloud/ansible-collection-nextcloud-admin)
 
 # Ansible collection for nextcloud administration
 
