@@ -1,0 +1,5 @@
+---
+# Debian 12 (bookworm) native package versions
+
+distro_php_version: "8.2"
+distro_postgresql_version: "15"

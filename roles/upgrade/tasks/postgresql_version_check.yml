@@ -1,0 +1,63 @@
+---
+# Check PostgreSQL version compatibility
+
+- name: Get current PostgreSQL version
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_info:
+    filter: version
+  register: postgresql_info
+
+- name: Determine PostgreSQL release version
+  ansible.builtin.set_fact:
+    _postgresql_release_version: >-
+      {{ (postgresql_info.version.major | string ~ '.' ~ postgresql_info.version.minor | string)
+         if postgresql_info.version.major | int < 10
+         else postgresql_info.version.major | string }}
+
+- name: Get supported PostgreSQL versions for both current and target Nextcloud versions
+  ansible.builtin.set_fact:
+    _postgresql_supported_versions: >-
+      {{ nextcloud_postgresql_requirements[current_nextcloud_version.split('.')[0]]
+         | intersect(nextcloud_postgresql_requirements[current_step_nextcloud_version.split('.')[0]]) }}
+
+- name: Check if PostgreSQL version is compatible with both current and target Nextcloud versions
+  ansible.builtin.set_fact:
+    _postgresql_version_compatible: "{{ _postgresql_release_version in _postgresql_supported_versions }}"
+
+- name: Fail if PostgreSQL version is incompatible and upgrade is disabled
+  ansible.builtin.fail:
+    msg: >-
+      PostgreSQL {{ _postgresql_release_version }} is not compatible with Nextcloud {{ current_nextcloud_version }} and {{ current_step_nextcloud_version }}.
+      Supported versions: {{ _postgresql_supported_versions | join(', ') }}.
+      Set nextcloud_upgrade_postgresql to true to enable automatic PostgreSQL upgrades.
+  when:
+    - not _postgresql_version_compatible
+    - not nextcloud_upgrade_postgresql
+
+- name: Determine target PostgreSQL version
+  ansible.builtin.set_fact:
+    _postgresql_target_version: >-
+      {% if distro_postgresql_version is defined and distro_postgresql_version in _postgresql_supported_versions -%}
+        {{ distro_postgresql_version }}
+      {%- else -%}
+        {{ _postgresql_supported_versions | last }}
+      {%- endif %}
+  when:
+    - not _postgresql_version_compatible
+    - nextcloud_upgrade_postgresql
+
+- name: "Upgrade PostgreSQL to {{ _postgresql_target_version | default('') }}"
+  ansible.builtin.include_tasks: postgresql_upgrade.yml
+  vars:
+    postgresql_version: "{{ _postgresql_target_version | default(omit) }}"
+  when:
+    - not _postgresql_version_compatible
+    - nextcloud_upgrade_postgresql
+
+- name: PostgreSQL version is compatible
+  ansible.builtin.debug:
+    msg: "PostgreSQL {{ _postgresql_release_version }} is compatible with Nextcloud {{ current_step_nextcloud_version }}."
+  when: _postgresql_version_compatible
+
+...

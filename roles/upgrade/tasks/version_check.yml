@@ -1,0 +1,71 @@
+---
+# Check if the version we are upgrading to is the actual target the updater has.
+
+- name: Gather Nextcloud update check parameters
+  become: true
+  become_user: "{{ nextcloud_websrv_user }}"
+  ansible.builtin.command:
+    argv:
+      - php
+      - -r
+      - >-
+        require "{{ nextcloud_webroot }}/config/config.php";
+        require "{{ nextcloud_webroot }}/version.php";
+        echo json_encode([
+        "version"      => $CONFIG["version"],
+        "updater_url"  => $CONFIG["updater.server.url"] ?? "https://updates.nextcloud.com/updater_server/",
+        "channel"      => $CONFIG["updater.release.channel"] ?? "stable",
+        "build_time"   => isset($OC_Build) ? $OC_Build : "",
+        "php_major"    => PHP_MAJOR_VERSION,
+        "php_minor"    => PHP_MINOR_VERSION,
+        "php_release"  => PHP_RELEASE_VERSION,
+        ]);
+  changed_when: false
+  register: _nc_update_params_raw
+
+- name: Parse update check parameters
+  ansible.builtin.set_fact:
+    _nc_update_params: "{{ _nc_update_params_raw.stdout | from_json }}"
+
+- name: Build update server query URL
+  ansible.builtin.set_fact:
+    _nc_update_url: >-
+      {{ _nc_update_params.updater_url }}?version={{
+      _nc_update_params.version | replace('.', 'x') }}xxx{{
+      _nc_update_params.channel }}xx{{
+      _nc_update_params.build_time | urlencode }}x{{
+      _nc_update_params.php_major }}x{{
+      _nc_update_params.php_minor }}x{{
+      _nc_update_params.php_release }}
+
+- name: Query Nextcloud update server
+  ansible.builtin.uri:
+    url: "{{ _nc_update_url }}"
+    method: GET
+    return_content: true
+    headers:
+      User-Agent: "Nextcloud Updater"
+  register: _nc_update_response
+
+- name: Parse update server XML response
+  ansible.builtin.set_fact:
+    _nc_update_data: "{{ _nc_update_response.content | ansible.utils.from_xml }}"
+
+- name: Set next version from update server response
+  ansible.builtin.set_fact:
+    _nc_next_version: >-
+      {{ _nc_update_data.nextcloud.versionstring
+         | default('NO_UPDATE')
+         | replace('Nextcloud ', '') }}
+
+- name: Verify version upgrading to matches upgrade path
+  ansible.builtin.assert:
+    that:
+      - _nc_next_version | trim == current_step_nextcloud_version
+    fail_msg: >-
+      Nextcloud updater would upgrade to '{{ _nc_next_version | trim }}',
+      but Ansible expects '{{ current_step_nextcloud_version }}'.
+      Ensure your upgrade path is correct.
+    success_msg: "Nextcloud updater confirms upgrade to {{ current_step_nextcloud_version }}."
+
+...

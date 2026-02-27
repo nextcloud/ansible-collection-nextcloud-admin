@@ -1,0 +1,110 @@
+---
+# Pre-upgrade checks for upgrade role
+
+# Verify that Nextcloud is installed
+
+- name: Check that nextcloud_webroot exists
+  ansible.builtin.stat:
+    path: "{{ nextcloud_webroot }}"
+  register: _nextcloud_webroot
+
+- name: Ensure nextcloud_webroot is a valid directory
+  ansible.builtin.assert:
+    that:
+      - _nextcloud_webroot.stat.exists
+      - _nextcloud_webroot.stat.isdir
+    fail_msg: >-
+      nextcloud_webroot '{{ nextcloud_webroot }}' does not exist or is not a directory.
+    success_msg: "nextcloud_webroot '{{ nextcloud_webroot }}' exists and is a directory."
+
+- name: Check that Nextcloud occ command exists
+  ansible.builtin.stat:
+    path: "{{ nextcloud_webroot }}/occ"
+  register: _nextcloud_occ
+
+- name: Ensure Nextcloud installation is valid (occ exists)
+  ansible.builtin.assert:
+    that:
+      - _nextcloud_occ.stat.exists
+    fail_msg: >-
+      No valid Nextcloud installation found at '{{ nextcloud_webroot }}'.
+    success_msg: "Valid Nextcloud installation found at '{{ nextcloud_webroot }}'."
+
+# Verify that instance status is adequate
+
+- name: Check Nextcloud instance health
+  become: true
+  become_user: "{{ nextcloud_websrv_user }}"
+  ansible.builtin.command: php occ status --output=json
+  args:
+    chdir: "{{ nextcloud_webroot }}"
+  register: _nextcloud_health
+  changed_when: false
+
+- name: Parse Nextcloud status
+  ansible.builtin.set_fact:
+    _nextcloud_status: "{{ _nextcloud_health.stdout | from_json }}"
+
+- name: Ensure Nextcloud reports as installed
+  ansible.builtin.assert:
+    that:
+      - _nextcloud_status.installed | bool
+    fail_msg: >-
+      Nextcloud instance at '{{ nextcloud_webroot }}' reports as not installed.
+    success_msg: "Nextcloud instance reports as installed."
+
+- name: Check Nextcloud maintenance mode
+  become: true
+  become_user: "{{ nextcloud_websrv_user }}"
+  ansible.builtin.command: php occ maintenance:mode
+  args:
+    chdir: "{{ nextcloud_webroot }}"
+  register: _nextcloud_maintenance
+  changed_when: false
+
+- name: Ensure Nextcloud is not in maintenance mode
+  ansible.builtin.assert:
+    that:
+      - "'disabled' in _nextcloud_maintenance.stdout"
+    fail_msg: >-
+      Nextcloud is currently in maintenance mode. Please disable maintenance mode before running
+      the upgrade.
+    success_msg: "Nextcloud is not in maintenance mode."
+
+# Version checks
+
+- name: Ensure `nextcloud_initial_version` has a compatible version in the upgrade path
+  vars:
+    _initial_major_minor: "{{ nextcloud_initial_version.split('.')[:2] | join('[.]') }}"
+    _compatible_versions: >-
+      {{ nextcloud_upgrade_path | select('match', '^' ~ _initial_major_minor ~ '[.]') |
+         select('version', nextcloud_initial_version, '>=') | list }}
+  ansible.builtin.assert:
+    that:
+      - _compatible_versions | length > 0
+    fail_msg: >-
+      No compatible version found for nextcloud_initial_version '{{ nextcloud_initial_version }}'.
+      Expected a version >= {{ nextcloud_initial_version }} with same major.minor.
+      Available versions: {{ nextcloud_upgrade_path | join(', ') }}
+    success_msg: >-
+      Compatible versions found for '{{ nextcloud_initial_version }}': {{ _compatible_versions | join(', ') }}
+
+- name: Ensure `nextcloud_target_version` is in the upgrade path
+  ansible.builtin.assert:
+    that:
+      - nextcloud_target_version in nextcloud_upgrade_path
+    fail_msg: >-
+      nextcloud_target_version '{{ nextcloud_target_version }}' is not present in nextcloud_upgrade_path.
+      Available versions: {{ nextcloud_upgrade_path | join(', ') }}
+    success_msg: "nextcloud_target_version '{{ nextcloud_target_version }}' found in upgrade path"
+
+- name: Ensure target version is greater than or equal to initial version
+  ansible.builtin.assert:
+    that:
+      - nextcloud_target_version is version(nextcloud_initial_version, '>=')
+    fail_msg: >-
+      nextcloud_target_version '{{ nextcloud_target_version }}' must be greater than or equal to
+      nextcloud_initial_version '{{ nextcloud_initial_version }}'
+    success_msg: "Version ordering is valid ({{ nextcloud_target_version }} >= {{ nextcloud_initial_version }})"
+
+...
