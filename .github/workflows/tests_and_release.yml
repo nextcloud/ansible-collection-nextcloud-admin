@@ -82,7 +82,7 @@ jobs:
             cat galaxy.yml | grep version: | cut -d' ' -f2
 
       - name: Publish the release notes
-        uses: release-drafter/release-drafter@v6
+        uses: release-drafter/release-drafter@v7
         with:
           publish: ${{ steps.check-version.outputs.tag != '' }}
           tag: ${{ steps.check-version.outputs.tag }}
