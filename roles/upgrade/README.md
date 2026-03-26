@@ -4,7 +4,7 @@ nextcloud.admin.upgrade
 Upgrades a Nextcloud instance step-by-step along a defined upgrade path. The role auto-detects the current version and iterates through each intermediate release up to the target version.
 
 In summary, at each step the role:
-- Checks PHP and PostgreSQL version compatibility (optionally upgrading them)
+- Checks PHP and PostgreSQL version compatibility (can be skipped), and optionally upgrades them
 - Runs version-specific pre-upgrade tasks (if any)
 - Runs the Nextcloud updater, managing maintenance mode
 - Runs version-specific post-upgrade tasks (if any)
@@ -40,6 +40,7 @@ Role Variables
 
 | Variable | Default | Description |
 |---|---|---|
+| `nextcloud_skip_php` | `false` | Skip PHP version check. Use at your own risk! |
 | `nextcloud_upgrade_php` | `false` | Enable automatic PHP version upgrades |
 | `nextcloud_php_requirements` | see defaults | Supported PHP versions per Nextcloud major release |
 
@@ -51,6 +52,7 @@ At the moment, it is absolutely necessary to set PHP role variables for the prop
 
 | Variable | Default | Description |
 |---|---|---|
+| `nextcloud_skip_postgresql` | `false` | Skip PostgreSQL version check. Use at your own risk! |
 | `nextcloud_upgrade_postgresql` | `false` | Enable automatic PostgreSQL version upgrades |
 | `nextcloud_db_name` | `nextcloud` | PostgreSQL database name |
 | `nextcloud_postgresql_requirements` | see defaults | Supported PostgreSQL versions per Nextcloud major release |

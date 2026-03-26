@@ -8,10 +8,12 @@
 # Check PHP version compatibility
 - name: Run PHP version compatibility check
   ansible.builtin.include_tasks: php_version_check.yml
+  when: not nextcloud_skip_php
 
 # Check PostgreSQL version compatibility
 - name: Run PostgreSQL version compatibility check
   ansible.builtin.include_tasks: postgresql_version_check.yml
+  when: not nextcloud_skip_postgresql
 
 # Tasks to run before the upgrade
 
