@@ -20,6 +20,17 @@
   ansible.builtin.set_fact:
     _php_version_compatible: "{{ current_php_version in _php_supported_versions }}"
 
+- name: Determine target PHP version for version check query
+  ansible.builtin.set_fact:
+    _php_version_for_query: >-
+      {% if _php_version_compatible -%}
+        {{ current_php_version }}
+      {%- elif distro_php_version is defined and distro_php_version in _php_supported_versions -%}
+        {{ distro_php_version }}
+      {%- else -%}
+        {{ _php_supported_versions | last }}
+      {%- endif %}
+
 - name: Fail if PHP version is incompatible and upgrade is disabled
   ansible.builtin.fail:
     msg: >-
@@ -30,25 +41,18 @@
     - not _php_version_compatible
     - not nextcloud_upgrade_php
 
-- name: Determine target PHP version
+- name: Set target PHP version for upgrade and mark as needed
   ansible.builtin.set_fact:
-    _php_target_version: >-
-      {% if distro_php_version is defined and distro_php_version in _php_supported_versions -%}
-        {{ distro_php_version }}
-      {%- else -%}
-        {{ _php_supported_versions | last }}
-      {%- endif %}
+    _php_target_version: "{{ _php_version_for_query }}"
+    _php_needs_upgrade: true
   when:
     - not _php_version_compatible
     - nextcloud_upgrade_php
 
-- name: "Upgrade PHP to {{ _php_target_version | default('') }}"
-  ansible.builtin.include_tasks: php_upgrade.yml
-  vars:
-    php_version: "{{ _php_target_version | default(omit) }}"
-  when:
-    - not _php_version_compatible
-    - nextcloud_upgrade_php
+- name: Mark PHP upgrade as not needed
+  ansible.builtin.set_fact:
+    _php_needs_upgrade: false
+  when: _php_version_compatible or not nextcloud_upgrade_php
 
 - name: PHP version is compatible
   ansible.builtin.debug:

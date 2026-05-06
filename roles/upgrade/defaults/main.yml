@@ -12,9 +12,6 @@ nextcloud_websrv_user: "www-data"
 
 nextcloud_target_version: '{{ nextcloud_upgrade_path | last }}'
 
-# Set to `true` to skip PHP version check (therefore, no upgrade either). Use at your own risk!
-nextcloud_skip_php: false
-
 # Enables automatic PHP version upgrade using geerlingguy.php-versions and geerlingguy.php roles.
 # When needed, upgrades PHP to a version compatible with both current and target Nextcloud versions.
 # The role will try to install a version available in your distribution's official repositories

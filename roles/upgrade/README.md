@@ -40,7 +40,6 @@ Role Variables
 
 | Variable | Default | Description |
 |---|---|---|
-| `nextcloud_skip_php` | `false` | Skip PHP version check. Use at your own risk! |
 | `nextcloud_upgrade_php` | `false` | Enable automatic PHP version upgrades |
 | `nextcloud_php_requirements` | see defaults | Supported PHP versions per Nextcloud major release |
 

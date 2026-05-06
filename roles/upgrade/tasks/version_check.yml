@@ -16,9 +16,6 @@
         "updater_url"  => $CONFIG["updater.server.url"] ?? "https://updates.nextcloud.com/updater_server/",
         "channel"      => $CONFIG["updater.release.channel"] ?? "stable",
         "build_time"   => isset($OC_Build) ? $OC_Build : "",
-        "php_major"    => PHP_MAJOR_VERSION,
-        "php_minor"    => PHP_MINOR_VERSION,
-        "php_release"  => PHP_RELEASE_VERSION,
         ]);
   changed_when: false
   register: _nc_update_params_raw
@@ -27,6 +24,10 @@
   ansible.builtin.set_fact:
     _nc_update_params: "{{ _nc_update_params_raw.stdout | from_json }}"
 
+- name: Parse target PHP version for query
+  ansible.builtin.set_fact:
+    _php_version_parts: "{{ _php_version_for_query.split('.') }}"
+
 - name: Build update server query URL
   ansible.builtin.set_fact:
     _nc_update_url: >-
@@ -34,9 +35,8 @@
       _nc_update_params.version | replace('.', 'x') }}xxx{{
       _nc_update_params.channel }}xx{{
       _nc_update_params.build_time | urlencode }}x{{
-      _nc_update_params.php_major }}x{{
-      _nc_update_params.php_minor }}x{{
-      _nc_update_params.php_release }}
+      _php_version_parts[0] }}x{{
+      _php_version_parts[1] }}x0
 
 - name: Query Nextcloud update server
   ansible.builtin.uri:

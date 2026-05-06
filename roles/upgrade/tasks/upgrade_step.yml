@@ -1,19 +1,32 @@
 ---
 # Upgrade one step in the path, from `current_nextcloud_version` to `current_step_nextcloud_version`
 
-# Check Nextcloud version we are upgrading to
-- name: Run version checks
-  ansible.builtin.include_tasks: version_check.yml
-
 # Check PHP version compatibility
 - name: Run PHP version compatibility check
   ansible.builtin.include_tasks: php_version_check.yml
-  when: not nextcloud_skip_php
 
 # Check PostgreSQL version compatibility
 - name: Run PostgreSQL version compatibility check
   ansible.builtin.include_tasks: postgresql_version_check.yml
   when: not nextcloud_skip_postgresql
+
+# Check Nextcloud version we are upgrading to
+- name: Run version checks
+  ansible.builtin.include_tasks: version_check.yml
+
+# Upgrade PHP if necessary
+- name: "Upgrade PHP to {{ _php_target_version | default('') }}"
+  ansible.builtin.include_tasks: php_upgrade.yml
+  vars:
+    php_version: "{{ _php_target_version | default(omit) }}"
+  when: _php_needs_upgrade | default(false)
+
+# Upgrade PostgreSQL if necessary
+- name: "Upgrade PostgreSQL to {{ _postgresql_target_version | default('') }}"
+  ansible.builtin.include_tasks: postgresql_upgrade.yml
+  vars:
+    postgresql_version: "{{ _postgresql_target_version | default(omit) }}"
+  when: _postgresql_needs_upgrade | default(false)
 
 # Tasks to run before the upgrade
 
