@@ -1,0 +1,27 @@
+---
+# defaults file for nextcloud
+### [DOWNLOAD] ###
+# An URL will be generated following naming rules used by nextcloud's repository
+# Not following this rules correctly will make the role unable to download nextcloud.
+nextcloud_version_channel: "releases"  # mandatory, can be one of (releases/latest)
+# channel releases requires nextcloud_version_full set.
+# channel lastest requires nextcloud_version_major set.
+# Mandatory. Specify either nextcloud_version_full or nextcloud_version_major
+# nextcloud_version_major: 25 # (24/25/26) for releases or for daily (master/stable25/stable26...)
+nextcloud_version_full: "29.0.1" # full version string
+
+# The URL where the server-package and the apps can be found.
+nextcloud_repository: "https://download.nextcloud.com/server"  # Domain URL where to download Nextcloud server.
+nextcloud_app_repository: "https://apps.nextcloud.com/apps"    # Domain URL where to download Nextcloud apps.
+
+nextcloud_archive_format: "zip"  # zip/tar.bz2
+
+# The directory on the control-host, relative to the playbook, to which the packages shall be downloaded.
+nextcloud_download_dir: ""
+
+# Control if the server archive or the apps are downloaded or both.
+nextcloud_download_server: true
+nextcloud_download_apps: true
+
+### [APPS] ###
+nextcloud_apps: {}

@@ -1,0 +1,48 @@
+---
+- name: Parameter check (1/4)
+  ansible.builtin.assert:
+    that:
+      - nextcloud_version_channel in [ 'latest', 'releases' ]
+    fail_msg: nextcloud_version_channel can bei either 'latest' or 'releases'
+  when: nextcloud_download_server
+
+- name: Parameter check (2/4)
+  ansible.builtin.assert:
+    that:
+      - nextcloud_version_full is defined
+    fail_msg: nextcloud_version_full must be defined when nextcloud_version_channel is 'releases'.
+  when:
+    - nextcloud_version_channel in [ 'releases' ]
+    - nextcloud_download_server
+
+- name: Parameter check (3/4)
+  ansible.builtin.assert:
+    that:
+      - nextcloud_version_major is defined
+    fail_msg: nextcloud_version_major must be defined when nextcloud_version_channel is 'latest'.
+  when:
+    - nextcloud_version_channel in [ 'latest' ]
+    - nextcloud_download_server
+
+- name: Parameter check (4/4)
+  ansible.builtin.assert:
+    that:
+      - (nextcloud_version_major is defined) or (nextcloud_version_full is defined)
+    fail_msg: nextcloud_version_major or nextcloud_version_major must be defined for downloading Apps.
+  when: nextcloud_download_apps
+
+- name: Always have major version of nextcloud defined.
+  ansible.builtin.set_fact:
+    nextcloud_version_major: "{{ nextcloud_version_full.split('.')[0] }}"
+  when: nextcloud_version_full is defined
+
+- name: Download the nextcloud server archive from nextcloud-server.
+  ansible.builtin.include_tasks: nc_download.yml
+  when: nextcloud_download_server
+
+- name: Download the apps-archive(s) from nextcloud-server.
+  ansible.builtin.include_tasks: nc_apps.yml
+  loop: "{{ nextcloud_apps | dict2items }}"
+  loop_control:
+    label: "{{ 'Downloading app package for app \"' ~ item.key ~ '\" from official app-store.' }}"
+  when: nextcloud_download_apps

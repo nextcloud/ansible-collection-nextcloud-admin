@@ -1,0 +1,28 @@
+---
+galaxy_info:
+  author: marioqxx
+  role_name: download
+  description: Download nextcloud server and apps archive(s) on the control host.
+
+  license: BSD
+
+  min_ansible_version: "2.14"
+
+  platforms:
+    - name: EL
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - all
+
+  galaxy_tags:
+    - nextcloud
+    - storage
+    - selfhosted
+    - privacy
+
+dependencies: []
