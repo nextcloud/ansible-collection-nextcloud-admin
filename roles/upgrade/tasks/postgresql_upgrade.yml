@@ -93,6 +93,9 @@
       PostgreSQL upgrade failed. Expected PostgreSQL {{ postgresql_version }}, but got PostgreSQL {{ _updated_postgresql_release_version }}.
     success_msg: "PostgreSQL successfully upgraded to version {{ postgresql_version }}."
 
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
 - name: Start services after upgrade
   ansible.builtin.include_tasks: manage_services.yml
   vars:

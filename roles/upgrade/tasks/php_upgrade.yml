@@ -62,6 +62,9 @@
       PHP upgrade failed. Expected PHP {{ php_version }}, but got PHP {{ _updated_php_version_result.stdout | trim }}.
     success_msg: "PHP successfully upgraded to version {{ php_version }}."
 
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
 - name: Start services after upgrade
   ansible.builtin.include_tasks: manage_services.yml
   vars:
