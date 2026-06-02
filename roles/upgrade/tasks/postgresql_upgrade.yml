@@ -27,7 +27,7 @@
   community.postgresql.postgresql_db:
     name: "{{ nextcloud_db_name }}"
     state: dump
-    target: "/tmp/{{ nextcloud_db_name }}-forPG{{ postgresql_version }}.sql"
+    target: "/tmp/{{ nextcloud_db_name }}-forPG{{ postgresql_version }}.pgc"
 
 - name: Stop PostgreSQL
   ansible.builtin.service:
@@ -69,7 +69,7 @@
   community.postgresql.postgresql_db:
     name: "{{ nextcloud_db_name }}"
     state: restore
-    target: "/tmp/{{ nextcloud_db_name }}-forPG{{ postgresql_version }}.sql"
+    target: "/tmp/{{ nextcloud_db_name }}-forPG{{ postgresql_version }}.pgc"
 
 - name: Get updated PostgreSQL version
   become: true
