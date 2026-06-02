@@ -102,8 +102,8 @@ nextcloud_upgrade_path:
 - 29.0.16
 - 30.0.17
 - 31.0.14 # EOL
-- 32.0.10 # https://nextcloud.com/changelog/#latest32
-- 33.0.4  # https://nextcloud.com/changelog/#latest33
+- 32.0.11 # https://nextcloud.com/changelog/#latest32
+- 33.0.5  # https://nextcloud.com/changelog/#latest33
 
 # References:
 #   - https://nextcloud.com/changelog/
