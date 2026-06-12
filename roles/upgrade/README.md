@@ -11,7 +11,12 @@ In summary, at each step the role:
 
 A backup of your Nextcloud instance is recommended prior to upgrading.
 
-At the moment, this role only works in APT-based systems (Debian 12/13). Additionally, some features are missing, like MySQL/MariaDB support or PHP/PostgreSQL variable auto-detection. PRs are encouraged!
+This role also works for instances using MySQL/MariaDB. However, this might require:
+- A [manual upgrade](https://mariadb.com/docs/server/server-management/install-and-upgrade-mariadb/upgrading) (unless it comes with your linux distribution's updates).
+- Running the [mariadb-upgrade](https://mariadb.com/docs/server/clients-and-utilities/deployment-tools/mariadb-upgrade) command.
+- Setting the `nextcloud_skip_postgresql` variable to `true` before running this role.
+
+At the moment, this role only works in APT-based systems (tested in Debian 12/13). Additionally, some features are missing, like PHP/PostgreSQL variable auto-detection. PRs are encouraged!
 
 Requirements
 ------------
@@ -51,7 +56,7 @@ At the moment, it is absolutely necessary to set PHP role variables for the prop
 
 | Variable | Default | Description |
 |---|---|---|
-| `nextcloud_skip_postgresql` | `false` | Skip PostgreSQL version check. Use at your own risk! |
+| `nextcloud_skip_postgresql` | `false` | Skip PostgreSQL version check. Useful when using MySQL/MariaDB. |
 | `nextcloud_upgrade_postgresql` | `false` | Enable automatic PostgreSQL version upgrades |
 | `nextcloud_db_name` | `nextcloud` | PostgreSQL database name |
 | `nextcloud_postgresql_requirements` | see defaults | Supported PostgreSQL versions per Nextcloud major release |
