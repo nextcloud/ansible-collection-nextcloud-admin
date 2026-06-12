@@ -25,7 +25,7 @@ Requirements
 - Jmespath
 - Xmltodict
 - APT-based system (Debian 12/13)
-- *Optional* - for automatic PHP upgrades: `geerlingguy.php` and `geerlingguy.php_versions` roles
+- *Optional* - for automatic PHP upgrades: `geerlingguy.php` ([fork](https://github.com/cielito/ansible-role-php/tree/cielito)) and `geerlingguy.php-versions` ([fork](https://github.com/cielito/ansible-role-php-versions/tree/cielito)) roles
 - *Optional* - for automatic PostgreSQL upgrades: `geerlingguy.postgresql` role and `community.postgresql` collection
 
 Role Variables
