@@ -1,0 +1,104 @@
+---
+# Playbook to upgrade PostgreSQL
+
+- name: Assert postgresql_version is defined
+  ansible.builtin.assert:
+    that:
+      - postgresql_version is defined
+      - postgresql_version | length > 0
+    fail_msg: "postgresql_version must be defined and non-empty."
+    quiet: true
+
+- name: Stop services before upgrade
+  ansible.builtin.include_tasks: manage_services.yml
+  vars:
+    nextcloud_maintenance_mode: true
+
+- name: Set PostgreSQL configuration paths and daemon
+  ansible.builtin.set_fact:
+    postgresql_data_dir: "/var/lib/postgresql/{{ postgresql_version }}/main"
+    postgresql_bin_path: "/usr/lib/postgresql/{{ postgresql_version }}/bin"
+    postgresql_config_path: "/etc/postgresql/{{ postgresql_version }}/main"
+    postgresql_daemon: "postgresql@{{ postgresql_version }}-main"
+
+- name: Dump Nextcloud database
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_db:
+    name: "{{ nextcloud_db_name }}"
+    state: dump
+    target: "/tmp/{{ nextcloud_db_name }}-forPG{{ postgresql_version }}.pgc"
+
+- name: Stop PostgreSQL
+  ansible.builtin.service:
+    name: "postgresql"
+    state: stopped
+
+- name: Uninstall PostgreSQL
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: absent
+    purge: true
+  loop:
+    - postgresql-*
+    - postgresql-client-*
+
+- name: Ensure PostgreSQL repository is configured
+  ansible.builtin.deb822_repository:
+    name: PostgreSQL
+    types: deb
+    uris: https://apt.postgresql.org/pub/repos/apt
+    suites: '{{ ansible_facts["distribution_release"] }}-pgdg'
+    components: main
+    signed_by: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    state: "{{ 'absent' if postgresql_version == distro_postgresql_version | default('') else 'present' }}"
+  register: _postgresql_repo
+
+- name: Update apt cache after repo configuration
+  ansible.builtin.apt:
+    update_cache: true
+  when: _postgresql_repo.changed | default(false) # noqa: no-handler
+
+- name: Install PostgreSQL {{ postgresql_version }}
+  ansible.builtin.include_role:
+    name: geerlingguy.postgresql
+
+- name: Restore Nextcloud database
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_db:
+    name: "{{ nextcloud_db_name }}"
+    state: restore
+    target: "/tmp/{{ nextcloud_db_name }}-forPG{{ postgresql_version }}.pgc"
+
+- name: Get updated PostgreSQL version
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_info:
+    filter: version
+  register: postgresql_info
+
+- name: Determine PostgreSQL release version
+  ansible.builtin.set_fact:
+    _updated_postgresql_release_version: >-
+      {{ (postgresql_info.version.major | string ~ '.' ~ postgresql_info.version.minor | string)
+         if postgresql_info.version.major | int < 10
+         else postgresql_info.version.major | string }}
+
+- name: Verify PostgreSQL version matches expected version
+  ansible.builtin.assert:
+    that:
+      - _updated_postgresql_release_version == postgresql_version
+    fail_msg: >-
+      PostgreSQL upgrade failed. Expected PostgreSQL {{ postgresql_version }}, but got PostgreSQL {{ _updated_postgresql_release_version }}.
+    success_msg: "PostgreSQL successfully upgraded to version {{ postgresql_version }}."
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Start services after upgrade
+  ansible.builtin.include_tasks: manage_services.yml
+  vars:
+    nextcloud_maintenance_mode: false
+
+...

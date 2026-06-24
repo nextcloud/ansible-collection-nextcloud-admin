@@ -1,0 +1,71 @@
+---
+## Tasks to start/stop services on a Nextcloud server
+
+- name: Detect web server - check if nginx is active
+  ansible.builtin.systemd:
+    name: nginx
+  register: _nginx_status
+  ignore_errors: true
+  changed_when: false
+
+- name: Detect web server - check if apache2 is active
+  ansible.builtin.systemd:
+    name: apache2
+  register: _apache_status
+  ignore_errors: true
+  changed_when: false
+
+- name: Set detected web server
+  ansible.builtin.set_fact:
+    _detected_websrv: >-
+      {{ 'nginx' if (_nginx_status.status.ActiveState | default('')) == 'active'
+         else 'apache2' if (_apache_status.status.ActiveState | default('')) == 'active'
+         else nextcloud_websrv | default('apache2') }}
+
+# When entering maintenance mode: enable maintenance first, then stop services
+
+- name: Enable Nextcloud maintenance mode
+  become: true
+  become_user: "{{ nextcloud_websrv_user }}"
+  ansible.builtin.command: php occ maintenance:mode --on
+  args:
+    chdir: "{{ nextcloud_webroot }}"
+  changed_when: true
+  when: nextcloud_maintenance_mode
+
+- name: Stop cron service
+  ansible.builtin.service:
+    name: cron
+    state: stopped
+  when: nextcloud_maintenance_mode
+
+- name: Stop web server
+  ansible.builtin.service:
+    name: "{{ _detected_websrv }}"
+    state: stopped
+  when: nextcloud_maintenance_mode
+
+# When leaving maintenance mode: start services first, then disable maintenance
+
+- name: Start web server
+  ansible.builtin.service:
+    name: "{{ _detected_websrv }}"
+    state: restarted
+  when: not nextcloud_maintenance_mode
+
+- name: Start cron service
+  ansible.builtin.service:
+    name: cron
+    state: restarted
+  when: not nextcloud_maintenance_mode
+
+- name: Disable Nextcloud maintenance mode
+  become: true
+  become_user: "{{ nextcloud_websrv_user }}"
+  ansible.builtin.command: php occ maintenance:mode --off
+  args:
+    chdir: "{{ nextcloud_webroot }}"
+  changed_when: true
+  when: not nextcloud_maintenance_mode
+
+...

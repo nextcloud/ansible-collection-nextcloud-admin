@@ -1,0 +1,95 @@
+---
+# Upgrade one step in the path, from `current_nextcloud_version` to `current_step_nextcloud_version`
+
+# Check PHP version compatibility
+- name: Run PHP version compatibility check
+  ansible.builtin.include_tasks: php_version_check.yml
+
+# Check PostgreSQL version compatibility
+- name: Run PostgreSQL version compatibility check
+  ansible.builtin.include_tasks: postgresql_version_check.yml
+  when: not nextcloud_skip_postgresql
+
+# Check Nextcloud version we are upgrading to
+- name: Run version checks
+  ansible.builtin.include_tasks: version_check.yml
+
+# Upgrade PHP if necessary
+- name: "Upgrade PHP to {{ _php_target_version | default('') }}"
+  ansible.builtin.include_tasks: php_upgrade.yml
+  vars:
+    php_version: "{{ _php_target_version | default(omit) }}"
+  when: _php_needs_upgrade | default(false)
+
+# Upgrade PostgreSQL if necessary
+- name: "Upgrade PostgreSQL to {{ _postgresql_target_version | default('') }}"
+  ansible.builtin.include_tasks: postgresql_upgrade.yml
+  vars:
+    postgresql_version: "{{ _postgresql_target_version | default(omit) }}"
+  when: _postgresql_needs_upgrade | default(false)
+
+# Tasks to run before the upgrade
+
+- name: Specific tasks before upgrade to version {{ current_step_nextcloud_version }}
+  ansible.builtin.include_tasks: '{{ item }}'
+  with_first_found:
+    - files:
+        - upgrade_tasks/pre_{{ current_step_nextcloud_version }}.yml
+        - upgrade_tasks/pre_{{ step_version_members[0:2] | join('.') }}.yml
+        - upgrade_tasks/pre_{{ step_version_members[0] | string }}.yml
+      skip: true
+  vars:
+    step_version_members: "{{ current_step_nextcloud_version | ansible.builtin.split('.') }}"
+
+# Upgrade step
+
+- name: Run Nextcloud upgrade
+  become: true
+  become_user: "{{ nextcloud_websrv_user }}"
+  module_defaults:
+    ansible.builtin.command:
+      chdir: "{{ nextcloud_webroot }}"
+  block:
+    - name: Upgrade Nextcloud to version {{ current_step_nextcloud_version }}
+      ansible.builtin.command: "php {{ nextcloud_webroot }}/updater/updater.phar  --no-interaction"
+      changed_when: true
+
+    - name: Get Nextcloud status
+      ansible.builtin.command: php occ status --output=json
+      changed_when: false
+      register: nextcloud_status
+
+- name: Verify Nextcloud version matches expected version
+  ansible.builtin.assert:
+    that:
+      - (nextcloud_status.stdout | from_json).versionstring == current_step_nextcloud_version
+    fail_msg: >-
+      Nextcloud upgrade failed. Expected {{ current_step_nextcloud_version }}, but got {{ (nextcloud_status.stdout | from_json).versionstring }}.
+    success_msg: "Nextcloud successfully upgraded to version {{ current_step_nextcloud_version }}."
+
+- name: Set current version to upgraded
+  ansible.builtin.set_fact:
+    current_nextcloud_version: '{{ current_step_nextcloud_version }}'
+
+# Tasks to run after the upgrade
+
+- name: Add missing indices
+  become: true
+  become_user: "{{ nextcloud_websrv_user }}"
+  ansible.builtin.command: php occ -vvv db:add-missing-indices
+  args:
+    chdir: "{{ nextcloud_webroot }}"
+  changed_when: true
+
+- name: Specific tasks after upgrade to version {{ current_step_nextcloud_version }}
+  ansible.builtin.include_tasks: '{{ item }}'
+  with_first_found:
+    - files:
+        - upgrade_tasks/post_{{ current_step_nextcloud_version }}.yml
+        - upgrade_tasks/post_{{ step_version_members[0:2] | join('.') }}.yml
+        - upgrade_tasks/post_{{ step_version_members[0] | string }}.yml
+      skip: true
+  vars:
+    step_version_members: "{{ current_step_nextcloud_version | ansible.builtin.split('.') }}"
+
+...

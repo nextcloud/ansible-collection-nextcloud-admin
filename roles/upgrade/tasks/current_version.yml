@@ -1,0 +1,22 @@
+---
+# Detect the currently installed Nextcloud version
+
+- name: Get Nextcloud status
+  become: true
+  become_user: "{{ nextcloud_websrv_user }}"
+  ansible.builtin.command: php occ status --output=json
+  args:
+    chdir: "{{ nextcloud_webroot }}"
+  changed_when: false
+  register: nextcloud_status
+
+- name: Set detected Nextcloud version
+  ansible.builtin.set_fact:
+    nextcloud_initial_version: "{{ (nextcloud_status.stdout | from_json).versionstring }}"
+
+- name: Display detected version
+  ansible.builtin.debug:
+    msg: "Detected Nextcloud version: {{ nextcloud_initial_version }}"
+    verbosity: 2
+
+...
