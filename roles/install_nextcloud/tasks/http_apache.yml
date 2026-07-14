@@ -1,20 +1,30 @@
 ---
 - name: http_apache | Enable APC for php CLI
   ansible.builtin.lineinfile:
-    dest: "{{ php_dir }}/cli/php.ini"
-    line: "apc.enable_cli = 1"
-    insertbefore: "^; End:$"
-    state: present
-    # validate: "/usr/sbin/{{ php_bin }} -t #%s"
-
-- name: http_apache | Enable PHP OPcache for php.ini
-  ansible.builtin.lineinfile:
-    dest: "{{ php_dir }}/apache2/php.ini"
-    state: present
+    dest: "{{ php_dir }}/mods-available/nc-cli_{{ nextcloud_instance_name }}.ini"
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
-    backrefs: true
+    create: true
+    mode: "0644"
+    state: present
+    # validate: "/usr/sbin/{{ php_bin }} -t #%s"
   with_items:
+    - {regexp: '; priority=', line: '; priority=50'}
+    - {regexp: 'apc.enable_cli', line: 'apc.enable_cli=1'}
+  notify:
+    - Load php nc-cli module
+    - Reload php-fpm
+
+- name: http_apache | Enable PHP OPcache in nextcloud php module
+  ansible.builtin.lineinfile:
+    dest: "{{ php_dir }}/mods-available/nc_{{ nextcloud_instance_name }}.ini"
+    state: present
+    create: true
+    mode: "0644"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - {regexp: '; priority=', line: '; priority=50'}
     - {regexp: 'opcache.enable=0', line: 'opcache.enable=1'}
     - {regexp: 'opcache.enable_cli', line: 'opcache.enable_cli=1'}
     - {regexp: 'opcache.interned_strings_buffer', line: 'opcache.interned_strings_buffer=16'}
@@ -24,7 +34,10 @@
     - {regexp: 'opcache.revalidate_freq', line: 'opcache.revalidate_freq=1'}
     - {regexp: 'memory_limit', line: 'memory_limit={{ php_memory_limit }}'}
     # validate: "/usr/sbin/{{ php_bin }} -t #%s"
-  notify: Reload http
+  notify:
+    - Load php nc module
+    - Reload php-fpm
+    - Reload http
 
 - name: http_apache | Enable required Apache2 modules
   community.general.apache2_module:
@@ -47,11 +60,18 @@
   when: (nextcloud_install_tls | bool)
   notify: Restart http
 
+- name: http_apache | Enable Apache2 FPM configuration
+  ansible.builtin.command:
+    cmd: a2enconf php{{ php_ver }}-fpm
+  register: fpm_conf
+  changed_when: "'Enabling' in fpm_conf.stdout"
+  notify: Restart http
+
 - name: http_apache | Generate Nextcloud configuration for apache
   ansible.builtin.template:
     dest: /etc/apache2/sites-available/nc_{{ nextcloud_instance_name }}.conf
     src: "{{ nextcloud_websrv_template }}"
-    mode: 0640
+    mode: "0640"
   notify: Reload http
 
 - name: http_apache | Enable Nextcloud site in apache conf
