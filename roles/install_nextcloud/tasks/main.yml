@@ -125,6 +125,14 @@
   tags:
     - molecule-idempotence-notest
 
+- name: Migrate mimetypes
+  nextcloud.admin.run_occ:
+    nextcloud_path: "{{ nextcloud_webroot }}"
+    command: maintenance:repair --include-expensive
+  become: true
+  register: nc_mimetypes_cmd
+  changed_when: true
+
 - name: Main | Patch from the app 'user_saml' the file SAMLController.php
   when:
     - nextcloud_patch_user_saml_app
