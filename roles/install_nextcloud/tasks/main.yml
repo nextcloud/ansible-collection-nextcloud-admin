@@ -12,6 +12,10 @@
   tags:
     - install_apps
 
+- name: Configure php custom variables
+  ansible.builtin.include_tasks: php_custom.yml
+  when: (custom_php_config_fpm is defined) or (custom_php_config_cli is defined)
+
 - name: Install web server packages
   when: nextcloud_install_websrv
   ansible.builtin.include_tasks: websrv_install.yml
