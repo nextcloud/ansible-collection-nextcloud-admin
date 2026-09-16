@@ -13,8 +13,8 @@
 - name: Get supported PHP versions for both current and target Nextcloud versions
   ansible.builtin.set_fact:
     _php_supported_versions: >-
-      {{ nextcloud_php_requirements[current_nextcloud_version.split('.')[0]]
-         | intersect(nextcloud_php_requirements[current_step_nextcloud_version.split('.')[0]]) }}
+      {{ nextcloud_php_requirements[current_nextcloud_version | string]
+         | intersect(nextcloud_php_requirements[current_step_nextcloud_version | string]) }}
 
 - name: Check if PHP version is compatible with both current and target Nextcloud versions
   ansible.builtin.set_fact:

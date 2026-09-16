@@ -73,26 +73,20 @@
 
 # Version checks
 
-- name: Ensure `nextcloud_initial_version` has a compatible version in the upgrade path
-  vars:
-    _initial_major_minor: "{{ nextcloud_initial_version.split('.')[:2] | join('[.]') }}"
-    _compatible_versions: >-
-      {{ nextcloud_upgrade_path | select('match', '^' ~ _initial_major_minor ~ '[.]') |
-         select('version', nextcloud_initial_version, '>=') | list }}
+- name: Ensure `nextcloud_initial_version` is in the upgrade path
   ansible.builtin.assert:
     that:
-      - _compatible_versions | length > 0
+      - nextcloud_initial_version | int in nextcloud_upgrade_path
     fail_msg: >-
-      No compatible version found for nextcloud_initial_version '{{ nextcloud_initial_version }}'.
-      Expected a version >= {{ nextcloud_initial_version }} with same major.minor.
+      nextcloud_initial_version '{{ nextcloud_initial_version }}' is not in the upgrade path.
       Available versions: {{ nextcloud_upgrade_path | join(', ') }}
     success_msg: >-
-      Compatible versions found for '{{ nextcloud_initial_version }}': {{ _compatible_versions | join(', ') }}
+      nextcloud_initial_version '{{ nextcloud_initial_version }}' found in upgrade path.
 
 - name: Ensure `nextcloud_target_version` is in the upgrade path
   ansible.builtin.assert:
     that:
-      - nextcloud_target_version in nextcloud_upgrade_path
+      - nextcloud_target_version | int in nextcloud_upgrade_path
     fail_msg: >-
       nextcloud_target_version '{{ nextcloud_target_version }}' is not present in nextcloud_upgrade_path.
       Available versions: {{ nextcloud_upgrade_path | join(', ') }}

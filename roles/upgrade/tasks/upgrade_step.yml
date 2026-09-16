@@ -35,11 +35,7 @@
   with_first_found:
     - files:
         - upgrade_tasks/pre_{{ current_step_nextcloud_version }}.yml
-        - upgrade_tasks/pre_{{ step_version_members[0:2] | join('.') }}.yml
-        - upgrade_tasks/pre_{{ step_version_members[0] | string }}.yml
       skip: true
-  vars:
-    step_version_members: "{{ current_step_nextcloud_version | ansible.builtin.split('.') }}"
 
 # Upgrade step
 
@@ -62,10 +58,11 @@
 - name: Verify Nextcloud version matches expected version
   ansible.builtin.assert:
     that:
-      - (nextcloud_status.stdout | from_json).versionstring == current_step_nextcloud_version
+      - (nextcloud_status.stdout | from_json).versionstring == _nc_next_version | trim
     fail_msg: >-
-      Nextcloud upgrade failed. Expected {{ current_step_nextcloud_version }}, but got {{ (nextcloud_status.stdout | from_json).versionstring }}.
-    success_msg: "Nextcloud successfully upgraded to version {{ current_step_nextcloud_version }}."
+      Nextcloud upgrade failed. Expected {{ _nc_next_version | trim }},
+      but got {{ (nextcloud_status.stdout | from_json).versionstring }}.
+    success_msg: "Nextcloud successfully upgraded to version {{ (nextcloud_status.stdout | from_json).versionstring }}."
 
 - name: Set current version to upgraded
   ansible.builtin.set_fact:
@@ -81,15 +78,19 @@
     chdir: "{{ nextcloud_webroot }}"
   changed_when: true
 
+- name: Add new mimetypes for handling certain file types
+  become: true
+  become_user: "{{ nextcloud_websrv_user }}"
+  ansible.builtin.command: php occ maintenance:repair --include-expensive
+  args:
+    chdir: "{{ nextcloud_webroot }}"
+  changed_when: true
+
 - name: Specific tasks after upgrade to version {{ current_step_nextcloud_version }}
   ansible.builtin.include_tasks: '{{ item }}'
   with_first_found:
     - files:
         - upgrade_tasks/post_{{ current_step_nextcloud_version }}.yml
-        - upgrade_tasks/post_{{ step_version_members[0:2] | join('.') }}.yml
-        - upgrade_tasks/post_{{ step_version_members[0] | string }}.yml
       skip: true
-  vars:
-    step_version_members: "{{ current_step_nextcloud_version | ansible.builtin.split('.') }}"
 
 ...

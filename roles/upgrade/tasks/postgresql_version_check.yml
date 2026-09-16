@@ -18,8 +18,8 @@
 - name: Get supported PostgreSQL versions for both current and target Nextcloud versions
   ansible.builtin.set_fact:
     _postgresql_supported_versions: >-
-      {{ nextcloud_postgresql_requirements[current_nextcloud_version.split('.')[0]]
-         | intersect(nextcloud_postgresql_requirements[current_step_nextcloud_version.split('.')[0]]) }}
+      {{ nextcloud_postgresql_requirements[current_nextcloud_version | string]
+         | intersect(nextcloud_postgresql_requirements[current_step_nextcloud_version | string]) }}
 
 - name: Check if PostgreSQL version is compatible with both current and target Nextcloud versions
   ansible.builtin.set_fact:

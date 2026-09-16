@@ -61,11 +61,11 @@
 - name: Verify version upgrading to matches upgrade path
   ansible.builtin.assert:
     that:
-      - _nc_next_version | trim == current_step_nextcloud_version
+      - (_nc_next_version | trim).split('.')[0] == current_step_nextcloud_version | string
     fail_msg: >-
       Nextcloud updater would upgrade to '{{ _nc_next_version | trim }}',
-      but Ansible expects '{{ current_step_nextcloud_version }}'.
+      but Ansible expects major version '{{ current_step_nextcloud_version }}'.
       Ensure your upgrade path is correct.
-    success_msg: "Nextcloud updater confirms upgrade to {{ current_step_nextcloud_version }}."
+    success_msg: "Nextcloud updater confirms upgrade to {{ _nc_next_version | trim }}."
 
 ...

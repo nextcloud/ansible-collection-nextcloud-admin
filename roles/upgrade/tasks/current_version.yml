@@ -12,7 +12,7 @@
 
 - name: Set detected Nextcloud version
   ansible.builtin.set_fact:
-    nextcloud_initial_version: "{{ (nextcloud_status.stdout | from_json).versionstring }}"
+    nextcloud_initial_version: "{{ (nextcloud_status.stdout | from_json).versionstring.split('.')[0] }}"
 
 - name: Display detected version
   ansible.builtin.debug:
