@@ -1,0 +1,48 @@
+---
+# tasks file for upgrade
+
+- name: Load distribution-specific variables
+  ansible.builtin.include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_facts["distribution"] }}_{{ ansible_facts["distribution_major_version"] }}.yml'
+        - '{{ ansible_facts["distribution"] }}.yml'
+        - '{{ ansible_facts["os_family"] }}.yml'
+      paths:
+        - '{{ role_path }}/vars'
+      skip: true
+
+- name: Auto-detect current Nextcloud version
+  ansible.builtin.include_tasks: current_version.yml
+  when: nextcloud_initial_version is not defined
+
+- name: Normalize Nextcloud versions to major integers
+  ansible.builtin.set_fact:
+    _nc_initial_major: "{{ (nextcloud_initial_version | string).split('.')[0] | int }}"
+    _nc_target_major: "{{ (nextcloud_target_version | string).split('.')[0] | int }}"
+
+- name: Run pre-upgrade checks
+  ansible.builtin.include_tasks: assert.yml
+
+- name: Build `current_nextcloud_upgrade_path`
+  ansible.builtin.set_fact:
+    current_nextcloud_version: '{{ _nc_initial_major }}'
+    current_nextcloud_upgrade_path: >-
+      {{ nextcloud_upgrade_path
+         | select('ge', _nc_initial_major)
+         | select('le', _nc_target_major)
+         | list }}
+
+- name: See `current_nextcloud_upgrade_path`
+  ansible.builtin.debug:
+    var: current_nextcloud_upgrade_path
+    verbosity: 2
+
+- name: Loop upgrade step on `current_nextcloud_upgrade_path`
+  ansible.builtin.include_tasks: upgrade_step.yml
+  loop: '{{ current_nextcloud_upgrade_path }}'
+  loop_control:
+    loop_var: current_step_nextcloud_version
+  when: current_nextcloud_upgrade_path | length > 0
+
+...

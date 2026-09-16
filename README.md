@@ -48,6 +48,7 @@ nextcloud.admin.group | Manage Nextcloud groups.
 
 Name | Description
 --- | ---
+nextcloud.admin.upgrade (**alpha**) | Upgrade a Nextcloud instance
 nextcloud.admin.backup (**beta**)|Create a backup of a Nextcloud server
 nextcloud.admin.install_nextcloud | Install and configure an Nextcloud instance for a Debian/Ubuntu server
 

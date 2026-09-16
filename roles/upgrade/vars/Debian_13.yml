@@ -1,0 +1,5 @@
+---
+# Debian 13 (trixie) native package versions
+
+distro_php_version: "8.4"
+distro_postgresql_version: "17"
