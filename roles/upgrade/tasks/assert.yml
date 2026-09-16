@@ -76,29 +76,29 @@
 - name: Ensure `nextcloud_initial_version` is in the upgrade path
   ansible.builtin.assert:
     that:
-      - nextcloud_initial_version | int in nextcloud_upgrade_path
+      - _nc_initial_major in nextcloud_upgrade_path
     fail_msg: >-
-      nextcloud_initial_version '{{ nextcloud_initial_version }}' is not in the upgrade path.
+      nextcloud_initial_version '{{ _nc_initial_major }}' is not in the upgrade path.
       Available versions: {{ nextcloud_upgrade_path | join(', ') }}
     success_msg: >-
-      nextcloud_initial_version '{{ nextcloud_initial_version }}' found in upgrade path.
+      nextcloud_initial_version '{{ _nc_initial_major }}' found in upgrade path.
 
 - name: Ensure `nextcloud_target_version` is in the upgrade path
   ansible.builtin.assert:
     that:
-      - nextcloud_target_version | int in nextcloud_upgrade_path
+      - _nc_target_major in nextcloud_upgrade_path
     fail_msg: >-
-      nextcloud_target_version '{{ nextcloud_target_version }}' is not present in nextcloud_upgrade_path.
+      nextcloud_target_version '{{ _nc_target_major }}' is not present in nextcloud_upgrade_path.
       Available versions: {{ nextcloud_upgrade_path | join(', ') }}
-    success_msg: "nextcloud_target_version '{{ nextcloud_target_version }}' found in upgrade path"
+    success_msg: "nextcloud_target_version '{{ _nc_target_major }}' found in upgrade path"
 
 - name: Ensure target version is greater than or equal to initial version
   ansible.builtin.assert:
     that:
-      - nextcloud_target_version is version(nextcloud_initial_version, '>=')
+      - _nc_target_major >= _nc_initial_major
     fail_msg: >-
-      nextcloud_target_version '{{ nextcloud_target_version }}' must be greater than or equal to
-      nextcloud_initial_version '{{ nextcloud_initial_version }}'
-    success_msg: "Version ordering is valid ({{ nextcloud_target_version }} >= {{ nextcloud_initial_version }})"
+      nextcloud_target_version '{{ _nc_target_major }}' must be greater than or equal to
+      nextcloud_initial_version '{{ _nc_initial_major }}'
+    success_msg: "Version ordering is valid ({{ _nc_target_major }} >= {{ _nc_initial_major }})"
 
 ...

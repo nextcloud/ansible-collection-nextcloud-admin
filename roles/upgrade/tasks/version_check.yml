@@ -58,7 +58,13 @@
          | default('NO_UPDATE')
          | replace('Nextcloud ', '') }}
 
-- name: Verify version upgrading to matches upgrade path
+- name: Determine if this upgrade step should be skipped
+  ansible.builtin.set_fact:
+    _skip_upgrade_step: >-
+      {{ (_nc_next_version == 'NO_UPDATE' and current_step_nextcloud_version | int == _nc_target_major) or
+         (_nc_next_version != 'NO_UPDATE' and (_nc_next_version | trim).split('.')[0] | int > current_step_nextcloud_version | int) }}
+
+- name: Verify update server proposes expected version (if not skipping)
   ansible.builtin.assert:
     that:
       - (_nc_next_version | trim).split('.')[0] == current_step_nextcloud_version | string
@@ -67,5 +73,6 @@
       but Ansible expects major version '{{ current_step_nextcloud_version }}'.
       Ensure your upgrade path is correct.
     success_msg: "Nextcloud updater confirms upgrade to {{ _nc_next_version | trim }}."
+  when: not _skip_upgrade_step | default(false)
 
 ...

@@ -16,16 +16,21 @@
   ansible.builtin.include_tasks: current_version.yml
   when: nextcloud_initial_version is not defined
 
+- name: Normalize Nextcloud versions to major integers
+  ansible.builtin.set_fact:
+    _nc_initial_major: "{{ (nextcloud_initial_version | string).split('.')[0] | int }}"
+    _nc_target_major: "{{ (nextcloud_target_version | string).split('.')[0] | int }}"
+
 - name: Run pre-upgrade checks
   ansible.builtin.include_tasks: assert.yml
 
 - name: Build `current_nextcloud_upgrade_path`
   ansible.builtin.set_fact:
-    current_nextcloud_version: '{{ nextcloud_initial_version }}'
+    current_nextcloud_version: '{{ _nc_initial_major }}'
     current_nextcloud_upgrade_path: >-
       {{ nextcloud_upgrade_path
-         | select('version', nextcloud_initial_version, '>')
-         | select('version', nextcloud_target_version, '<=')
+         | select('ge', _nc_initial_major)
+         | select('le', _nc_target_major)
          | list }}
 
 - name: See `current_nextcloud_upgrade_path`
