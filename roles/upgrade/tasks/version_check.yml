@@ -49,13 +49,15 @@
 
 - name: Parse update server XML response
   ansible.builtin.set_fact:
-    _nc_update_data: "{{ _nc_update_response.content | ansible.utils.from_xml }}"
+    _nc_update_data: >-
+      {{ (_nc_update_response.content | ansible.utils.from_xml)
+         if _nc_update_response.content | trim != ''
+         else {} }}
 
 - name: Set next version from update server response
   ansible.builtin.set_fact:
     _nc_next_version: >-
-      {{ _nc_update_data.nextcloud.versionstring
-         | default('NO_UPDATE')
+      {{ ((_nc_update_data.nextcloud | default({}, true)).versionstring | default('NO_UPDATE', true))
          | replace('Nextcloud ', '') }}
 
 - name: Determine if this upgrade step should be skipped
@@ -71,7 +73,7 @@
     fail_msg: >-
       Nextcloud updater would upgrade to '{{ _nc_next_version | trim }}',
       but Ansible expects major version '{{ current_step_nextcloud_version }}'.
-      Ensure your upgrade path is correct.
+      This might be a connectivity or upstream issue.
     success_msg: "Nextcloud updater confirms upgrade to {{ _nc_next_version | trim }}."
   when: not _skip_upgrade_step | default(false)
 
