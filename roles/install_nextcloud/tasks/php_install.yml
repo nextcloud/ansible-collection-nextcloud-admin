@@ -30,7 +30,7 @@
     backrefs: true
   with_items:
     - {regexp: 'opcache.interned_strings_buffer', line: 'opcache.interned_strings_buffer=16'}
-    - {regexp: 'memory_limit', line: 'memory_limit={{ php_memory_limit }}'}
+    - {regexp: '\bmemory_limit\b', line: 'memory_limit={{ php_memory_limit }}'}
   notify:
     - Start php-fpm
     - Reload http
