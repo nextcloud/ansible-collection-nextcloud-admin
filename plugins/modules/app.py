@@ -112,8 +112,13 @@ miscellaneous:
       type: str
 """
 
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from ansible_collections.nextcloud.admin.plugins.module_utils.app import NCApp
+
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nextcloud.admin.plugins.module_utils.app import app
+from ansible_collections.nextcloud.admin.plugins.module_utils.server import NCServer
 from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
     AppExceptions,
 )
@@ -136,7 +141,7 @@ module_args_spec = dict(
 def main():
     global module
     misc_msg = []
-    result = dict(
+    result = dict[str, Any](
         actions_taken=[],
         version=None,
     )
@@ -144,9 +149,10 @@ def main():
         argument_spec=extend_nc_tools_args_spec(module_args_spec),
         supports_check_mode=True,
     )
-    app_name = module.params.get("name")
+    nc_server: NCServer = NCServer(module)
+    nc_app: NCApp = nc_server.app(name=module.params.get("name"))
+
     target_state = module.params.get("state", "present")
-    nc_app = app(module, app_name)
     # case1: switch between enable/disable status
     if (target_state == "disabled" and nc_app.state == "present") or (
         target_state == "present" and nc_app.state == "disabled"
