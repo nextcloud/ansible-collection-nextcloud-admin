@@ -69,7 +69,7 @@ class OccExceptions(NextcloudException):
     def __init__(
         self,
         occ_cmd: list[str] | str | None = None,
-        rc: str | None = None,
+        rc: int | None = None,
         stdout: str | None = None,
         stderr: str | None = None,
         **kwargs,
