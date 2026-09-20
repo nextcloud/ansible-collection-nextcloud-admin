@@ -198,15 +198,16 @@ def main():
         stdout = run_occ(module, occ_command)[1]
         users = json.loads(stdout)
 
+        module.exit_json(
+            changed=False,
+            users=users,
+        )
     except OccExceptions as e:
         e.fail_json(module)
     except json.JSONDecodeError:
-        module.fail_json(msg="Unable to understand the server answer.", stdout=stdout)
-
-    module.exit_json(
-        changed=False,
-        users=users,
-    )
+        module.fail_json(
+            msg="Unable to understand the server answer.", stdout=stdout
+        )  # pyright: ignore[reportPossiblyUnboundVariable]
 
 
 if __name__ == "__main__":

@@ -24,8 +24,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-from multiprocessing import Process, Pipe
 import json
+import copy
+from multiprocessing import Process, Pipe
 from textwrap import dedent
 from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
     OccExceptions,
@@ -40,7 +41,10 @@ from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import 
     PhpResultJsonException,
 )
 from shlex import shlex
-import copy
+from typing import TYPE_CHECKING, Any, cast
+
+if TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 NC_TOOLS_ARGS_SPEC = dict(
@@ -57,8 +61,8 @@ def extend_nc_tools_args_spec(some_module_spec):
     return arg_spec
 
 
-def convert_string(command: str) -> list:
-    command_lex = shlex(command, posix=False)
+def convert_string(command: str) -> list[str]:
+    command_lex = shlex(instream=command, posix=False)
     command_lex.whitespace_split = True
     command_lex.commenters = ""
     command_lex.escape = ""
@@ -66,7 +70,9 @@ def convert_string(command: str) -> list:
     return [token if " " in token else token.strip("\"'") for token in command_lex]
 
 
-def execute_occ_command(conn, module, php_exec, command, **kwargs):
+def execute_occ_command(
+    conn, module: AnsibleModule, php_exec: str, command: list[str], **kwargs
+) -> None:
     """
     Execute a given occ command using the PHP interpreter and handle user permissions.
 
@@ -89,8 +95,9 @@ def execute_occ_command(conn, module, php_exec, command, **kwargs):
     Returns:
     None: This function does not return anything. It sends the results or exceptions through the conn object.
     """
+
+    cli_stats = os.stat(command[0])
     try:
-        cli_stats = os.stat(command[0])
         if os.getuid() != cli_stats.st_uid:
             os.setgid(cli_stats.st_gid)
             os.setuid(cli_stats.st_uid)
@@ -112,9 +119,11 @@ def execute_occ_command(conn, module, php_exec, command, **kwargs):
         conn.close()
 
 
-def run_occ(module, command, **kwargs):
-    cli_full_path = module.params.get("nextcloud_path") + "/occ"
-    php_exec = module.params.get("php_runtime")
+def run_occ(
+    module: AnsibleModule, command: str | list[str], **kwargs
+) -> tuple[int, str, str, bool]:
+    cli_full_path: str = module.params.get("nextcloud_path") + "/occ"
+    php_exec: str = module.params.get("php_runtime")
     if isinstance(command, list):
         full_command = [cli_full_path, "--no-ansi", "--no-interaction"] + command
     elif isinstance(command, str):
@@ -132,12 +141,12 @@ def run_occ(module, command, **kwargs):
         kwargs=kwargs,
     )
     p.start()
-    result = module_conn.recv()
+    result: dict[str, Any] = module_conn.recv()
     p.join()
 
     # check if the child process has sent an exception.
     if "exception" in result:
-        exception_type = result["exception"]
+        exception_type = cast(str, result["exception"])
         # raise the proper exception.
         if exception_type == "OccFileNotFoundException":
             raise OccFileNotFoundException(full_command)
@@ -171,10 +180,15 @@ def run_occ(module, command, **kwargs):
     elif result["rc"] != 0:
         raise OccExceptions(full_command, **result)
 
-    return result["rc"], result["stdout"], result["stderr"], maintenanceMode
+    return (
+        cast(int, result["rc"]),
+        cast(str, result["stdout"]),
+        cast(str, result["stderr"]),
+        maintenanceMode,
+    )
 
 
-def run_php_inline(module, php_code: str) -> dict:
+def run_php_inline(module: AnsibleModule, php_code: str) -> dict[str, Any]:
     """
     Interface with Nextcloud server through ad-hoc php scripts.
     The script must define the var $result that will be exported into a python dict
@@ -209,7 +223,9 @@ def run_php_inline(module, php_code: str) -> dict:
 
     stdout = stdout.strip()
     try:
-        result = json.loads(stdout) if stdout and stdout != "null" else None
+        result: dict[str, Any] = (
+            json.loads(stdout) if stdout and stdout != "null" else {}
+        )
         return result
     except json.JSONDecodeError as e:
         raise PhpResultJsonException(
