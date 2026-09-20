@@ -97,8 +97,8 @@ def execute_occ_command(
     None: This function does not return anything. It sends the results or exceptions through the conn object.
     """
 
-    cli_stats = os.stat(command[0])
     try:
+        cli_stats = os.stat(command[0])
         if os.getuid() != cli_stats.st_uid:
             os.setgid(cli_stats.st_gid)
             os.setuid(cli_stats.st_uid)
@@ -111,7 +111,7 @@ def execute_occ_command(
         conn.send(
             {
                 "exception": "OccAuthenticationException",
-                "msg": f"Insufficient permissions to switch to user id {cli_stats.st_uid}.",
+                "msg": f"Insufficient permissions to switch to user id {cli_stats.st_uid}.",  # pyright: ignore[reportPossiblyUnboundVariable]
             }
         )
     except Exception as e:

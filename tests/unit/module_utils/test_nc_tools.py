@@ -266,18 +266,18 @@ class TestRunPhpInline(unittest.TestCase):
         result = run_php_inline(mocked_module, "fu bar")
         self.assertEqual(result, dict(output=True))
 
-    def test_run_php_inline_return_none(self):
+    def test_run_php_inline_return_empty_dict(self):
         mocked_module.run_command.return_value = (0, "null", "")
         result = run_php_inline(mocked_module, "fu bar")
-        self.assertEqual(result, None)
+        self.assertEqual(result, {})
 
     def test_run_php_inline_php_error(self):
         mocked_module.run_command.return_value = (1, "null", "")
         with self.assertRaises(occ_exceptions.PhpScriptException):
             result = run_php_inline(mocked_module, "fu bar")
 
-    def test_run_php_inline_json_decode_error(self):
-        mocked_module.run_command.return_value = (1, "not some json", "")
+    def test_run_php_inline_result_is_not_json_decode_error(self):
+        mocked_module.run_command.return_value = (0, "not some json", "")
         with self.assertRaises(occ_exceptions.PhpResultJsonException):
             result = run_php_inline(mocked_module, "fu bar")
 
@@ -290,7 +290,9 @@ class TestRunPhpInline(unittest.TestCase):
 
     def test_run_php_inline_refuse_bad_params(self):
         with self.assertRaises(Exception):
-            result = run_php_inline(mocked_module, dict(fu="bar"))
+            result = run_php_inline(
+                mocked_module, dict(fu="bar")
+            )  # pyright: ignore[reportArgumentType]
 
 
 if __name__ == "__main__":
