@@ -1,6 +1,9 @@
 from unittest import TestCase
-from unittest.mock import patch, MagicMock
-from ansible_collections.nextcloud.admin.plugins.module_utils import app
+from unittest.mock import MagicMock
+from ansible_collections.nextcloud.admin.plugins.module_utils import (
+    app as ncapp,
+    server as ncserver,
+)
 from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
     OccExceptions,
     AppExceptions,
@@ -14,28 +17,8 @@ class TestApp(TestCase):
     def setUp(self):
         self.app_name = "test_app"
         self.app_version = "1.0.0"
-        self.mock_run_occ = MagicMock()
-        self.run_occ_patcher = patch(
-            "ansible_collections.nextcloud.admin.plugins.module_utils.app.run_occ",
-            self.mock_run_occ,
-        )
-        self.run_occ_patcher.start()
-
-        self.mock_ansible_module = MagicMock()
-        self.module_patcher = patch(
-            "ansible.module_utils.basic.AnsibleModule", self.mock_ansible_module
-        )
-        self.module_patcher.start()
-        self.mock_ansible_module.params = {
-            "nextcloud_path": "/path/to/nextcloud",
-            "php_runtime": "/usr/bin/php",
-            "id": self.app_name,
-        }
+        self.server = MagicMock(spec=ncserver.NCServer)
         self.app_instance = self._init_app()
-
-    def tearDown(self):
-        self.run_occ_patcher.stop()
-        self.module_patcher.stop()
 
     def _init_app(
         self, shipped: bool = False, enabled: bool = True, present: bool = True
@@ -70,21 +53,34 @@ class TestApp(TestCase):
             "disabled": {"disabled_external_app": "0.6.0"},
         }
 
+        # Create our test app entry
         status = "enabled" if enabled else "disabled"
-        if present or shipped:
+        test_app_entry = {self.app_name: self.app_version}
+
+        if present:
             if shipped:
-                shipped_app_list[status][self.app_name] = self.app_version
+                shipped_app_list[status].update(test_app_entry)
             else:
-                ext_app_list[status][self.app_name] = self.app_version
-        app_list = {
-            "enabled": {**shipped_app_list["enabled"], **ext_app_list["enabled"]},
-            "disabled": {**shipped_app_list["disabled"], **ext_app_list["disabled"]},
-        }
-        self.mock_run_occ.side_effect = [
-            (0, json.dumps(shipped_app_list)),
-            (0, json.dumps(app_list)),
-        ]
-        return app.app(self.mock_ansible_module, self.app_name)
+                ext_app_list[status].update(test_app_entry)
+
+        # Mock server.apps structure to match what NCApp expects
+        self.server.apps = {"enabled": {}, "disabled": {}}
+
+        # Setup server apps dict with our test data (we directly assign to the dict)
+        if shipped:
+            # Shipped apps
+            self.server.apps["enabled"].update(shipped_app_list["enabled"])
+            self.server.apps["disabled"].update(shipped_app_list["disabled"])
+        else:
+            # External apps
+            self.server.apps["enabled"].update(ext_app_list["enabled"])
+            self.server.apps["disabled"].update(ext_app_list["disabled"])
+
+        # Mock the shipped_apps and external_apps properties too
+        self.server.shipped_apps = shipped_app_list
+        self.server.external_apps = ext_app_list
+
+        return ncapp.NCApp(self.server, self.app_name)
 
     def test_init_app_shipped_and_enabled(self):
         app_instance = self._init_app(shipped=True, enabled=True)
@@ -116,8 +112,8 @@ class TestApp(TestCase):
         self.assertFalse(self.app_instance.shipped)
 
     def test_update_version_available(self):
-        # Simulate output from the run_occ function for app:update --showonly
-        self.mock_run_occ.side_effect = [
+        # Simulate output from the server.occ function for app:update --showonly
+        self.server.occ.side_effect = [
             (0, f"{self.app_name} new version available: 1.1.0")
         ]
         update_version = self.app_instance.update_version_available
@@ -125,17 +121,21 @@ class TestApp(TestCase):
         self.assertTrue(self.app_instance.update_available)
 
     def test_no_update_available(self):
-        # Simulate output from the run_occ function for app:update --showonly
-        self.mock_run_occ.side_effect = [
-            (0, f"{self.app_name} is up-to-date or no updates could be found")
-        ]
+        # Simulate output from the server.occ function for app:update --showonly
+        # Mock the single call that update_version_available property makes
+        self.server.occ.return_value = (
+            0,
+            f"{self.app_name} is up-to-date or no updates could be found",
+        )
         update_version = self.app_instance.update_version_available
         self.assertEqual(update_version, None)
+        # Since update_version_available returns None, update_available should be False
+        # Check that it correctly evaluates to False
         self.assertFalse(self.app_instance.update_available)
 
     def test_path(self):
         # Simulate output from the run_occ function for app:getpath
-        self.mock_run_occ.side_effect = [(0, "/var/www/nextcloud/apps/test_app")]
+        self.server.occ.side_effect = [(0, "/var/www/nextcloud/apps/test_app")]
         app_path = self.app_instance.path
         self.assertEqual(app_path, "/var/www/nextcloud/apps/test_app")
 
@@ -145,7 +145,7 @@ class TestApp(TestCase):
         self.assertEqual(facts, {"state": "absent", "is_shipped": False})
 
     def test_get_facts_present_app(self):
-        self.mock_run_occ.side_effect = [
+        self.server.occ.side_effect = [
             (0, f"{self.app_name} new version available: 1.1.0"),
             (0, "/var/www/nextcloud/apps/test_app"),
         ]
@@ -167,33 +167,31 @@ class TestApp(TestCase):
                 f"{self.app_name}": {"key": "value"},
             },
         }
-        self.mock_run_occ.side_effect = [(0, json.dumps(app_fake_config))]
+        self.server.occ.side_effect = [(0, json.dumps(app_fake_config))]
         settings = self.app_instance.current_settings
         self.assertEqual(settings, {"key": "value"})
 
     def test_install_enabled_with_success(self):
-        self.mock_run_occ.side_effect = [
+        self.server.occ.side_effect = [
             (
                 0,
                 f"{self.app_name} 1.0.0 installed\n{self.app_name} enabled\nmisc message",
             )
         ]
         actions_taken, misc_msg = self.app_instance.install()
-        self.mock_run_occ.assert_called_with(
-            self.mock_ansible_module, ["app:install", self.app_name]
-        )
+        self.server.occ.assert_called_with(["app:install", self.app_name])
         self.assertEqual(self.app_instance.version, "1.0.0")
         self.assertEqual(self.app_instance.state, "present")
         self.assertEqual(actions_taken, ["installed", "enabled"])
         self.assertEqual(misc_msg, ["misc message"])
 
     def test_install_disabled_with_success(self):
-        self.mock_run_occ.side_effect = [
+        self.server.occ.side_effect = [
             (0, f"{self.app_name} 1.0.0 installed\nmisc message")
         ]
         actions_taken, misc_msg = self.app_instance.install(enable=False)
-        self.mock_run_occ.assert_called_with(
-            self.mock_ansible_module, ["app:install", "--keep-disabled", self.app_name]
+        self.server.occ.assert_called_with(
+            ["app:install", "--keep-disabled", self.app_name]
         )
         self.assertEqual(self.app_instance.version, "1.0.0")
         self.assertEqual(self.app_instance.state, "disabled")
@@ -201,82 +199,72 @@ class TestApp(TestCase):
         self.assertEqual(misc_msg, ["misc message"])
 
     def test_install_with_failure(self):
-        execute_occ_command = [
-            f"{self.mock_ansible_module.params['nextcloud_path']}",
-            f"{self.mock_ansible_module.params['nextcloud_path']}/occ",
-            "app:install",
-            self.app_name,
-        ]
-        execute_occ_result = dict(
-            rc=1, stdout=f"{self.app_name} already installed", stderr=""
-        )
-        self.mock_run_occ.side_effect = [
-            OccExceptions(execute_occ_command, **execute_occ_result)
+        self.server.occ.side_effect = [
+            OccExceptions(
+                occ_cmd=[
+                    "app:install",
+                    self.app_name,
+                ],
+                rc=1,
+                stdout=f"{self.app_name} already installed",
+                stderr="",
+            )
         ]
         with self.assertRaises(AppExceptions):
-            actions_taken, misc_msg = self.app_instance.install()
+            self.app_instance.install()
 
     def test_remove_with_success(self):
-        self.mock_run_occ.side_effect = [
+        self.server.occ.side_effect = [
             (
                 0,
                 f"misc message\n{self.app_name} disabled\n{self.app_name} 1.0.0 removed\n",
             )
         ]
         actions_taken, misc_msg = self.app_instance.remove()
-        self.mock_run_occ.assert_called_with(
-            self.mock_ansible_module, command=["app:remove", self.app_name]
-        )
+        self.server.occ.assert_called_with(command=["app:remove", self.app_name])
         self.assertEqual(self.app_instance.version, None)
         self.assertEqual(self.app_instance.state, "absent")
         self.assertEqual(actions_taken, ["disabled", "removed"])
         self.assertEqual(misc_msg, ["misc message"])
 
     def test_remove_with_failure(self):
-        execute_occ_command = [
-            f"{self.mock_ansible_module.params['nextcloud_path']}",
-            f"{self.mock_ansible_module.params['nextcloud_path']}/occ",
-            "app:remove",
-            self.app_name,
-        ]
-        execute_occ_result = dict(
-            rc=1, stdout=f"{self.app_name} is not enabled", stderr=""
-        )
-        self.mock_run_occ.side_effect = [
-            OccExceptions(execute_occ_command, **execute_occ_result)
+        execute_occ_command = ["occ", "app:remove", self.app_name]
+        self.server.occ.side_effect = [
+            OccExceptions(
+                execute_occ_command,
+                rc=1,
+                stdout=f"{self.app_name} is not enabled",
+                stderr="",
+            )
         ]
         with self.assertRaises(AppExceptions):
-            actions_taken, misc_msg = self.app_instance.install()
+            actions_taken, misc_msg = self.app_instance.remove()
 
     def test_toggle_from_enabled(self):
         self.app_instance.state = "present"
-        self.mock_run_occ.side_effect = [
+        self.server.occ.side_effect = [
             (0, f"misc message\n{self.app_name} 1.0.0 disabled\n")
         ]
         actions_taken, misc_msg = self.app_instance.toggle()
-        self.mock_run_occ.assert_called_with(
-            self.mock_ansible_module, ["app:disable", self.app_name]
-        )
+        self.server.occ.assert_called_with(["app:disable", self.app_name])
         self.assertEqual(self.app_instance.state, "disabled")
         self.assertEqual(actions_taken, ["disabled"])
         self.assertEqual(misc_msg, ["misc message"])
 
     def test_toggle_from_disabled(self):
         self.app_instance.state = "disabled"
-        self.mock_run_occ.side_effect = [
+        self.server.occ.side_effect = [
             (0, f"{self.app_name} 1.0.0 enabled\nmisc message\n")
         ]
         actions_taken, misc_msg = self.app_instance.toggle()
-        self.mock_run_occ.assert_called_with(
-            self.mock_ansible_module, ["app:enable", self.app_name]
-        )
+        self.server.occ.assert_called_with(["app:enable", self.app_name])
         self.assertEqual(self.app_instance.state, "present")
         self.assertEqual(actions_taken, ["enabled"])
         self.assertEqual(misc_msg, ["misc message"])
 
     def test_toggle_raise_exception(self):
         self.app_instance.state = "disabled"
-        self.mock_run_occ.side_effect = [OccExceptions]
+        self.server.occ.side_effect = [OccExceptions]
         with self.assertRaises(AppExceptions):
             actions_taken, misc_msg = self.app_instance.toggle()
 
@@ -288,17 +276,15 @@ class TestApp(TestCase):
     def test_update(self):
         self.app_instance.version = "1.0.0"
         self.app_instance._update_version_available = "1.1.0"
-        self.mock_run_occ.side_effect = [(0, "")]
+        self.server.occ.side_effect = [(0, "")]
         old_version, new_version = self.app_instance.update()
-        self.mock_run_occ.assert_called_with(
-            self.mock_ansible_module, ["app:update", self.app_name]
-        )
+        self.server.occ.assert_called_with(["app:update", self.app_name])
         self.assertEqual(old_version, "1.0.0")
         self.assertEqual(new_version, "1.1.0")
 
     def test_update_raise_exception(self):
         self.app_instance.version = "1.0.0"
-        self.mock_run_occ.side_effect = [OccExceptions]
+        self.server.occ.side_effect = [OccExceptions]
         with self.assertRaises(AppExceptions):
             old_version, new_version = self.app_instance.update()
 
