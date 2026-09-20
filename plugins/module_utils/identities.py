@@ -23,14 +23,19 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from __future__ import annotations
+# from __future__ import annotations
 import json
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ansible_collections.nextcloud.admin.plugins.module_utils.server import NCServer
+
 from enum import Enum
 from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
     OccExceptions,
     IdentityNotPresent,
 )
-from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import run_occ  # type: ignore
 
 
 class idState(Enum):
@@ -55,7 +60,7 @@ class NCIdentity:
         state (idState): The current state of the identity.
     """
 
-    def __init__(self, module, namespace, ident: str):
+    def __init__(self, server: NCServer, namespace: str, ident: str) -> None:
         """
         Initialize a new NextCloud identity instance.
 
@@ -67,12 +72,13 @@ class NCIdentity:
         Raises:
             OccExceptions: If an error occurs while fetching information from NextCloud.
         """
+        self.server = server
         self.ident = ident
-        self.module = module
         self.namespace = namespace
+
         try:
-            stdout = run_occ(
-                self.module, [f"{self.namespace}:info", "--output=json", self.ident]
+            stdout = self.server.occ(
+                [f"{self.namespace}:info", "--output=json", self.ident]
             )[1]
             self.infos = json.loads(stdout)
             if self.infos["enabled"]:
@@ -88,7 +94,7 @@ class NCIdentity:
             else:
                 raise e
 
-    def __take_action__(self, action: str, *args, **kwargs):
+    def _take_action(self, action: str, *args, **kwargs):
         """
         Internal method to execute a NextCloud OCC command with the given action.
 
@@ -98,33 +104,31 @@ class NCIdentity:
             **kwargs: Additional keyword arguments for the OCC command.
         """
         command = [f"{self.namespace}:{action}", "--no-interaction"] + list(args)
-        run_occ(self.module, command + [self.ident], **kwargs)[0:3]
+        self.server.occ(command + [self.ident], **kwargs)[0:3]
 
     def add(self):
         """
         Add the identity to NextCloud.
         """
-        self.__take_action__("add")
+        self._take_action("add")
         self.state = idState.PRESENT
 
     def delete(self):
         """
         Delete the identity from NextCloud.
         """
-        self.__take_action__("delete")
+        self._take_action("delete")
         self.state = idState.ABSENT
 
 
-class Group(NCIdentity):
+class NCGroup(NCIdentity):
     """
     Class for managing NextCloud groups.
 
     Inherits from NCIdentity.
     """
 
-    __users__ = None
-
-    def __init__(self, module, ident: str):
+    def __init__(self, server: NCServer, ident: str) -> None:
         """
         Initialize a new NextCloud group instance.
 
@@ -132,23 +136,24 @@ class Group(NCIdentity):
             module: The Ansible module instance.
             ident (str): The identifier for the group.
         """
-        super().__init__(module, "group", ident)
+        self._users: list[str] = []
+        super().__init__(server, namespace="group", ident=ident)
         if self.state is idState.PRESENT:
-            self.__users__ = self.__get_users__()
+            self._users = self._get_users()
 
-    def __get_users__(self):
-        stdout = run_occ(
-            self.module, ["group:list", self.ident, "--output", "json_pretty"]
-        )[1]
+    def _get_users(self):
+        stdout = self.server.occ(["group:list", self.ident, "--output", "json_pretty"])[
+            1
+        ]
         return json.loads(stdout)[self.ident]
 
     @property
     def users(self):
-        if self.__users__ is None:
-            self.__users__ = self.__get_users__()
-        return self.__users__
+        if self._users is None:
+            self._users = self._get_users()
+        return self._users
 
-    def __user_mgnt__(self, action: str, user_id: str):
+    def _user_mgnt(self, action: str, user_id: str):
         """
         Internal method to manage group membership in NextCloud.
 
@@ -158,7 +163,7 @@ class Group(NCIdentity):
         """
         command = [f"group:{action}", "--no-interaction"]
         try:
-            run_occ(self.module, command + [self.ident, user_id])
+            self.server.occ(command + [self.ident, user_id])
         except OccExceptions as e:
             if "not found" in e.stdout or "does not exist" in e.stdout:
                 raise IdentityNotPresent("user", user_id, **e.__dict__)
@@ -173,11 +178,10 @@ class Group(NCIdentity):
             display_name (str | None): The display name for the group.
         """
         if display_name:
-            self.__take_action__("add", f"--display-name='{display_name}'")
+            self._take_action("add", f"--display-name='{display_name}'")
         else:
-            self.__take_action__("add")
+            self._take_action("add")
         self.state = idState.PRESENT
-        self.__users__ = []
 
     def add_user(self, user_id: str):
         """
@@ -186,8 +190,8 @@ class Group(NCIdentity):
         Args:
             user_id (str): The user identifier to add to the group.
         """
-        self.__user_mgnt__("adduser", user_id)
-        self.__users__ += [user_id]
+        self._user_mgnt("adduser", user_id)
+        self._users += [user_id]
 
     def remove_user(self, user_id: str):
         """
@@ -196,26 +200,26 @@ class Group(NCIdentity):
         Args:
             user_id (str): The user identifier to remove from the group.
         """
-        self.__user_mgnt__("removeuser", user_id)
-        self.__users__.remove(user_id)
+        self._user_mgnt("removeuser", user_id)
+        self._users.remove(user_id)
 
 
-class User(NCIdentity):
+class NCUser(NCIdentity):
     """
     Class for managing NextCloud users.
 
     Inherits from NCIdentity.
     """
 
-    def __init__(self, module, ident: str):
+    def __init__(self, server: NCServer, ident: str):
         """
         Initialize a new NextCloud user instance.
 
         Args:
-            module: The Ansible module instance.
+            server: The nextcloud Server instance.
             ident (str): The identifier for the user.
         """
-        super().__init__(module, "user", ident)
+        super().__init__(server, "user", ident)
 
     @property
     def groups(self):
@@ -260,9 +264,7 @@ class User(NCIdentity):
         for group in groups or []:
             command += ["--group", group]
 
-        rc, stdout, stderr = run_occ(
-            self.module, command + [self.ident], environ_update=env
-        )[0:3]
+        self.server.occ(command + [self.ident], environ_update=env)
 
         if display_name:
             self.infos["display_name"] = display_name
@@ -276,14 +278,14 @@ class User(NCIdentity):
         """
         Disable the user account in NextCloud.
         """
-        self.__take_action__("disable")
+        self._take_action("disable")
         self.state = idState.DISABLED
 
     def enable(self):
         """
         Enable the user account in NextCloud.
         """
-        self.__take_action__("enable")
+        self._take_action("enable")
         self.state = idState.PRESENT
 
     def reset_password(self, password: str | None = None):
@@ -298,7 +300,7 @@ class User(NCIdentity):
         if password:
             args += ["--password-from-env"]
             env = dict(NC_PASS=password)
-        self.__take_action__(*args, environ_update=env)
+        self._take_action(*args, environ_update=env)
 
     def edit_settings(
         self,
@@ -325,4 +327,4 @@ class User(NCIdentity):
             command += ["--delete", self.ident, "settings", key]
         else:
             command += [self.ident, "settings", key, value]
-        run_occ(self.module, command)
+        self.server.occ(command)

@@ -24,6 +24,11 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+from typing import Any
+
+from plugins.module_utils.identities import NCGroup
+
+
 DOCUMENTATION = r"""
 ---
 module: group
@@ -139,8 +144,8 @@ from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import (
 )
 from ansible_collections.nextcloud.admin.plugins.module_utils.identities import (
     idState,
-    Group,
 )
+from ansible_collections.nextcloud.admin.plugins.module_utils.server import NCServer
 from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
     IdentityNotPresent,
 )
@@ -189,14 +194,14 @@ def main():
         argument_spec=extend_nc_tools_args_spec(module_args_spec),
         supports_check_mode=True,
     )
-    result = dict(
+    result: dict[str, Any] = dict(
         changed=False,
         added_users=[],
         removed_users=[],
     )
-    group_id = module.params.get("id")
-
-    nc_group = Group(module, group_id)
+    group_id: str = module.params.get("id")
+    nc_server = NCServer(module)
+    nc_group = nc_server.group(name=group_id)
 
     display_name = module.params.get("display_name")
     ignore_missing_users = module.params.get("ignore_missing_users")
