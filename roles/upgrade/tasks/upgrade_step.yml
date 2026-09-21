@@ -23,9 +23,7 @@
     msg: >-
       Skipping upgrade execution for Nextcloud {{ current_step_nextcloud_version }}.
       {% if _nc_next_version == 'NO_UPDATE' -%}
-      Update server reports no further updates available (might be a connectivity or upstream issue).
-      {%- else -%}
-      Update server reports next version is '{{ _nc_next_version }}'.
-      {%- endif %}
+      Update server reports no further updates available (might be a connectivity or upstream issue).{%- else -%}
+      Update server reports next version is '{{ _nc_next_version }}'.{%- endif %}
   when: _skip_upgrade_step | default(false)
 ...

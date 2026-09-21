@@ -1,13 +1,13 @@
 ---
 # Upgrade PHP if necessary
-- name: "Upgrade PHP to {{ _php_target_version | default('') }}"
+- name: "Upgrade PHP to {{ _php_target_version | default('N/A') }}"
   ansible.builtin.include_tasks: php_upgrade.yml
   vars:
     php_version: "{{ _php_target_version | default(omit) }}"
   when: _php_needs_upgrade | default(false)
 
 # Upgrade PostgreSQL if necessary
-- name: "Upgrade PostgreSQL to {{ _postgresql_target_version | default('') }}"
+- name: "Upgrade PostgreSQL to {{ _postgresql_target_version | default('N/A') }}"
   ansible.builtin.include_tasks: postgresql_upgrade.yml
   vars:
     postgresql_version: "{{ _postgresql_target_version | default(omit) }}"
@@ -15,7 +15,7 @@
 
 # Tasks to run before the upgrade
 
-- name: Specific tasks before upgrade to version {{ current_step_nextcloud_version }}
+- name: Run pre-upgrade tasks for step {{ current_step_nextcloud_version }}
   ansible.builtin.include_tasks: '{{ item }}'
   with_first_found:
     - files:
@@ -31,7 +31,7 @@
     ansible.builtin.command:
       chdir: "{{ nextcloud_webroot }}"
   block:
-    - name: Upgrade Nextcloud to version {{ current_step_nextcloud_version }}
+    - name: Upgrade Nextcloud to version {{ _nc_next_version | trim }}
       ansible.builtin.command: "php {{ nextcloud_webroot }}/updater/updater.phar  --no-interaction"
       changed_when: true
 
@@ -71,7 +71,7 @@
     chdir: "{{ nextcloud_webroot }}"
   changed_when: true
 
-- name: Specific tasks after upgrade to version {{ current_step_nextcloud_version }}
+- name: Run post-upgrade tasks for step {{ current_step_nextcloud_version }}
   ansible.builtin.include_tasks: '{{ item }}'
   with_first_found:
     - files:
