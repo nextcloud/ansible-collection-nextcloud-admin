@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from unittest import TestCase
-from unittest.mock import patch, MagicMock, call
+from unittest.mock import MagicMock, call
 import unittest.main
 import ansible_collections.nextcloud.admin.plugins.module_utils.identities as ncid
 import ansible_collections.nextcloud.admin.plugins.module_utils.exceptions as occ_exceptions
@@ -195,7 +195,7 @@ class TestGroup(TestCase):
         self.mocked_server.occ.side_effect = [(0, "ok", "", False)]
         self.group.add_user(username)
         self.mocked_server.occ.assert_called_with(
-            [f"group:adduser", "--no-interaction", self.groupname, username]
+            ["group:adduser", "--no-interaction", self.groupname, username]
         )
         self.assertIn(username, self.group.users)
 
@@ -204,7 +204,7 @@ class TestGroup(TestCase):
         username = self.test_users[0]
         self.group.remove_user(username)
         self.mocked_server.occ.assert_called_with(
-            [f"group:removeuser", "--no-interaction", self.groupname, username]
+            ["group:removeuser", "--no-interaction", self.groupname, username]
         )
         self.assertNotIn(username, self.group.users)
 

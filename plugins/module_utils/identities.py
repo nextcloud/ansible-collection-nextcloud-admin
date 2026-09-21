@@ -26,7 +26,7 @@
 from __future__ import annotations
 import json
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ansible_collections.nextcloud.admin.plugins.module_utils.server import NCServer

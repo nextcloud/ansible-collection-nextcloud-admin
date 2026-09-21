@@ -117,15 +117,13 @@ RETURN = r"""
 users:
   description:
     - Dictionary of users found in the Nextcloud instance.
-    - The structure depends on the value of the C(infos) parameter.
+    - Keys are Nextcloud user IDs and are therefore dynamic.
+    - When O(infos=false), each element is a key:value pair where
+      key is the user ID and value is the display name.
+    - When O(infos=true), each value is a dictionary containing detailed
+      user information such as email, quota, last login, and so on.
   returned: always
   type: dict
-  contains:
-    <user_id>:
-      description:
-        - If C(infos) is false, each key is a user_id and the value its display name.
-        - If C(infos) is true, each key is a user_id and the value is a dictionary containing detailed user information (e.g. email, quota, last login, etc.).
-      type: raw
   sample:
     simple:
       alice: "Alice Dupont"
@@ -206,8 +204,9 @@ def main():
         e.fail_json(module)
     except json.JSONDecodeError:
         module.fail_json(
-            msg="Unable to understand the server answer.", stdout=stdout
-        )  # pyright: ignore[reportPossiblyUnboundVariable]
+            msg="Unable to understand the server answer.",
+            stdout=stdout,  # pyright: ignore[reportPossiblyUnboundVariable]
+        )
 
 
 if __name__ == "__main__":

@@ -75,16 +75,12 @@ RETURN = r"""
 groups:
   description:
     - Dictionary of groups found in the Nextcloud instance.
-    - The structure depends on the value of the C(infos) parameter.
+    - Keys are Nextcloud group IDs and are therefore dynamic.
+    - When O(infos=false), each value is a list of group members.
+    - When O(infos=true), each value is a dictionary containing detailed
+      group information such as display name, users, and backends.
   returned: always
   type: dict
-  contains:
-    <group_id>:
-      description:
-        - If C(infos) is false, each key is a group_id and the value the list of members.
-        - If C(infos) is true, each key is a group_id and the value is a dictionary containing
-          detailed group information (e.g. displayNames, users, backend, etc.).
-      type: raw
   sample:
     simple:
       admin: ["admin"]
@@ -163,8 +159,9 @@ def main():
         )
     except json.JSONDecodeError:
         module.fail_json(
-            msg="Unable to understand the server answer.", stdout=stdout
-        )  # pyright: ignore[reportPossiblyUnboundVariable]
+            msg="Unable to understand the server answer.",
+            stdout=stdout,  # pyright: ignore[reportPossiblyUnboundVariable]
+        )
     except OccExceptions as e:
         e.fail_json(module)
 

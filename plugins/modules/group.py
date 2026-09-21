@@ -23,12 +23,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-from typing import Any
-
-from plugins.module_utils.identities import NCGroup
-
-
 DOCUMENTATION = r"""
 ---
 module: group
@@ -137,7 +131,6 @@ removed_users:
   type: list
 """
 
-
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import (
     extend_nc_tools_args_spec,
@@ -194,7 +187,7 @@ def main():
         argument_spec=extend_nc_tools_args_spec(module_args_spec),
         supports_check_mode=True,
     )
-    result: dict[str, Any] = dict(
+    result = dict(
         changed=False,
         added_users=[],
         removed_users=[],
