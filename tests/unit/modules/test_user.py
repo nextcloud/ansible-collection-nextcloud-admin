@@ -10,12 +10,15 @@ from ansible_collections.nextcloud.admin.plugins.module_utils.identities import 
 class TestUserModule(TestCase):
     def setUp(self):
         self.user_id = "test_user"
+        self.fake_result = dict(
+            changed=False,
+        )
 
         self.module_patcher = patch(
             "ansible_collections.nextcloud.admin.plugins.modules.user.AnsibleModule"
         )
-        self.mock_module = MagicMock(spec=basic.AnsibleModule)
         self.mock_module_obj = self.module_patcher.start()
+        self.mock_module = self.mock_module_obj.return_value
         self.mock_module.check_mode = False
         self.mock_module_obj.return_value = self.mock_module
         self.mock_module.params = {
@@ -26,31 +29,26 @@ class TestUserModule(TestCase):
             "password": "test_password",
         }
 
-        self.user_patcher = patch(
-            "ansible_collections.nextcloud.admin.plugins.modules.user.User"
+        self.server_patcher = patch(
+            "ansible_collections.nextcloud.admin.plugins.modules.user.NCServer"
         )
-        self.mock_user = MagicMock()
-        self.mock_user_obj = self.user_patcher.start()
+        self.mock_server_obj = self.server_patcher.start()
+        self.mock_server = self.mock_server_obj.return_value
 
-        self.group_patcher = patch(
-            "ansible_collections.nextcloud.admin.plugins.modules.user.Group"
-        )
-        self.mock_group_obj = self.group_patcher.start()
+        self.mock_user = self.mock_server.user.return_value
+
         self.mock_group_add = MagicMock()
         self.mock_group_add.state = idState.PRESENT
         self.mock_group_remove = MagicMock()
         self.mock_group_remove.state = idState.PRESENT
-        self.mock_group_obj.side_effect = [self.mock_group_add, self.mock_group_remove]
-
-        self.fake_result = dict(
-            changed=False,
-        )
-        self.mock_user_obj.return_value = self.mock_user
+        self.mock_server.group.side_effect = [
+            self.mock_group_add,
+            self.mock_group_remove,
+        ]
 
     def tearDown(self):
         self.module_patcher.stop()
-        self.user_patcher.stop()
-        self.group_patcher.stop()
+        self.server_patcher.stop()
 
     def test_user_creation(self):
         self.mock_user.state = idState.ABSENT
