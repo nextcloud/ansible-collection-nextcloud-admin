@@ -58,7 +58,6 @@ class TestRunOccModule(unittest.TestCase):
             command="invalid-command",
             occ_cmd="invalid-command",
             rc=1,
-            stdout="",
             stderr="Error",
         )
 
