@@ -13,6 +13,11 @@ from ansible_collections.nextcloud.admin.plugins.module_utils.identities import 
 class TestGroupModule(TestCase):
     def setUp(self):
         self.group_id = "test_group"
+        self.fake_result = dict(
+            changed=False,
+            added_users=[],
+            removed_users=[],
+        )
 
         self.module_patcher = patch(
             "ansible_collections.nextcloud.admin.plugins.modules.group.AnsibleModule"
@@ -27,21 +32,16 @@ class TestGroupModule(TestCase):
             "id": self.group_id,
         }
 
-        self.group_patcher = patch(
-            "ansible_collections.nextcloud.admin.plugins.modules.group.Group"
+        self.server_patcher = patch(
+            "ansible_collections.nextcloud.admin.plugins.modules.group.NCServer"
         )
-        self.mock_group = MagicMock()
-        self.mock_group_obj = self.group_patcher.start()
-        self.fake_result = dict(
-            changed=False,
-            added_users=[],
-            removed_users=[],
-        )
-        self.mock_group_obj.return_value = self.mock_group
+        self.mock_server_obj = self.server_patcher.start()
+        self.mock_server = self.mock_server_obj.return_value
+        self.mock_group = self.mock_server.group.return_value
 
     def tearDown(self):
         self.module_patcher.stop()
-        self.group_patcher.stop()
+        self.server_patcher.stop()
 
     def test_group_creation(self):
         self.mock_group.state = idState.ABSENT
