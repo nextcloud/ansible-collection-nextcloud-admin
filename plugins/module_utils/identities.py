@@ -86,6 +86,7 @@ class NCIdentity:
                 self.state = (
                     idState.PRESENT if self.infos["enabled"] else idState.DISABLED
                 )
+                self.infos.pop("enabled")
             elif "groupID" in self.infos:
                 self.state = idState.PRESENT
         except OccExceptions as e:
@@ -243,11 +244,11 @@ class NCUser(NCIdentity):
         Add the user to NextCloud with specified attributes.
 
         Args:
-            password (str | None): The password for the user.
+            password (str | None): The password for the user. Has priority over generate_password
             display_name (str | None): The display name for the user.
             groups (list[str] | None): A list of groups to which the user will be added.
             email (str | None): The email address for the user.
-            generate_password (bool): Whether to generate a password for the user.
+            generate_password (bool): Whether to generate a password for the user. skipped if a password is provided
 
         Raises:
             ValueError: If neither a password is provided nor password generation is requested.
@@ -255,11 +256,11 @@ class NCUser(NCIdentity):
         command = ["user:add", "--no-interaction"]
         env = {}
 
-        if generate_password:
-            command.append("--generate-password")
-        elif password:
+        if password:
             command.append("--password-from-env")
             env["NC_PASS"] = password
+        elif generate_password:
+            command.append("--generate-password")
         else:
             raise ValueError("Password required unless using generate-password")
 
