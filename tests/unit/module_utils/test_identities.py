@@ -2,6 +2,7 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, call
 import unittest.main
+import json
 import ansible_collections.nextcloud.admin.plugins.module_utils.identities as ncid
 import ansible_collections.nextcloud.admin.plugins.module_utils.exceptions as occ_exceptions
 from ansible_collections.nextcloud.admin.plugins.module_utils.server import NCServer
@@ -217,141 +218,138 @@ class TestGroup(TestCase):
             self.group.add_user(username)
 
 
-# class TestUser(TestCase):
+class TestUser(TestCase):
 
-#     def setUp(self):
-#         self.mock_server = MagicMock()
-#         self.mocked_server.occ = patch(
-#             "ansible_collections.nextcloud.admin.plugins.module_utils.identities.NCServer.occ"
-#         ).start()
-#         self.addCleanup(patch.stopall)
+    def setUp(self):
+        self.testuser = dict(
+            id="gabitbol",
+            enabled=True,
+            display_name="Georges Abitbol",
+            email="goat.abitbol@american.class",
+            groups=["tegzas"],
+        )
+        self.mocked_server = MagicMock(spec=NCServer)
 
-#         # Setup default return for successful user lookup
-#         self.mocked_server.occ.return_value = (0, '{"id":"testuser","enabled":true}', '', False)
+        # Setup default return for successful user lookup
+        self.mocked_server.occ.return_value = (0, json.dumps(self.testuser), "", False)
+        self.user = ncid.NCUser(self.mocked_server, str(self.testuser["id"]))
 
-#     def test_user_init_present(self):
-#         # Mock run_occ to return a user that exists
-#         self.mocked_server.occ.return_value = (0, '{"id":"testuser","enabled":true}', '', False)
+    def test_user_init_present(self):
+        self.assertEqual(self.user.state, ncid.idState.PRESENT)
 
-#         user = ncid.NCUser(self.mocked_server, "testuser")
-#         self.assertEqual(user.state, "PRESENT")
+    def test_user_init_absent(self):
+        self.mocked_server.occ.side_effect = occ_exceptions.OccExceptions(
+            stdout="User does not exist",
+            stderr="",
+        )
+        user = ncid.NCUser(self.mocked_server, "testuser")
+        self.assertEqual(user.state, ncid.idState.ABSENT)
+        self.assertDictEqual(user.infos, {})
 
-#     def test_user_groups_property(self):
-#         # Mock run_occ to return a list of groups
-#         self.mocked_server.occ.return_value = (
-#             0,
-#             '{"groups":["group1","group2"]}',
-#             '',
-#             False
-#         )
+    def test_user_groups_property(self):
+        groups = self.user.groups
+        self.assertEqual(groups, self.testuser["groups"])
 
-#         user = ncid.NCUser(self.mocked_server, "testuser")
-#         groups = user.groups
+    def test_user_add_with_no_args(self):
+        with self.assertRaises(ValueError):
+            self.user.add()
 
-#         self.assertEqual(groups, ["group1", "group2"])
+    def test_user_add_with_gen_pwd(self):
+        self.user.add(generate_password=True)
+        self.mocked_server.occ.assert_called_with(
+            [
+                "user:add",
+                "--no-interaction",
+                "--generate-password",
+                self.testuser["id"],
+            ],
+            environ_update={},
+        )
 
-#     def test_user_add_no_args(self):
-#         self.mocked_server.occ.return_value = (0, 'Success', '', False)
+    def test_user_add_with_password(self):
+        self.user.add(password="total-investigation")
+        self.mocked_server.occ.assert_called_with(
+            [
+                "user:add",
+                "--no-interaction",
+                "--password-from-env",
+                self.testuser["id"],
+            ],
+            environ_update={"NC_PASS": "total-investigation"},
+        )
 
-#         with patch.object(ncid.NCUser, '_take_action') as mock_take_action:
-#             mock_take_action.return_value = True
-#             user = ncid.NCUser(self.mocked_server, "testuser")
-#             result = user.add()
+    def test_user_add_with_both_pwd_and_gen_pwd(self):
+        self.user.add(generate_password=True, password="total-investigation")
+        self.mocked_server.occ.assert_called_with(
+            [
+                "user:add",
+                "--no-interaction",
+                "--password-from-env",
+                self.testuser["id"],
+            ],
+            environ_update={"NC_PASS": "total-investigation"},
+        )
 
-#             self.assertTrue(result)
+    def test_user_add_with_args_gen_pwd(self):
+        kwargs = {**self.testuser}
+        kwargs.pop("id")
+        kwargs.pop("enabled")
+        kwargs["generate_password"] = True
+        self.user.add(**kwargs)  # pyright: ignore[reportArgumentType]
+        self.mocked_server.occ.assert_called_with(
+            [
+                "user:add",
+                "--no-interaction",
+                "--generate-password",
+                "--display-name",
+                self.testuser["display_name"],
+                "--email",
+                self.testuser["email"],
+                "--group",
+                self.testuser["groups"][0],  # pyright: ignore[reportIndexIssue]
+                self.testuser["id"],
+            ],
+            environ_update={},
+        )
 
-#     def test_user_add_with_email(self):
-#         self.mocked_server.occ.return_value = (0, 'Success', '', False)
+    def test_user_disable(self):
+        self.user.disable()
+        self.mocked_server.occ.assert_called_with(
+            ["user:disable", "--no-interaction", self.testuser["id"]]
+        )
+        self.assertEqual(self.user.state, ncid.idState.DISABLED)
 
-#         with patch.object(ncid.NCUser, '_take_action') as mock_take_action:
-#             mock_take_action.return_value = True
-#             user = ncid.NCUser(self.mocked_server, "testuser", email="test@example.com")
-#             result = user.add()
+    def test_user_enable(self):
+        self.user.state = ncid.idState.DISABLED
+        self.user.enable()
+        self.mocked_server.occ.assert_called_with(
+            ["user:enable", "--no-interaction", self.testuser["id"]]
+        )
+        self.assertEqual(self.user.state, ncid.idState.PRESENT)
 
-#             self.assertTrue(result)
+    def test_user_reset_pwd_with_no_arg(self):
+        self.user.reset_password()
+        self.mocked_server.occ.assert_called_with(
+            ["user:resetpassword", "--no-interaction", self.testuser["id"]],
+            environ_update={},
+        )
 
-#     def test_user_add_with_password(self):
-#         self.mocked_server.occ.return_value = (0, 'Success', '', False)
+    def test_user_reset_pwd_with_password(self):
+        self.user.reset_password(password="total-investigation")
+        self.mocked_server.occ.assert_called_with(
+            [
+                "user:resetpassword",
+                "--no-interaction",
+                "--password-from-env",
+                self.testuser["id"],
+            ],
+            environ_update={"NC_PASS": "total-investigation"},
+        )
 
-#         with patch.object(ncid.NCUser, '_take_action') as mock_take_action:
-#             mock_take_action.return_value = True
-#             user = ncid.NCUser(self.mocked_server, "testuser", password="secret")
-#             result = user.add()
 
-#             self.assertTrue(result)
-
-#     def test_user_add_with_display_name(self):
-#         self.mocked_server.occ.return_value = (0, 'Success', '', False)
-
-#         with patch.object(ncid.NCUser, '_take_action') as mock_take_action:
-#             mock_take_action.return_value = True
-#             user = ncid.NCUser(self.mocked_server, "testuser", display_name="Test User")
-#             result = user.add()
-
-#             self.assertTrue(result)
-
-#     def test_user_add_with_all_args(self):
-#         self.mocked_server.occ.return_value = (0, 'Success', '', False)
-
-#         with patch.object(ncid.NCUser, '_take_action') as mock_take_action:
-#             mock_take_action.return_value = True
-#             user = ncid.NCUser(
-#                 mocked_server,
-#                 "testuser",
-#                 email="test@example.com",
-#                 password="secret",
-#                 display_name="Test User"
-#             )
-#             result = user.add()
-
-#             self.assertTrue(result)
-
-#     def test_user_disable(self):
-#         self.mocked_server.occ.return_value = (0, 'Success', '', False)
-
-#         with patch.object(ncid.NCUser, '_take_action') as mock_take_action:
-#             mock_take_action.return_value = True
-#             user = ncid.NCUser(self.mocked_server, "testuser")
-#             result = user.disable()
-
-#             self.assertTrue(result)
-
-#     def test_user_enable(self):
-#         self.mocked_server.occ.return_value = (0, 'Success', '', False)
-
-#         with patch.object(ncid.NCUser, '_take_action') as mock_take_action:
-#             mock_take_action.return_value = True
-#             user = ncid.NCUser(self.mocked_server, "testuser")
-#             result = user.enable()
-
-#             self.assertTrue(result)
-
-#     def test_user_reset_password(self):
-#         self.mocked_server.occ.return_value = (0, 'Success', '', False)
-
-#         with patch.object(ncid.NCUser, '_take_action') as mock_take_action:
-#             mock_take_action.return_value = True
-#             user = ncid.NCUser(self.mocked_server, "testuser")
-#             result = user.reset_password("newpassword")
-
-#             self.assertTrue(result)
-
+# TODO: User's Settings management
 #     def test_user_edit_settings(self):
 #         self.mocked_server.occ.return_value = (0, 'Success', '', False)
-
-#         with patch.object(ncid.NCUser, '_take_action') as mock_take_action:
-#             mock_take_action.return_value = True
-#             user = ncid.NCUser(self.mocked_server, "testuser")
-#             result = user.edit_settings(dict(setting="value"))
-
-#             self.assertTrue(result)
-
-#     def test_user_groups_exception(self):
-#         self.mocked_server.occ.side_effect = occ_exceptions.OccExceptions("User not found")
-
-#         with self.assertRaises(occ_exceptions.OccExceptions):
-#             user = ncid.NCUser(self.mocked_server, "testuser")
-#             _ = user.groups
 
 
 if __name__ == "__main__":
