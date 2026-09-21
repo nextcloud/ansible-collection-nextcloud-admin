@@ -26,7 +26,7 @@
 from __future__ import annotations
 import json
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from ansible_collections.nextcloud.admin.plugins.module_utils.server import NCServer
@@ -81,12 +81,13 @@ class NCIdentity:
                 [f"{self.namespace}:info", "--output=json", self.ident]
             )[1]
             self.infos = json.loads(stdout)
-            if self.infos["enabled"]:
+            # Users have an "enabled" attribute, groups don't.
+            if "enabled" in self.infos:
+                self.state = (
+                    idState.PRESENT if self.infos["enabled"] else idState.DISABLED
+                )
+            elif "groupID" in self.infos:
                 self.state = idState.PRESENT
-            else:
-                self.state = idState.DISABLED
-        except KeyError:
-            self.state = idState.PRESENT
         except OccExceptions as e:
             if "not found" in e.stdout or "does not exist" in e.stdout:
                 self.state = idState.ABSENT
@@ -94,30 +95,30 @@ class NCIdentity:
             else:
                 raise e
 
-    def _take_action(self, action: str, *args, **kwargs):
+    def _take_action(self, action: str, *args, **kwargs) -> tuple[int, str, str]:
         """
         Internal method to execute a NextCloud OCC command with the given action.
 
         Args:
             action (str): The action to perform on the identity.
             *args: Additional positional arguments for the OCC command.
-            **kwargs: Additional keyword arguments for the OCC command.
+            **kwargs: keyword arguments for the ansible command.
         """
         command = [f"{self.namespace}:{action}", "--no-interaction"] + list(args)
-        self.server.occ(command + [self.ident], **kwargs)[0:3]
+        return self.server.occ(command + [self.ident], **kwargs)[0:3]
 
-    def add(self):
+    def add(self, *args, **kwargs):
         """
         Add the identity to NextCloud.
         """
-        self._take_action("add")
+        self._take_action("add", *args, **kwargs)
         self.state = idState.PRESENT
 
-    def delete(self):
+    def delete(self, *args, **kwargs):
         """
         Delete the identity from NextCloud.
         """
-        self._take_action("delete")
+        self._take_action("delete", *args, **kwargs)
         self.state = idState.ABSENT
 
 
@@ -136,20 +137,22 @@ class NCGroup(NCIdentity):
             module: The Ansible module instance.
             ident (str): The identifier for the group.
         """
-        self._users: list[str] = []
+        self._users: list[str] | None = None
         super().__init__(server, namespace="group", ident=ident)
         if self.state is idState.PRESENT:
             self._users = self._get_users()
 
-    def _get_users(self):
+    def _get_users(self) -> list[str]:
         stdout = self.server.occ(["group:list", self.ident, "--output", "json_pretty"])[
             1
         ]
         return json.loads(stdout)[self.ident]
 
     @property
-    def users(self):
-        if self._users is None:
+    def users(self) -> list[str]:
+        if self.state is idState.ABSENT:
+            return []
+        elif self._users is None:
             self._users = self._get_users()
         return self._users
 
@@ -177,13 +180,14 @@ class NCGroup(NCIdentity):
         Args:
             display_name (str | None): The display name for the group.
         """
+        args = ["add"]
         if display_name:
-            self._take_action("add", f"--display-name='{display_name}'")
-        else:
-            self._take_action("add")
+            args.append(f"--display-name='{display_name}'")
+
+        self._take_action(*args)
         self.state = idState.PRESENT
 
-    def add_user(self, user_id: str):
+    def add_user(self, user_id: str) -> None:
         """
         Add a user to the group.
 
@@ -191,9 +195,10 @@ class NCGroup(NCIdentity):
             user_id (str): The user identifier to add to the group.
         """
         self._user_mgnt("adduser", user_id)
-        self._users += [user_id]
+        if self._users:
+            self._users += [user_id]
 
-    def remove_user(self, user_id: str):
+    def remove_user(self, user_id: str) -> None:
         """
         Remove a user from the group.
 
@@ -201,7 +206,8 @@ class NCGroup(NCIdentity):
             user_id (str): The user identifier to remove from the group.
         """
         self._user_mgnt("removeuser", user_id)
-        self._users.remove(user_id)
+        if self._users:
+            self._users.remove(user_id)
 
 
 class NCUser(NCIdentity):
