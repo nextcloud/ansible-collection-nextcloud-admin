@@ -162,9 +162,8 @@ from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import (
 )
 from ansible_collections.nextcloud.admin.plugins.module_utils.identities import (
     idState,
-    Group,
-    User,
 )
+from ansible_collections.nextcloud.admin.plugins.module_utils.server import NCServer
 from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
     OccExceptions,
 )
@@ -227,7 +226,8 @@ def main():
     user_added = False
 
     user_id = module.params.get("id")
-    nc_user = User(module=module, ident=user_id)
+    nc_server = NCServer(module)
+    nc_user = nc_server.user(name=user_id)
     desired_state = idState[module.params.get("state").upper()]
     user_groups = module.params.get("groups")
     if isinstance(user_groups, str):
@@ -303,7 +303,7 @@ def main():
                 groups_to_add = set(user_groups) - set(nc_user.groups)
                 groups_to_remove = set(nc_user.groups) - set(user_groups)
                 for group in groups_to_add:
-                    nc_group = Group(module, group)
+                    nc_group = nc_server.group(group)
                     if nc_group.state is idState.ABSENT:
                         message = f"Cannot add user {user_id} to absent group {group}."
                         if ignore_missing_groups:
@@ -316,7 +316,7 @@ def main():
                         result["changed"] = True
 
                 for group in groups_to_remove:
-                    nc_group = Group(module, group)
+                    nc_group = nc_server.group(group)
                     if nc_group.state is idState.PRESENT:
                         if not module.check_mode:
                             nc_group.remove_user(user_id)
@@ -324,7 +324,7 @@ def main():
         except TypeError as e:
             module.fail_json(msg="The groups argument must be a list", **e.__dict__)
         except OccExceptions as e:
-            e.fail_json(msg=e.msg, **e.__dict__)
+            e.fail_json(**e.__dict__)
 
     module.exit_json(**result)
 

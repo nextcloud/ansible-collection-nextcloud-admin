@@ -119,8 +119,13 @@ nextcloud_application:
 
 """
 
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from ansible_collections.nextcloud.admin.plugins.module_utils.app import NCApp
+
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nextcloud.admin.plugins.module_utils.app import app
+from ansible_collections.nextcloud.admin.plugins.module_utils.server import NCServer
 from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import (
     extend_nc_tools_args_spec,
 )
@@ -153,9 +158,10 @@ def main():
         "types",
         "dependencies",
     ]
-    result = dict(changed=False)
+    result: dict[str, Any] = dict(changed=False)
     try:
-        nc_app = app(module, module.params.get("name"))
+        nc_server: NCServer = NCServer(module)
+        nc_app: NCApp = nc_server.app(name=module.params.get("name"))
         result.update(nc_app.get_facts())
         if nc_app.state != "absent":
             # Display all appInfo if in debug or only a small list of usefull infos.

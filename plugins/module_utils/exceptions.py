@@ -23,6 +23,8 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import annotations
+
 
 class NextcloudException(Exception):
     """
@@ -35,11 +37,8 @@ class NextcloudException(Exception):
         stderr (str, optional): Standard error output from the command.
     """
 
-    def __init__(self, msg="", rc=None, stdout=None, stderr=None, **kwargs):
+    def __init__(self, msg="", **kwargs):
         super().__init__(msg)
-        self.rc = rc
-        self.stdout = stdout
-        self.stderr = stderr
         for key, value in kwargs.items():
             setattr(self, key, value)
 
@@ -67,12 +66,25 @@ class OccExceptions(NextcloudException):
         occ_cmd (str): The occ command that triggered the error.
     """
 
-    def __init__(self, occ_cmd=None, **kwargs):
+    def __init__(
+        self,
+        occ_cmd: list[str] | str | None = None,
+        rc: int | None = None,
+        stdout: str | None = None,
+        stderr: str | None = None,
+        **kwargs,
+    ):
         if "msg" not in kwargs:
             kwargs["msg"] = "Failure when executing provided occ command."
         super().__init__(**kwargs)
         if occ_cmd:
             self.occ_cmd = occ_cmd
+        if rc:
+            self.rc = rc
+        if stdout:
+            self.stdout = stdout
+        if stderr:
+            self.stderr = stderr
 
 
 class OccFileNotFoundException(OccExceptions):

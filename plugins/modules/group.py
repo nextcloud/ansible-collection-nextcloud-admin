@@ -23,7 +23,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 DOCUMENTATION = r"""
 ---
 module: group
@@ -132,15 +131,14 @@ removed_users:
   type: list
 """
 
-
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import (
     extend_nc_tools_args_spec,
 )
 from ansible_collections.nextcloud.admin.plugins.module_utils.identities import (
     idState,
-    Group,
 )
+from ansible_collections.nextcloud.admin.plugins.module_utils.server import NCServer
 from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
     IdentityNotPresent,
 )
@@ -194,9 +192,9 @@ def main():
         added_users=[],
         removed_users=[],
     )
-    group_id = module.params.get("id")
-
-    nc_group = Group(module, group_id)
+    group_id: str = module.params.get("id")
+    nc_server = NCServer(module)
+    nc_group = nc_server.group(name=group_id)
 
     display_name = module.params.get("display_name")
     ignore_missing_users = module.params.get("ignore_missing_users")

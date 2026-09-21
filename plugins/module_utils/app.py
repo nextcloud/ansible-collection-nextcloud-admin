@@ -25,7 +25,11 @@
 
 from __future__ import annotations
 import json
-from typing import Union
+from typing import TYPE_CHECKING, Union, Any, cast
+
+if TYPE_CHECKING:
+    from ansible_collections.nextcloud.admin.plugins.module_utils.server import NCServer
+
 from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
     OccExceptions,
     AppExceptions,
@@ -34,44 +38,42 @@ from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import 
     AppPSR4InfosNotReadable,
     AppPSR4InfosUnavailable,
 )
-from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import run_occ, run_php_inline  # type: ignore
+from ansible_collections.nextcloud.admin.plugins.module_utils.nc_tools import (
+    run_php_inline,
+)
 
 
-class app:
-    _update_version_available = ""
-    _path = None
-    _autoloaded_infos = None
-    _current_settings = None
+class NCApp:
 
-    def __init__(self, module, app_name: str):
-        self.module = module
+    def __init__(self, server: NCServer, app_name: str) -> None:
+
+        self.server = server
+        self._update_version_available: str | None = None
+        self._path: str | None = None
+        self._autoloaded_infos = None
+        self._current_settings = None
         self.app_name = app_name
-        self.all_shipped_apps = json.loads(
-            run_occ(module, ["app:list", "--output=json", "--shipped=true"])[1]
-        )
-        self.all_present_apps = json.loads(
-            run_occ(module, ["app:list", "--output=json"])[1]
-        )
-        if app_name in self.all_present_apps["enabled"].keys():
+
+        if app_name in self.server.apps["enabled"]:
             self.state = "present"
-            self.version = self.all_present_apps["enabled"][app_name]
-        elif app_name in self.all_present_apps["disabled"].keys():
+            self.version: str | None = self.server.apps["enabled"][app_name]
+        elif app_name in self.server.apps["disabled"]:
             self.state = "disabled"
-            self.version = self.all_present_apps["disabled"][app_name].split()[0]
+            self.version = self.server.apps["disabled"][app_name].split()[0]
         else:
             self.state = "absent"
             self.version = None
-        self.shipped = app_name in [
-            s
-            for a in self.all_shipped_apps.keys()
-            for s in self.all_shipped_apps[a].keys()
-        ]
+        self.shipped = (
+            app_name
+            in self.server.shipped_apps["enabled"]
+            | self.server.shipped_apps["disabled"]
+        )
 
     @property
     def update_version_available(self) -> Union[str, None]:
-        if self._update_version_available == "":
-            _check_app_update = run_occ(
-                self.module, ["app:update", "--showonly", self.app_name]
+        if self._update_version_available is None:
+            _check_app_update = self.server.occ(
+                ["app:update", "--showonly", self.app_name]
             )[1]
             if _check_app_update == "" or "up-to-date" in _check_app_update:
                 result = None
@@ -87,14 +89,12 @@ class app:
     @property
     def path(self) -> str:
         if not self._path:
-            result = run_occ(self.module, ["app:getpath", self.app_name])[1].strip()
-        self._path = result
+            self._path = self.server.occ(["app:getpath", self.app_name])[1].strip()
         return self._path
 
-    def get_facts(self) -> dict[str, any]:
-        facts = dict(
-            state=self.state,
-            is_shipped=self.shipped,
+    def get_facts(self) -> dict[str, Any]:
+        facts: dict[str, str | bool | None] = dict(
+            state=self.state, is_shipped=self.shipped
         )
         if self.state != "absent":
             facts.update(update_available=self.update_available)
@@ -104,20 +104,20 @@ class app:
         return facts
 
     @property
-    def autoloaded_infos(self) -> dict:
+    def autoloaded_infos(self) -> dict[str, dict[str, Any]]:
         if self._autoloaded_infos is None:
             self._autoloaded_infos = self._get_autoloaded_infos()
         return self._autoloaded_infos
 
     @property
-    def infos(self) -> dict:
-        return self.autoloaded_infos.get("appInfo")
+    def infos(self) -> dict[str, Any]:
+        return cast(dict[str, Any], self.autoloaded_infos.get("appInfo"))
 
     @property
-    def default_settings(self) -> dict:
-        return self.autoloaded_infos["settings"]
+    def default_settings(self) -> dict[str, Any]:
+        return cast(dict[str, Any], self.autoloaded_infos["settings"])
 
-    def _get_autoloaded_infos(self) -> dict:
+    def _get_autoloaded_infos(self) -> dict[str, dict[str, Any]]:
         """
         Run inline php script that use the server autoloading system to inspect the app.
         return a dict that contains keys: appInfo, settings.
@@ -151,7 +151,7 @@ class app:
         }}
         """
         try:
-            result = run_php_inline(self.module, php_script)
+            result = run_php_inline(self.server.module, php_script)
             # force the 'settings' key to be dict if it is empty
             if isinstance(result["settings"], list) and not result["settings"]:
                 result["settings"] = {}
@@ -162,25 +162,27 @@ class app:
             raise AppPSR4InfosUnavailable(app_name=self.app_name, **e.__dict__)
 
     @property
-    def current_settings(self) -> dict[str, any]:
+    def current_settings(self) -> dict[str, Any]:
         if self._current_settings is None:
             self._current_settings = self._get_current_settings()
         return self._current_settings
 
-    def _get_current_settings(self) -> dict[str, any]:
+    def _get_current_settings(self) -> dict[str, Any]:
         """
         Returns the current configured settings for the app, using `occ config:list <app>`.
         """
         non_informative = ["installed_version", "enabled", "types"]
         try:
-            raw_config = run_occ(self.module, ["config:list", self.app_name])[1]
-            occ_config = json.loads(raw_config).get("apps", {}).get(self.app_name, {})
+            raw_config = self.server.occ(["config:list", self.app_name])[1]
+            occ_config: dict[str, Any] = (
+                json.loads(raw_config).get("apps", {}).get(self.app_name, {})
+            )
             if isinstance(occ_config, list) and not occ_config:
                 return {}
             else:
                 return {k: v for k, v in occ_config.items() if k not in non_informative}
         except OccExceptions as e:
-            self.module.warn(
+            self.server.module.warn(
                 f"Failed to get current config for {self.app_name}: {e.stderr}"
             )
             return {}
@@ -196,7 +198,7 @@ class app:
         if not enable:
             occ_args.insert(1, "--keep-disabled")
         try:
-            action_stdout = run_occ(self.module, occ_args)[1].splitlines()
+            action_stdout = self.server.occ(occ_args)[1].splitlines()
         except OccExceptions as e:
             raise AppExceptions(
                 msg=f"Error during {self.app_name} installation.",
@@ -214,10 +216,10 @@ class app:
             self.state = "disabled"
         return actions_taken, misc_msg
 
-    def remove(self):
+    def remove(self) -> tuple[list[str], list[str]]:
         occ_args = ["app:remove", self.app_name]
         try:
-            action_stdout = run_occ(self.module, command=occ_args)[1].splitlines()
+            action_stdout = self.server.occ(command=occ_args)[1].splitlines()
         except OccExceptions as e:
             raise AppExceptions(
                 msg=f"Error while removing {self.app_name}.",
@@ -231,7 +233,7 @@ class app:
         self.state = "absent"
         return actions_taken, misc_msg
 
-    def toggle(self):
+    def toggle(self) -> tuple[list[str], list[str]]:
         if self.state == "absent":
             raise AssertionError("Cannot enable/disable an absent application")
         if self.state == "disabled":
@@ -239,7 +241,7 @@ class app:
         else:
             new_state = "disable"
         try:
-            action_stdout = run_occ(self.module, [f"app:{new_state}", self.app_name])[
+            action_stdout = self.server.occ([f"app:{new_state}", self.app_name])[
                 1
             ].splitlines()
         except OccExceptions as e:
@@ -258,9 +260,9 @@ class app:
         return actions_taken, misc_msg
 
     def update(self):
-        old_version = self.version
+        old_version = cast(str, self.version)
         try:
-            run_occ(self.module, ["app:update", self.app_name])
+            self.server.occ(["app:update", self.app_name])
         except OccExceptions as e:
             raise AppExceptions(
                 msg=f"Error while updating {self.app_name}.",
