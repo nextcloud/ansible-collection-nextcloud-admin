@@ -1,0 +1,12 @@
+---
+
+- name: Nextcloud upgrade test
+  hosts: nextcloud_servers
+  roles:
+    - role: nextcloud.admin.upgrade
+      vars:
+        nextcloud_webroot: /var/www/nextcloud
+        nextcloud_target_version: "32.0.6"
+        nextcloud_upgrade_php: true
+
+...

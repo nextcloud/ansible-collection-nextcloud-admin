@@ -1,0 +1,73 @@
+---
+# Playbook to upgrade PHP
+
+- name: Assert php_version is defined
+  ansible.builtin.assert:
+    that:
+      - php_version is defined
+      - php_version | length > 0
+    fail_msg: "php_version must be defined and non-empty."
+    quiet: true
+
+- name: Stop services before upgrade
+  ansible.builtin.include_tasks: manage_services.yml
+  vars:
+    nextcloud_maintenance_mode: true
+
+- name: Set PHP configuration paths
+  ansible.builtin.set_fact:
+    php_conf_paths:
+      - /etc/php/{{ php_version }}/fpm
+      - /etc/php/{{ php_version }}/apache2
+      - /etc/php/{{ php_version }}/cli
+    php_extension_conf_paths:
+      - /etc/php/{{ php_version }}/fpm/conf.d
+      - /etc/php/{{ php_version }}/apache2/conf.d
+      - /etc/php/{{ php_version }}/cli/conf.d
+
+- name: 'Remove installed PHP versions different from {{ php_version }}'
+  ansible.builtin.include_role:
+    name: geerlingguy.php-versions
+
+- name: Remove third-party PHP repo when target version matches distro default
+  when: php_version == distro_php_version
+  block:
+    - name: Remove Ondrej's PHP repo
+      ansible.builtin.deb822_repository:
+        name: "ondrej-php-{{ ansible_facts['distribution_release'] }}"
+        state: absent
+      register: _php_repo_removed
+
+    - name: Update apt cache after repo removal
+      ansible.builtin.apt:
+        update_cache: true
+      when: _php_repo_removed.changed | default(false) # noqa: no-handler
+
+- name: 'Install PHP {{ php_version }}'
+  ansible.builtin.include_role:
+    name: geerlingguy.php
+  vars:
+    php_enable_webserver: false # We handle starting/stopping the webserver within this role.
+
+- name: Get updated PHP version
+  ansible.builtin.command: php -r "echo PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION;"
+  register: _updated_php_version_result
+  changed_when: false
+
+- name: Verify PHP version matches expected version
+  ansible.builtin.assert:
+    that:
+      - _updated_php_version_result.stdout | trim == php_version
+    fail_msg: >-
+      PHP upgrade failed. Expected PHP {{ php_version }}, but got PHP {{ _updated_php_version_result.stdout | trim }}.
+    success_msg: "PHP successfully upgraded to version {{ php_version }}."
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Start services after upgrade
+  ansible.builtin.include_tasks: manage_services.yml
+  vars:
+    nextcloud_maintenance_mode: false
+
+...
