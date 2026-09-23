@@ -68,7 +68,7 @@ def convert_string(command: str) -> list[str]:
     command_lex.commenters = ""
     command_lex.escape = ""
     command_lex.quotes = "\"'"
-    return [token if " " in token else token.strip("\"'") for token in command_lex]
+    return [token.strip("\"'") for token in command_lex]
 
 
 def execute_occ_command(
