@@ -40,17 +40,16 @@
         nextcloud_path: "{{ nextcloud_webroot }}"
         command: >-
           maintenance:install
-          --database {{ nextcloud_tmp_backend }}
+          {% if nextcloud_db_backend in ['mysql', 'mariadb', 'pgsql'] %}
+          --database {{ 'mysql' if nextcloud_db_backend == 'mariadb' else nextcloud_db_backend }}
           --database-host {{ nextcloud_db_host }}
           --database-name {{ nextcloud_db_name }}
           --database-user {{ nextcloud_db_admin }}
           --database-pass {{ nextcloud_db_pwd }}
+          {% endif %}
           --admin-user {{ nextcloud_admin_name }}
           --admin-pass {{ nextcloud_admin_pwd }}
           --data-dir {{ nextcloud_data_dir }}
-      vars:
-        # mariadb is equal to mysql for occ
-        nextcloud_tmp_backend: "{{ 'mysql' if nextcloud_db_backend == 'mariadb' else nextcloud_db_backend }}"
       notify: Reload http
 
     - name: nc_installation | Verify config.php - check filesize
