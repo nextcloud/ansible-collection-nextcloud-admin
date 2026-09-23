@@ -10,7 +10,7 @@
 - name: tls_selfsigned | Create self-signed SSL cert
   ansible.builtin.command: >
     openssl req -new -nodes -x509
-    -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=${hostname --fqdn}"
+    -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN={{ ansible_facts["fqdn"] }}"
     -days 365
     -keyout {{ nextcloud_tls_cert_key_file }}
     -out {{ nextcloud_tls_cert_file }}
