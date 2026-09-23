@@ -40,19 +40,14 @@
     name: "{{ php_pkg_spe }}"
     state: present
 
-- name: php_install | Install php*-mysql package
+- name: php_install | Install the php backend driver
   ansible.builtin.package:
-    name: "php{{ php_ver }}-mysql"
+    name: "php{{ php_ver }}-{{ db_driver }}"
     state: present
-  when: (nextcloud_db_backend == "mysql") or (nextcloud_db_backend == "mariadb")
+  vars:
+    db_driver: "{{ (nextcloud_db_backend in ['mysql', 'mariadb'])|ternary('mysql', nextcloud_db_backend) }}"
 
-- name: php_install | Install php*-pgsql package
-  ansible.builtin.package:
-    name: "php{{ php_ver }}-pgsql"
-    state: present
-  when: (nextcloud_db_backend == "pgsql")
-
-- name: php_install | Install PHP APCu pacakge
+- name: php_install | Install PHP APCu package
   ansible.builtin.package:
     name: "php{{ php_ver }}-apcu"
     state: present
