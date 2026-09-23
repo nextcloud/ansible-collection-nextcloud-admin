@@ -23,7 +23,7 @@ nextcloud_archive_format: "zip"  # zip/tar.bz2
 # by default, use references stored in defaults/php_configs.yml
 nextcloud_install_php: true
 php_install_external_repos: true
-php_ver: "8.2"
+php_ver: "8.3"
 php_dir: "/etc/php/{{ php_ver }}"
 php_bin: "php-fpm{{ php_ver }}"
 php_pkg_spe:
@@ -81,7 +81,7 @@ nextcloud_config_settings:
 # [DATABASE]
 nextcloud_install_db: true
 nextcloud_db_host: "127.0.0.1"
-nextcloud_db_backend: "mysql"  # mysql/mariadb/pgsql
+nextcloud_db_backend: "mysql"  # sqlite/mysql/mariadb/pgsql
 mysql_daemon: >-
   {{
   os_config_ref[ansible_distribution | lower][ansible_distribution_release | lower].mysql_daemon |

@@ -347,9 +347,13 @@ nextcloud_db_backend: "mysql"
 Database type used by nextcloud.
 
 Supported values are:
+
+-   sqlite
 -   mysql
 -   mariadb
 -   pgsql _(PostgreSQL)_
+
+If your DB backend is not sqlite, you must define the following variables:
 
 ```yaml
 nextcloud_db_name: "nextcloud"

@@ -24,12 +24,10 @@
       when: ansible_distribution == 'Ubuntu'
   vars:
     nextcloud_install_db: false
-    nextcloud_db_name: nc
-    nextcloud_db_admin: nc
-    nextcloud_db_pwd: nc
+    nextcloud_db_backend: sqlite
     nextcloud_version_channel: "releases"
     nextcloud_get_latest: true
-    nextcloud_admin_pwd: "The_Answer_Is_42!"
+    nextcloud_disable_websrv_default_site: true
   roles:
     - role: nextcloud.admin.install_nextcloud
   post_tasks:
