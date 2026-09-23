@@ -15,7 +15,6 @@
       - "php{{ php_ver }}-fpm"
       - "php{{ php_ver }}-gd"
       - "php{{ php_ver }}-ldap"
-      - "php{{ php_ver }}-imap"
       - "php{{ php_ver }}-curl"
       - "php{{ php_ver }}-intl"
       - "php{{ php_ver }}-bz2"
