@@ -36,16 +36,16 @@ class TestConvertString(unittest.TestCase):
         self.assertEqual(convert_string(""), [])
 
     def test_block_of_words(self):
-        self.assertEqual(convert_string('"a block a words"'), ['"a block a words"'])
+        self.assertEqual(convert_string('"a block a words"'), ["a block a words"])
 
     def test_mixed_blocks(self):
         self.assertEqual(
             convert_string('a command with a "block of words"'),
-            ["a", "command", "with", "a", '"block of words"'],
+            ["a", "command", "with", "a", "block of words"],
         )
         self.assertEqual(
             convert_string("a command with a 'block of words'"),
-            ["a", "command", "with", "a", "'block of words'"],
+            ["a", "command", "with", "a", "block of words"],
         )
 
     def test_backslash_behaviour(self):
