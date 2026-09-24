@@ -21,17 +21,20 @@
       - "php{{ php_ver }}-bz2"
     state: present
 
-- name: "[php-fpm] - setup fpm php.ini"
+- name: "[php-fpm] - setup php nextcloud module"
   ansible.builtin.lineinfile:
-    dest: "{{ php_dir }}/fpm/php.ini"
+    dest: "{{ php_dir }}/mods-available/nc_{{ nextcloud_instance_name }}.ini"
     state: present
+    create: true
+    mode: "0644"
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
-    backrefs: true
   with_items:
+    - {regexp: '; priority=', line: '; priority=50'}
     - {regexp: 'opcache.interned_strings_buffer', line: 'opcache.interned_strings_buffer=16'}
     - {regexp: '\bmemory_limit\b', line: 'memory_limit={{ php_memory_limit }}'}
   notify:
+    - Load php nc module
     - Start php-fpm
     - Reload http
 
