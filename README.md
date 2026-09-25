@@ -26,7 +26,7 @@ Plugins and modules within a collection may be tested with only specific Ansible
 
 ## Supported nextcloud version
 
-This collection supports Nextcloud versions: `30`, `31`, `32(latest)`
+This collection supports Nextcloud versions: `33`, `34`, `35(latest)`
 The community makes it's best efforts to keep tested versions updated with [Nextcloud release schedule](https://github.com/nextcloud/server/wiki/Maintenance-and-Release-Schedule).
 
 ## Included content
@@ -49,7 +49,7 @@ nextcloud.admin.group | Manage Nextcloud groups.
 Name | Description
 --- | ---
 nextcloud.admin.upgrade | Upgrade a Nextcloud instance
-nextcloud.admin.backup (**beta**)|Create a backup of a Nextcloud server
+nextcloud.admin.backup (**beta**) | Create a backup of a Nextcloud server
 nextcloud.admin.install_nextcloud | Install and configure an Nextcloud instance for a Debian/Ubuntu server
 
 <!--end collection content-->
@@ -87,7 +87,7 @@ You can also include it in a `requirements.yml` file and install it via `ansible
 ---
 collections:
   - name: nextcloud.admin
-    version: 2.3.0
+    version: 2.4.0
 ```
 
 ### Using modules from the Nextcloud Collection in your playbooks
