@@ -5,12 +5,13 @@
 
 import copy
 import os
-from ansible.plugins.action import ActionBase
+from ansible.plugins.action import ActionBase, AnsibleActionFail
 
 
 class ActionModule(ActionBase):
     def run(self, tmp=None, task_vars=None):
         del tmp  # tmp no longer has any effect
+        task_vars = task_vars or {}
         new_module_args = copy.deepcopy(self._task.args)
 
         # missing occ common arguments fallback
@@ -35,6 +36,15 @@ class ActionModule(ActionBase):
             new_module_args["php_runtime"] = php_runtime
         elif "php_runtime" in new_module_args:
             del new_module_args["php_runtime"]
+
+        if self._task.action.endswith("maintenance_mode"):
+            raw_params = new_module_args.pop("_raw_params", None)
+            if raw_params is not None:
+                if "state" in new_module_args:
+                    raise AnsibleActionFail(
+                        "The 'state' parameter and free-form syntax cannot be used together"
+                    )
+                new_module_args["state"] = raw_params
 
         return self._execute_module(
             module_name=self._task.action,
