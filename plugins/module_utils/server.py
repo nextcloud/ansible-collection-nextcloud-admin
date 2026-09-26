@@ -40,6 +40,14 @@ from ansible_collections.nextcloud.admin.plugins.module_utils.identities import 
 
 
 class NCServer:
+    installed: bool
+    version: str
+    versionstring: str
+    edition: None | str
+    maintenance: bool
+    needsDbUpgrade: bool
+    productname: str
+    extendedSupport: bool
 
     def __init__(self, module: AnsibleModule) -> None:
 
@@ -151,3 +159,15 @@ class NCServer:
 
     def user(self, name: str) -> NCUser:
         return NCUser(self, ident=name)
+
+    def set_maintenance(self, enabled: bool) -> None:
+        if self.maintenance == enabled:
+            return
+        command = [
+            "maintenance:mode",
+            "--on" if enabled else "--off",
+            "--no-interaction",
+            "--no-warnings",
+        ]
+        self.occ(command)
+        self.maintenance = enabled
