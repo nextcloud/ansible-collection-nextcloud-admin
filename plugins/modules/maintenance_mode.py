@@ -48,18 +48,18 @@ author:
 
 EXAMPLES = r"""
 - name: Enable maintenance mode
-  nextcloud.admin.maintenance_mode: yes
+  nextcloud.admin.maintenance_mode: true
 
 - name: Enable maintenance mode
   nextcloud.admin.maintenance_mode:
-    state: on
+    state: true
 
 - name: Disable maintenance mode
-  nextcloud.admin.maintenance_mode: no
+  nextcloud.admin.maintenance_mode: false
 
 - name: Disable maintenance mode
   nextcloud.admin.maintenance_mode:
-    state: off
+    state: true
 """
 
 RETURN = r"""
