@@ -1,10 +1,6 @@
-from math import exp
-from unittest import TestCase, result
-from unittest.mock import patch, MagicMock, ANY
+from unittest import TestCase
+from unittest.mock import patch, MagicMock
 from ansible_collections.nextcloud.admin.plugins.modules import maintenance_mode
-from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
-    AppExceptions,
-)
 from ansible.module_utils import basic
 
 
