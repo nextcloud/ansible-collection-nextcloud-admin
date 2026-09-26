@@ -37,7 +37,7 @@ class ActionModule(ActionBase):
         elif "php_runtime" in new_module_args:
             del new_module_args["php_runtime"]
 
-        if self._task.action.endswith(".maintenance_mode"):
+        if self._task.action.endswith("maintenance_mode"):
             raw_params = new_module_args.pop("_raw_params", None)
             if raw_params is not None:
                 if "state" in new_module_args:

@@ -112,8 +112,8 @@ def main():
         result["changed"] = True
         if module._diff:
             result["diff"] = {
-                "before": {"maintenance": current},
-                "after": {"maintenance": desired},
+                "before": {"maintenance_mode": current},
+                "after": {"maintenance_mode": desired},
             }
     module.exit_json(**result)
 
