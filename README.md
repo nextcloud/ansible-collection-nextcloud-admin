@@ -43,6 +43,7 @@ nextcloud.admin.user_list | List configured users on the server with optional us
 nextcloud.admin.user | short_description: Manage a Nextcloud user.
 nextcloud.admin.group_list | List configured groups on the server with optional group infos
 nextcloud.admin.group | Manage Nextcloud groups.
+nextcloud.admin.maintenance_mode | Manage Nextcloud maintenance mode.
 
 ### Roles
 
