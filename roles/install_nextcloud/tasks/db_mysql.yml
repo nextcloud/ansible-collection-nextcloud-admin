@@ -15,6 +15,14 @@
   changed_when: false
   check_mode: false
 
+# Parse the first x.y.z number from the client output, e.g.
+#   MySQL:   "mysql  Ver 8.4.11-0ubuntu0.26.04.1 for Linux ..."  -> 8.4.11
+#   MariaDB: "mysql  Ver 15.1 Distrib 10.11.6-MariaDB, ..."      -> 10.11.6
+- name: db_mysql | Parse MySQL/MariaDB version
+  ansible.builtin.set_fact:
+    nc_mysql_is_mariadb: "{{ 'mariadb' in (mysql_cli_version.stdout | lower) }}"
+    nc_mysql_version: "{{ mysql_cli_version.stdout | regex_search('[0-9]+[.][0-9]+[.][0-9]+') | default('0.0.0', true) }}"
+
 - name: db_mysql | Install packages for MySQL
   ansible.builtin.package:
     name: "{{ nc_mysql_deps }}"
@@ -22,6 +30,8 @@
   vars:
     nc_mysql_deps:
       - "python3-pymysql"
+      # needed by PyMySQL for caching_sha2_password (MySQL >= 8.4) over TCP
+      - "python3-cryptography"
 
 - name: db_mysql | Ensure MySQL is started and enabled on boot
   ansible.builtin.service:
@@ -43,28 +53,36 @@
 
 # Note: We do not use mysql_user for this operation, as it doesn't always update
 # the root password correctly. See: https://goo.gl/MSOejW
-- name: db_mysql | Update MySQL root password for localhost root account (5.7.x)
-  ansible.builtin.shell: >
-    mysql -u root -NBe
-    'ALTER USER "root"@"{{ item }}"
-    IDENTIFIED WITH mysql_native_password BY "{{ nextcloud_mysql_root_pwd }}"; FLUSH PRIVILEGES;'
+#
+# The authentication plugin must be set explicitly: ALTER USER ... IDENTIFIED BY
+# keeps the current plugin, and root uses auth_socket on Debian/Ubuntu.
+# - MySQL 5.7 up to (excluding) 8.4: mysql_native_password
+# - MySQL >= 8.4: caching_sha2_password (mysql_native_password is disabled by
+#   default there)
+# - MariaDB: plain ALTER USER ... IDENTIFIED BY (supported since MariaDB 10.2)
+# SET PASSWORD = PASSWORD() was removed in MySQL 8.0 and is not used anymore.
+- name: db_mysql | Update MySQL root password for localhost root account
+  ansible.builtin.command:
+    argv:
+      - mysql
+      - -u
+      - root
+      - -NBe
+      - >-
+        ALTER USER 'root'@'{{ item }}'
+        IDENTIFIED {{ nc_mysql_root_auth }}BY '{{ nextcloud_mysql_root_pwd }}';
+        FLUSH PRIVILEGES;
+  vars:
+    nc_mysql_root_auth: >-
+      {{ '' if nc_mysql_is_mariadb
+         else 'WITH caching_sha2_password ' if nc_mysql_version is version('8.4', '>=')
+         else 'WITH mysql_native_password ' if nc_mysql_version is version('5.7', '>=')
+         else '' }}
   with_items: "{{ mysql_root_hosts.stdout_lines | default([]) }}"
-  when: >
-    ((mysql_install_packages | bool) or nextcloud_mysql_root_pwd_update)
-    and ('5.7.' in mysql_cli_version.stdout or '8.0.' in mysql_cli_version.stdout)
+  when: (mysql_install_packages | bool) or nextcloud_mysql_root_pwd_update
   register: output
   changed_when: "output.rc == 0"
-
-- name: db_mysql | Update MySQL root password for localhost root account (< 5.7.x)
-  ansible.builtin.shell: >
-    mysql -NBe
-    'SET PASSWORD FOR "root"@"{{ item }}" = PASSWORD("{{ nextcloud_mysql_root_pwd }}"); FLUSH PRIVILEGES;'
-  with_items: "{{ mysql_root_hosts.stdout_lines | default([]) }}"
-  when: >
-    ((mysql_install_packages | bool) or nextcloud_mysql_root_pwd_update)
-    and ('5.7.' not in mysql_cli_version.stdout and '8.0.' not in mysql_cli_version.stdout)
-  register: output
-  changed_when: "output.rc == 0"
+  no_log: true
 
 - name: db_mysql | Copy .my.cnf file with root password credentials
   ansible.builtin.template:
@@ -108,12 +126,23 @@
     config_file: "{{ mysql_credential_file[(ansible_os_family | lower)] | default(omit) }}"
     state: present
 
+# The "password" parameter of community.mysql.mysql_user only works with
+# mysql_native_password, which is disabled by default since MySQL 8.4.
+# For caching_sha2_password the password has to be passed as plugin_auth_string.
 - name: db_mysql | Configure the database user
   community.mysql.mysql_user:
     name: "{{ nextcloud_db_admin }}"
-    password: "{{ nextcloud_db_pwd }}"
+    password: "{{ omit if nc_mysql_user_sha2 | bool else nextcloud_db_pwd }}"
+    plugin: "{{ 'caching_sha2_password' if nc_mysql_user_sha2 | bool else omit }}"
+    plugin_auth_string: "{{ nextcloud_db_pwd if nc_mysql_user_sha2 | bool else omit }}"
+    # the plugin_auth_string cannot be compared with the stored hash, so only
+    # set it when the user is created to keep the task idempotent
+    update_password: "{{ 'on_create' if nc_mysql_user_sha2 | bool else 'always' }}"
     priv: "{{ nextcloud_db_name }}.*:ALL"
     login_user: root
     login_password: "{{ nextcloud_mysql_root_pwd }}"
     config_file: "{{ mysql_credential_file[(ansible_os_family | lower)] | default(omit) }}"
     state: present
+  vars:
+    nc_mysql_user_sha2: "{{ not nc_mysql_is_mariadb and nc_mysql_version is version('8.4', '>=') }}"
+
