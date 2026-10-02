@@ -145,4 +145,3 @@
     state: present
   vars:
     nc_mysql_user_sha2: "{{ not nc_mysql_is_mariadb and nc_mysql_version is version('8.4', '>=') }}"
-
