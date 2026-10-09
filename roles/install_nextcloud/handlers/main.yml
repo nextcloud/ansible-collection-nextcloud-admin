@@ -1,5 +1,33 @@
 ---
 # handlers file for nextcloud
+- name: Load php nc module
+  ansible.builtin.command:
+    cmd: phpenmod -s fpm nc_{{ nextcloud_instance_name }}
+  register: phpenmod_out
+  failed_when: "'WARNING' in phpenmod_out"
+  changed_when: phpenmod_out.rc == 0
+
+- name: Load php nc-cli module
+  ansible.builtin.command:
+    cmd: phpenmod -s cli nc-cli_{{ nextcloud_instance_name }}
+  register: phpenmod_out
+  failed_when: "'WARNING' in phpenmod_out"
+  changed_when: phpenmod_out.rc == 0
+
+- name: Load php nc-custom modules
+  ansible.builtin.command:
+    cmd: phpenmod -s fpm nc-custom_{{ nextcloud_instance_name }}
+  register: phpenmod_out
+  failed_when: "'WARNING' in phpenmod_out"
+  changed_when: phpenmod_out.rc == 0
+
+- name: Load php nc-cli-custom modules
+  ansible.builtin.command:
+    cmd: phpenmod -s fpm nc-cli_custom_{{ nextcloud_instance_name }}
+  register: phpenmod_out
+  failed_when: "'WARNING' in phpenmod_out"
+  changed_when: phpenmod_out.rc == 0
+
 - name: Restart mysql
   ansible.builtin.service:
     name: "{{ mysql_daemon }}"
