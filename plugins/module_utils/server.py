@@ -171,3 +171,80 @@ class NCServer:
         ]
         self.occ(command)
         self.maintenance = enabled
+
+    def install(self, **kwargs: str | int | bool) -> None:
+        """
+        Installs Nextcloud with the specified parameters.
+
+        This method performs the initial installation of Nextcloud by configuring
+        the database, administrator accounts and the data directory.
+
+        Args:
+            **kwargs: Arguments that can be passed to the install command.
+                These include:
+                - database_type (str, optional): Database type (e.g. 'mysql', 'pgsql'). Defaults to None.
+                - database_name (str, optional): Name of the database. Defaults to None.
+                - database_host (str, optional): Database host. Defaults to None.
+                - database_port (int, optional): Database port. Defaults to None.
+                - database_user (str, optional): Database username. Defaults to None.
+                - database_pass (str, optional): Database password. Defaults to None.
+                - database_table_space (str, optional): Database table space (oci only). Defaults to None.
+                - admin_user (str, optional): Administrator username. Defaults to None.
+                - admin_pass (str, optional): Administrator password. Defaults to None.
+                - admin_email (str, optional): Administrator email address. Defaults to None.
+                - data_dir (str): Path to Nextcloud data directory.
+                The following arguments may be available depending on the version of Nextcloud:
+                - disable_admin_user (bool): Disable the creation of an admin user. Defaults to False.
+                - database_ssl_mode (str): Encryption mode for the database connection (pgsql only).
+                - database_ssl_ca (str): Path to CA certificate (mysql and pgsql only).
+                - database_ssl_cert (str): Path to client certificate (mysql and pgsql only).
+                - database_ssl_key (str): Path to private key of client certificate (mysql and pgsql only).
+                - database_ssl_crl (str): Path to certificate revocation list (pgsql only).
+                - database_ssl_no_verify (bool): Do not verify server certificate (mysql only). Defaults to False.
+                - password_salt (str): Password salt, at least 32 characters.
+                - server_secret (str): Server secret, at least 48 characters.
+
+        Returns:
+            None
+
+        Raises:
+            RuntimeError: If Nextcloud is already installed.
+
+        Note:
+            This method can only be called if Nextcloud is not yet installed.
+            The kwargs parameters are version-dependent and may not be available
+            in all versions of Nextcloud.
+
+        Examples:
+            >>> server.install(
+            ...     database_type="mysql",
+            ...     database_name="nextcloud",
+            ...     database_user="nc_user",
+            ...     database_pass="password",
+            ...     admin_user="admin",
+            ...     admin_pass="admin_password",
+            ...     data_dir="/var/www/nextcloud/data"
+            ... )
+        """
+
+        if self.installed:
+            raise RuntimeError("Nextcloud is already installed")
+
+        occ_args = ["--no-interaction", "--no-warnings"]
+
+        for bool_param in ("disable_admin_user", "database_ssl_no_verify"):
+            param_value = kwargs.pop(bool_param, False)
+            if param_value:
+                occ_args.append(f"--{bool_param.replace('_', '-')}")
+
+        occ_args.extend(
+            arg
+            for k, v in kwargs.items()
+            if v is not False
+            for arg in (
+                [f"--{k.replace('_', '-')}"]
+                if v is True
+                else [f"--{k.replace('_', '-')}", str(v)]
+            )
+        )
+        self.occ(["maintenance:install"] + occ_args)

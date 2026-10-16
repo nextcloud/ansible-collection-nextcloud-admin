@@ -47,6 +47,7 @@ nextcloud.admin.user | short_description: Manage a Nextcloud user.
 nextcloud.admin.group_list | List configured groups on the server with optional group infos
 nextcloud.admin.group | Manage Nextcloud groups.
 nextcloud.admin.maintenance_mode | Manage Nextcloud maintenance mode.
+nextcloud.admin.server_install | Run the server installation routine with the provided options.
 
 ### Roles
 
