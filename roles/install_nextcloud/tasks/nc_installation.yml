@@ -45,10 +45,10 @@
           --database-host {{ nextcloud_db_host }}
           --database-name {{ nextcloud_db_name }}
           --database-user {{ nextcloud_db_admin }}
-          --database-pass {{ nextcloud_db_pwd }}
+          --database-pass={{ nextcloud_db_pwd }}
           {% endif %}
           --admin-user {{ nextcloud_admin_name }}
-          --admin-pass {{ nextcloud_admin_pwd }}
+          --admin-pass={{ nextcloud_admin_pwd }}
           --data-dir {{ nextcloud_data_dir }}
       notify: Reload http
 
