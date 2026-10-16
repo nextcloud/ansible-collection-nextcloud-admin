@@ -41,13 +41,16 @@
         - name: Collect diagnostics
           ansible.builtin.shell: |
             for f in /usr/sbin/php-fpm[0-9]*; do echo "== $f -t"; "$f" -t 2>&1; done
-            echo "== systemctl"; systemctl status 'php*-fpm' --no-pager -l 2>&1
-            echo "== journal"; journalctl --no-pager -n 100 -u 'php*-fpm' 2>&1
+            echo "== systemd state"; systemctl is-system-running 2>&1
+            echo "== systemctl php-fpm"; systemctl status 'php*fpm*' --no-pager -l 2>&1
+            echo "== php-fpm journal"; journalctl --no-pager -n 100 -u 'php*fpm*' 2>&1
+            echo "== php-fpm log"; tail -n 100 /var/log/php*fpm.log 2>&1
             echo "== /run/php"; ls -la /run/php 2>&1
             echo "== pool.d"; ls -la /etc/php/*/fpm/pool.d 2>&1
             echo "== apache2 -t"; apache2ctl -t 2>&1
             echo "== apache2 systemctl"; systemctl status apache2 --no-pager -l 2>&1
             echo "== apache2 journal"; journalctl --no-pager -n 100 -u apache2 2>&1
+            echo "== apache2 error log"; tail -n 100 /var/log/apache2/error.log 2>&1
             echo "== sites-enabled"; ls -la /etc/apache2/sites-enabled 2>&1
             echo "== listening sockets"; ss -ltnp 2>&1
           changed_when: false
