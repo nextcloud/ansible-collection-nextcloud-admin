@@ -4,15 +4,19 @@ name: collection-tests
   workflow_call:
     inputs:
       distros:
-        required: false
+        required: true
         description: a list of debian based distribution
         type: string
-        default: '["debian13", "debian12", "ubuntu2404", "ubuntu2604"]'
       nc_versions:
         required: false
         description: a list of nextcloud server version
         type: string
         default: '["latest"]'
+      run_molecule:
+        required: false
+        description: whether to run the molecule tests
+        type: boolean
+        default: true
 env:
   PYTHON_VERSION: '3.12'
 jobs:
@@ -90,6 +94,7 @@ jobs:
           ansible-test sanity --requirements
 
   molecule_test:
+    if: ${{ inputs.run_molecule }}
     defaults:
       run:
         working-directory: "nextcloud.ansible-collection-nextcloud-admin"

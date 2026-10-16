@@ -1,0 +1,30 @@
+---
+name: Scheduled latest
+"on":
+  schedule:
+    - cron: "0 3 */5 * *"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - name: Check if already green for this commit
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          count=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/schedule-latest.yml/runs?head_sha=$GITHUB_SHA&status=success&per_page=1" --jq '.total_count')
+          skip=false
+          if [ "$count" -gt 0 ]; then skip=true; fi
+          echo "skip=$skip" >> "$GITHUB_OUTPUT"
+
+  tests:
+    needs: check
+    if: needs.check.outputs.skip != 'true'
+    uses: ./.github/workflows/main.yml
+    with:
+      full: false
