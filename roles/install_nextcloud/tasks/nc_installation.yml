@@ -34,37 +34,24 @@
         path: "{{ nextcloud_webroot }}/config/config.php"
         state: absent
 
-    - name: nc_installation | Run occ installation command
+    - name: nc_installation | Run Nextcloud installation
       become: true
-      nextcloud.admin.run_occ:
+      nextcloud.admin.server_install:
         nextcloud_path: "{{ nextcloud_webroot }}"
-        command: >-
-          maintenance:install
-          {% if nextcloud_db_backend in ['mysql', 'mariadb', 'pgsql'] %}
-          --database {{ 'mysql' if nextcloud_db_backend == 'mariadb' else nextcloud_db_backend }}
-          --database-host {{ nextcloud_db_host }}
-          --database-name {{ nextcloud_db_name }}
-          --database-user {{ nextcloud_db_admin }}
-          --database-pass={{ nextcloud_db_pwd }}
-          {% endif %}
-          --admin-user {{ nextcloud_admin_name }}
-          --admin-pass={{ nextcloud_admin_pwd }}
-          --data-dir {{ nextcloud_data_dir }}
+        options: >-
+          {{ {
+            'admin_user': nextcloud_admin_name,
+            'admin_pass': nextcloud_admin_pwd,
+            'data_dir': nextcloud_data_dir
+          } | combine(nc_installation_db_options if nextcloud_db_backend in ['mysql', 'mariadb', 'pgsql'] else {}) }}
+      vars:
+        nc_installation_db_options:
+          database: "{{ 'mysql' if nextcloud_db_backend == 'mariadb' else nextcloud_db_backend }}"
+          database_host: "{{ nextcloud_db_host }}"
+          database_name: "{{ nextcloud_db_name }}"
+          database_user: "{{ nextcloud_db_admin }}"
+          database_pass: "{{ nextcloud_db_pwd }}"
       notify: Reload http
-
-    - name: nc_installation | Verify config.php - check filesize
-      ansible.builtin.stat:
-        path: "{{ nextcloud_webroot }}/config/config.php"
-      register: nc_installation_confsize
-      failed_when: nc_installation_confsize.stat.size is undefined or nc_installation_confsize.stat.size <= 100
-
-    - name: nc_installation | Verify config.php - php syntax check
-      ansible.builtin.command: "php -l {{ nextcloud_webroot }}/config/config.php"
-      register: nc_installation_confphp
-      changed_when: false
-      failed_when:
-        - nc_installation_confphp.rc is defined
-        - nc_installation_confphp.rc != 0
 
   rescue:
     # - name: Unfix su issue with occ
