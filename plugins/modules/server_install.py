@@ -71,7 +71,7 @@ EXAMPLES = r"""
   nextcloud.admin.server_install:
     options:
       database_type: sqlite
-      disable_admin_user: True
+      disable_admin_user: true
 
 - name: Install Nextcloud with a PostgreSQL database
   nextcloud.admin.server_install:
