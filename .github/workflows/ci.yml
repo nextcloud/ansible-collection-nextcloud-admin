@@ -7,19 +7,21 @@ name: CI
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   changes:
     runs-on: ubuntu-latest
     outputs:
-      roles: ${{ steps.filter.outputs.roles }}
-      plugins: ${{ steps.filter.outputs.plugins }}
+      roles: ${{ steps.filter.outputs.roles || 'true' }}
+      plugins: ${{ steps.filter.outputs.plugins || 'true' }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@v7
 
       - name: Detect changed paths
         id: filter
+        if: github.event_name != 'workflow_dispatch'
         uses: dorny/paths-filter@v3
         with:
           filters: |
@@ -27,6 +29,7 @@ jobs:
               - 'roles/**'
               - 'molecule/**'
               - '.github/distros.json'
+              - '.github/nextcloud-versions.json'
             plugins:
               - 'plugins/**'
 

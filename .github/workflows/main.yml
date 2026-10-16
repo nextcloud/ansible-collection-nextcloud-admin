@@ -21,14 +21,16 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       distros: ${{ steps.read.outputs.distros }}
+      nc_versions: ${{ steps.read.outputs.nc_versions }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@v7
 
-      - name: Read distros list
+      - name: Read distros and Nextcloud versions
         id: read
         run: |
           echo "distros=$(jq -c . .github/distros.json)" >> "$GITHUB_OUTPUT"
+          echo "nc_versions=$(jq -c . .github/nextcloud-versions.json)" >> "$GITHUB_OUTPUT"
 
   collection_tests:
     name: tests
@@ -37,4 +39,4 @@ jobs:
     with:
       run_molecule: true
       distros: ${{ needs.config.outputs.distros }}
-      nc_versions: ${{ inputs.full && '["latest", "nc34", "nc33"]' || '["latest"]' }}
+      nc_versions: ${{ inputs.full && needs.config.outputs.nc_versions || '["latest"]' }}

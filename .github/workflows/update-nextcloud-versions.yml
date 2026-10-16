@@ -1,0 +1,42 @@
+---
+name: Update Nextcloud versions
+"on":
+  schedule:
+    - cron: "0 4 1 * *"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Compute Nextcloud versions
+        run: |
+          major=$(git ls-remote --tags --refs https://github.com/nextcloud/server \
+            | sed -n 's#.*refs/tags/v\([0-9]*\)\.[0-9]*\.[0-9]*$#\1#p' \
+            | sort -n | tail -1)
+          jq -n --argjson m "$major" '["nc\($m)", "nc\($m - 1)", "nc\($m - 2)"]' > .github/nextcloud-versions.json
+          sed -i "s/Nextcloud_versions-[0-9_%7C]*-green/Nextcloud_versions-${major}_%7C_$((major - 1))_%7C_$((major - 2))-green/" README.md
+
+      - name: Create pull request
+        id: cpr
+        uses: peter-evans/create-pull-request@v8
+        with:
+          branch: update/nextcloud-versions
+          title: "chore: update Nextcloud versions"
+          commit-message: "chore: update Nextcloud versions"
+          labels: dependencies
+          body: Update the Nextcloud versions tested by the collection.
+
+      - name: Trigger CI on the pull request branch
+        if: steps.cpr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run ci.yml --ref update/nextcloud-versions
