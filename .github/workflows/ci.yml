@@ -1,0 +1,57 @@
+---
+name: CI
+"on":
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      roles: ${{ steps.filter.outputs.roles }}
+      plugins: ${{ steps.filter.outputs.plugins }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Detect changed paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            roles:
+              - 'roles/**'
+              - 'molecule/**'
+              - '.github/distros.json'
+            plugins:
+              - 'plugins/**'
+
+  config:
+    runs-on: ubuntu-latest
+    outputs:
+      distros: ${{ steps.read.outputs.distros }}
+      first_distro: ${{ steps.read.outputs.first_distro }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Read distros list
+        id: read
+        run: |
+          echo "distros=$(jq -c . .github/distros.json)" >> "$GITHUB_OUTPUT"
+          echo "first_distro=$(jq -c '[.[0]]' .github/distros.json)" >> "$GITHUB_OUTPUT"
+
+  collection_tests:
+    name: tests
+    needs:
+      - changes
+      - config
+    uses: ./.github/workflows/collection-tests.yml
+    with:
+      run_molecule: ${{ needs.changes.outputs.roles == 'true' || needs.changes.outputs.plugins == 'true' }}
+      distros: ${{ needs.changes.outputs.roles == 'true' && needs.config.outputs.distros || needs.config.outputs.first_distro }}
+      nc_versions: '["latest"]'

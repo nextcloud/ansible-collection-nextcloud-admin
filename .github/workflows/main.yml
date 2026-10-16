@@ -1,0 +1,40 @@
+---
+name: Main
+"on":
+  workflow_call:
+    inputs:
+      full:
+        required: false
+        description: run the full Nextcloud version matrix
+        type: boolean
+        default: true
+  workflow_dispatch:
+    inputs:
+      full:
+        required: false
+        description: run the full Nextcloud version matrix
+        type: boolean
+        default: true
+
+jobs:
+  config:
+    runs-on: ubuntu-latest
+    outputs:
+      distros: ${{ steps.read.outputs.distros }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Read distros list
+        id: read
+        run: |
+          echo "distros=$(jq -c . .github/distros.json)" >> "$GITHUB_OUTPUT"
+
+  collection_tests:
+    name: tests
+    needs: config
+    uses: ./.github/workflows/collection-tests.yml
+    with:
+      run_molecule: true
+      distros: ${{ needs.config.outputs.distros }}
+      nc_versions: ${{ inputs.full && '["latest", "nc34", "nc33"]' || '["latest"]' }}

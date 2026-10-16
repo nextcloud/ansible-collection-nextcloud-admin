@@ -2,7 +2,10 @@
 ![GitHub Release](https://img.shields.io/github/v/release/nextcloud/ansible-collection-nextcloud-admin?logo=Github)
 ![Ansible Collection Version](https://img.shields.io/ansible/collection/v/nextcloud/admin?logo=Ansible)
 ![Ansible Collection Downloads](https://img.shields.io/ansible/collection/d/nextcloud/admin?logo=Ansible)
-[![Collection tests](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/tests_and_release.yml/badge.svg?branch=main)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/tests_and_release.yml)
+[![CI](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/ci.yml)
+[![Scheduled latest](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/schedule-latest.yml/badge.svg?branch=main)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/schedule-latest.yml)
+[![Scheduled full](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/schedule-full.yml/badge.svg?branch=main)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/schedule-full.yml)
+[![Release](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/release.yml/badge.svg)](https://github.com/nextcloud/ansible-collection-nextcloud-admin/actions/workflows/release.yml)
 ![Static Badge](https://img.shields.io/badge/Nextcloud_versions-35_%7C_34_%7C_33-green?logo=Nextcloud&logoColor=blue)
 [![codecov](https://codecov.io/gh/nextcloud/ansible-collection-nextcloud-admin/graph/badge.svg?token=6nF3Fx75mH)](https://codecov.io/gh/nextcloud/ansible-collection-nextcloud-admin)
 
