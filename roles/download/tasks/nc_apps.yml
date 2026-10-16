@@ -1,0 +1,38 @@
+---
+# add this in the task below instead
+  vars:
+    nc_app_name: "{{ item.value if item.value != None else item.key }}"
+
+- name: "{{ 'nc_apps | Fetch web-page for app \"' ~ item.key ~'\" from online-apps store (1/2).' }}"
+  ansible.builtin.get_url:
+    url: "{{ nextcloud_app_repository }}/{{ nc_app_name }}"
+    dest: /tmp/app.html
+    mode: u=rw,g=r,o=r
+    force: true
+  changed_when: false
+  delegate_to: localhost
+  become: false
+
+# Retrieve the app-package archive from the web-page content.
+- name: "{{ 'nc_apps | Fetch for app \"' ~ item.key ~ '\" package download-link from web-page and download from online-apps store (2/2).' }}"
+  ansible.builtin.get_url:
+    url: "{{ dl_link }}"
+    dest: "{{ nextcloud_download_dir|default('.') ~ '/' ~ dl_link|basename }}"
+    mode: u=rw,g=r,o=r
+  delegate_to: localhost
+  become: false
+  vars:
+    file_lines: "{{ lookup('file', '/tmp/app.html').split('\n') }}"
+    values: "{{ file_lines|select('search', '<td[^>]*>')|map('regex_replace', '.*<td[^>]*>(.*)</td>', '\\1') }}"
+    titles: "{{ file_lines|select('search', '<th>')|map('regex_replace', '.*<th[^>]*>(.*)</th>', '\\1') }}"
+    download: "{{ values|batch( titles|length )|select('search', nextcloud_version_major)|flatten }}"
+    link: "{{ titles.index('Stable channel') }}"
+    dl_link: "{{ values[ link|int ] | regex_replace('^.*href=\"([^\"]*)\".*$', '\\1') }}"
+
+- name: nc_apps | Remove temporary web page content file from /tmp
+  ansible.builtin.file:
+    path: /tmp/app.html
+    state: absent
+  changed_when: false
+  delegate_to: localhost
+  become: false

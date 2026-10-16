@@ -1,0 +1,5 @@
+---
+# vars file for nextcloud
+nextcloud_dl_file_name:
+  latest: "{{ ['latest', nextcloud_version_major] | reject('undefined') | join('-') }}"
+  releases: "{{ ['nextcloud', nextcloud_version_full] | reject('undefined') | join('-') }}"
