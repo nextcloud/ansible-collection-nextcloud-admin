@@ -22,7 +22,7 @@ jobs:
           major=$(git ls-remote --tags --refs https://github.com/nextcloud/server \
             | sed -n 's#.*refs/tags/v\([0-9]*\)\.[0-9]*\.[0-9]*$#\1#p' \
             | sort -n | tail -1)
-          jq -n --argjson m "$major" '["nc\($m)", "nc\($m - 1)", "nc\($m - 2)"]' > .github/nextcloud-versions.json
+          jq -nc --argjson m "$major" '["nc\($m)", "nc\($m - 1)", "nc\($m - 2)"]' > .github/nextcloud-versions.json
           sed -i "s/Nextcloud_versions-[0-9_%7C]*-green/Nextcloud_versions-${major}_%7C_$((major - 1))_%7C_$((major - 2))-green/" README.md
 
       - name: Create pull request
@@ -33,6 +33,7 @@ jobs:
           title: "chore: update Nextcloud versions"
           commit-message: "chore: update Nextcloud versions"
           labels: dependencies
+          signoff: true
           body: Update the Nextcloud versions tested by the collection.
 
       - name: Trigger CI on the pull request branch
