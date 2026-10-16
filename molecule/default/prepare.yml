@@ -1,0 +1,18 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Wait for the container to accept connections
+      ansible.builtin.wait_for_connection:
+        timeout: 120
+
+    - name: Wait until privilege escalation works
+      ansible.builtin.command: "true"
+      become: true
+      changed_when: false
+      register: _become_check
+      until: _become_check is success
+      retries: 10
+      delay: 5

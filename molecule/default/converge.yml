@@ -28,8 +28,35 @@
     nextcloud_version_channel: "releases"
     nextcloud_get_latest: true
     nextcloud_disable_websrv_default_site: true
-  roles:
-    - role: nextcloud.admin.install_nextcloud
+  tasks:
+    - name: Install Nextcloud and check its services
+      block:
+        - name: Include install_nextcloud role
+          ansible.builtin.import_role:
+            name: nextcloud.admin.install_nextcloud
+
+        - name: Run pending handlers inside the block
+          ansible.builtin.meta: flush_handlers
+      rescue:
+        - name: Collect diagnostics
+          ansible.builtin.shell: |
+            for f in /usr/sbin/php-fpm[0-9]*; do echo "== $f -t"; "$f" -t 2>&1; done
+            echo "== systemctl"; systemctl status 'php*-fpm' --no-pager -l 2>&1
+            echo "== journal"; journalctl --no-pager -n 100 -u 'php*-fpm' 2>&1
+            echo "== /run/php"; ls -la /run/php 2>&1
+            echo "== pool.d"; ls -la /etc/php/*/fpm/pool.d 2>&1
+            echo "== listening sockets"; ss -ltnp 2>&1
+          changed_when: false
+          failed_when: false
+          register: _diagnostics
+
+        - name: Display diagnostics
+          ansible.builtin.debug:
+            msg: "{{ _diagnostics.stdout_lines }}"
+
+        - name: Fail after collecting diagnostics
+          ansible.builtin.fail:
+            msg: Nextcloud installation failed, see the diagnostics above.
   post_tasks:
     - name: Get server Status.
       nextcloud.admin.run_occ:
