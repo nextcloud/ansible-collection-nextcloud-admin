@@ -45,6 +45,10 @@
             echo "== journal"; journalctl --no-pager -n 100 -u 'php*-fpm' 2>&1
             echo "== /run/php"; ls -la /run/php 2>&1
             echo "== pool.d"; ls -la /etc/php/*/fpm/pool.d 2>&1
+            echo "== apache2 -t"; apache2ctl -t 2>&1
+            echo "== apache2 systemctl"; systemctl status apache2 --no-pager -l 2>&1
+            echo "== apache2 journal"; journalctl --no-pager -n 100 -u apache2 2>&1
+            echo "== sites-enabled"; ls -la /etc/apache2/sites-enabled 2>&1
             echo "== listening sockets"; ss -ltnp 2>&1
           changed_when: false
           failed_when: false
