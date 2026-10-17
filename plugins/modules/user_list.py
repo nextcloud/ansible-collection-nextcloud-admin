@@ -23,49 +23,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# DOCUMENTATION = r"""
-
-# module: user_list
-
-# short_description: List configured users on the server with optional user infos.
-
-# author:
-#   - "Marc Crébassa (@aalaesar)"
-
-# description:
-#   - Return the list of users present in the server instance
-#   - Optionally recovery infos of one or more user
-#   - This module requires to be run with advanced privileges
-#     unless it is run as the user that own the occ tool.
-
-# extends_documentation_fragment:
-#   - nextcloud.admin.occ_common_options
-
-# options:
-#   infos:
-#     description:
-#       - Weither to fetch user infos or not
-#     aliases: ['show_details']
-#     type: bool
-
-#   limit:
-#     description:
-#       - Number of users to retrieve
-#     required: false
-#     type: int
-#     default: 500
-
-#   offset:
-#     description:
-#       - Offset for retrieving users
-#     required: false
-#     type: int
-#     default: 0
-
-# requirements:
-#   - "python >=3.12"
-# """
-
 DOCUMENTATION = r"""
 ---
 module: user_list
