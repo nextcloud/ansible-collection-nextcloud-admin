@@ -10,6 +10,8 @@ The roles requires the following tools to be available on the host:
 - rsync
 - a mysql or postgreSQL client if the database has to be dumped.
 
+The role also uses the `community.general` Ansible collection (`archive` module). Install it with `ansible-galaxy collection install community.general`.
+
 You'll need enough space on the target file system, depending on the size of your nextcloud server.
 
 ## Role Variables
@@ -45,7 +47,7 @@ nextcloud_backup_format: "tgz" # extension of the archive. use a supported forma
 Or you can change it completely by redefining
 
 ```yaml
-nc_archive_name: "{{ nextcloud_instance_name }}_nextcloud-{{ nc_status.versionstring }}_{{ ansible_date_time.iso8601_basic_short }}{{ nextcloud_backup_suffix }}"
+nc_archive_name: "{{ nextcloud_instance_name }}_nextcloud-{{ nc_status.versionstring }}_{{ ansible_facts['date_time']['iso8601_basic_short'] }}{{ nextcloud_backup_suffix }}"
 ```
 
 ### Adjusting the backup content

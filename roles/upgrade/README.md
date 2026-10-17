@@ -21,12 +21,12 @@ At the moment, this role only works in APT-based systems (tested in Debian 12/13
 Requirements
 ------------
 
-- Ansible >= 2.14
-- Jmespath
-- Xmltodict
+- Ansible >= 2.19
+- Xmltodict (Python library on the control node, used by the `from_xml` filter)
+- Ansible collections: `ansible.utils` (`from_xml` filter) and `community.postgresql` (PostgreSQL upgrade)
 - APT-based system (Debian 12/13)
 - *Optional* - for automatic PHP upgrades: `geerlingguy.php` ([fork](https://github.com/cielito/ansible-role-php/tree/cielito)) and `geerlingguy.php-versions` ([fork](https://github.com/cielito/ansible-role-php-versions/tree/cielito)) roles
-- *Optional* - for automatic PostgreSQL upgrades: `geerlingguy.postgresql` role and `community.postgresql` collection
+- *Optional* - for automatic PostgreSQL upgrades: `geerlingguy.postgresql` role
 
 Role Variables
 --------------

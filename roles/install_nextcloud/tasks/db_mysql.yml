@@ -1,7 +1,7 @@
 ---
 - name: db_mysql | Service is installed
   ansible.builtin.package:
-    name: "{{ 'default-' if ((ansible_distribution | lower) == 'debian' and nextcloud_db_backend == 'mysql') else '' }}{{ nextcloud_db_backend }}-server"
+    name: "{{ 'default-' if ((ansible_facts['distribution'] | lower) == 'debian' and nextcloud_db_backend == 'mysql') else '' }}{{ nextcloud_db_backend }}-server"
     state: present
   register: nc_mysql_db_install
 
@@ -105,7 +105,7 @@
     name: "{{ nextcloud_db_name }}"
     login_user: root
     login_password: "{{ nextcloud_mysql_root_pwd }}"
-    config_file: "{{ mysql_credential_file[(ansible_os_family | lower)] | default(omit) }}"
+    config_file: "{{ mysql_credential_file[(ansible_facts['os_family'] | lower)] | default(omit) }}"
     state: present
 
 - name: db_mysql | Configure the database user
@@ -115,5 +115,5 @@
     priv: "{{ nextcloud_db_name }}.*:ALL"
     login_user: root
     login_password: "{{ nextcloud_mysql_root_pwd }}"
-    config_file: "{{ mysql_credential_file[(ansible_os_family | lower)] | default(omit) }}"
+    config_file: "{{ mysql_credential_file[(ansible_facts['os_family'] | lower)] | default(omit) }}"
     state: present

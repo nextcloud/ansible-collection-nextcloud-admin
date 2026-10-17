@@ -57,7 +57,7 @@ options:
       - args
 
 requirements:
-  - "python >=3.6"
+  - "python >= 3.12"
 """
 
 EXAMPLES = r"""
