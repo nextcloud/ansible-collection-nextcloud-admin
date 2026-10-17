@@ -27,7 +27,7 @@ jobs:
           filters: |
             roles:
               - 'roles/**'
-              - 'molecule/**'
+              - 'extensions/molecule/**'
               - '.github/distros.json'
               - '.github/nextcloud-versions.json'
             plugins:

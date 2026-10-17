@@ -1,7 +1,5 @@
 ---
 role_name_check: 1
-dependency:
-  name: galaxy
 driver:
   name: docker
 platforms:
@@ -21,3 +19,13 @@ provisioner:
     MOLECULE_NC: "${MOLECULE_NC:-latest}"
 verifier:
   name: ansible
+scenario:
+  test_sequence:
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - verify
+    - destroy
