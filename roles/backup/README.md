@@ -45,7 +45,7 @@ nextcloud_backup_format: "tgz" # extension of the archive. use a supported forma
 Or you can change it completely by redefining
 
 ```yaml
-nc_archive_name: "{{ nextcloud_instance_name }}_nextcloud-{{ nc_status.versionstring }}_{{ ansible_date_time.iso8601_basic_short }}{{ nextcloud_backup_suffix }}"
+nc_archive_name: "{{ nextcloud_instance_name }}_nextcloud-{{ nc_status.versionstring }}_{{ ansible_facts['date_time']['iso8601_basic_short'] }}{{ nextcloud_backup_suffix }}"
 ```
 
 ### Adjusting the backup content

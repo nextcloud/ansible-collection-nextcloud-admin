@@ -38,8 +38,8 @@ php_memory_limit: 512M
 
 # [NEXTCLOUD CONFIG]
 nextcloud_trusted_domain:
-  - "{{ ansible_fqdn }}"
-  - "{{ ansible_default_ipv4.address }}"
+  - "{{ ansible_facts['fqdn'] }}"
+  - "{{ ansible_facts['default_ipv4']['address'] }}"
 
 nextcloud_ipv6: false
 
@@ -49,8 +49,8 @@ nextcloud_instance_name: "{{ nextcloud_trusted_domain | first }}"
 
 nextcloud_install_websrv: true
 nextcloud_websrv: "apache2"  # "apache2"/"nginx"
-nextcloud_websrv_user: "{{ os_config_ref[ansible_os_family | lower].defaults.nextcloud_websrv_user }}"
-nextcloud_websrv_group: "{{ os_config_ref[ansible_os_family | lower].defaults.nextcloud_websrv_group }}"
+nextcloud_websrv_user: "{{ os_config_ref[ansible_facts['os_family'] | lower].defaults.nextcloud_websrv_user }}"
+nextcloud_websrv_group: "{{ os_config_ref[ansible_facts['os_family'] | lower].defaults.nextcloud_websrv_group }}"
 nextcloud_disable_websrv_default_site: false
 nextcloud_websrv_template: "templates/{{ nextcloud_websrv }}_nc.j2"
 nextcloud_webroot: "/opt/nextcloud"
@@ -84,8 +84,8 @@ nextcloud_db_host: "127.0.0.1"
 nextcloud_db_backend: "mysql"  # sqlite/mysql/mariadb/pgsql
 mysql_daemon: >-
   {{
-  os_config_ref[ansible_distribution | lower][ansible_distribution_release | lower].mysql_daemon |
-  default(os_config_ref[ansible_distribution | lower].defaults.mysql_daemon)
+  os_config_ref[ansible_facts['distribution'] | lower][ansible_facts['distribution_release'] | lower].mysql_daemon |
+  default(os_config_ref[ansible_facts['distribution'] | lower].defaults.mysql_daemon)
   }}
 nextcloud_db_enabled_on_startup: true
 nextcloud_db_name: "nextcloud"

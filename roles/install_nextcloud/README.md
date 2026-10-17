@@ -191,8 +191,8 @@ nextcloud_version_special: "2022-01-01"
 
 ```yaml
 nextcloud_trusted_domain:
-  - "{{ ansible_fqdn }}"
-  - "{{ ansible_default_ipv4.address }}"
+  - "{{ ansible_facts['fqdn'] }}"
+  - "{{ ansible_facts['default_ipv4']['address'] }}"
 ```
 
 The list of domains you will use to access the same Nextcloud instance.

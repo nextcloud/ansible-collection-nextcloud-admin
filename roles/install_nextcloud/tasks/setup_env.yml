@@ -16,14 +16,14 @@
   loop:
     - acl
     - ca-certificates
-  when: ansible_os_family in [ "Debian" ]
+  when: ansible_facts['os_family'] in [ "Debian" ]
 
 - name: setup_env | Upgrade all packages to latest version
   ansible.builtin.apt:
     upgrade: "yes"
     force_apt_get: true
   when:
-    - ansible_os_family in [ "Debian" ]
+    - ansible_facts['os_family'] in [ "Debian" ]
     - upgrade_packages_first
 
   # fix for debian not using sudo :
@@ -33,7 +33,7 @@
   changed_when: false
   register: nc_sudo_installed_result
   failed_when: false
-  when: ansible_distribution == "Debian"
+  when: ansible_facts['distribution'] == "Debian"
 
 - name: setup_env | Deterime become_method or becom_flags
   when:
