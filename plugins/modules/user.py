@@ -324,7 +324,7 @@ def main():
         except TypeError as e:
             module.fail_json(msg="The groups argument must be a list", **e.__dict__)
         except OccExceptions as e:
-            e.fail_json(**e.__dict__)
+            e.fail_json(module)
 
     module.exit_json(**result)
 

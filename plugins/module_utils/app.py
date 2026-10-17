@@ -190,7 +190,6 @@ class NCApp:
             raise AppExceptions(
                 msg=f"Unexpected error in reading configured values. {str(e)}",
                 app_name=self.app_name,
-                **e.__dict__,
             )
 
     def install(self, enable: bool = True):

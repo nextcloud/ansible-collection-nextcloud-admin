@@ -1,6 +1,9 @@
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 from ansible_collections.nextcloud.admin.plugins.modules import maintenance_mode
+from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
+    OccExceptions,
+)
 from ansible.module_utils import basic
 
 
@@ -98,3 +101,19 @@ class TestMaintenanceMode(TestCase):
         }
         maintenance_mode.main()
         self.mock_module.exit_json.assert_called_once_with(**expected_result)
+
+    def test_server_init_exception(self):
+        self.mock_server_class.side_effect = OccExceptions(stderr="boom")
+
+        maintenance_mode.main()
+
+        self.mock_module.fail_json.assert_called_once()
+        self.mock_module.exit_json.assert_not_called()
+
+    def test_set_maintenance_exception(self):
+        self.mock_server.set_maintenance.side_effect = OccExceptions(stderr="boom")
+
+        maintenance_mode.main()
+
+        self.mock_module.fail_json.assert_called_once()
+        self.mock_module.exit_json.assert_not_called()
