@@ -1,6 +1,9 @@
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 from ansible_collections.nextcloud.admin.plugins.modules import user
+from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
+    OccExceptions,
+)
 from ansible_collections.nextcloud.admin.plugins.module_utils.identities import (
     idState,
 )
@@ -138,3 +141,113 @@ class TestUserModule(TestCase):
             self.mock_module.params["password"]
         )
         self.mock_module.exit_json.assert_called_with(**self.fake_result)
+
+    def test_disable_absent_user(self):
+        self.mock_module.params.update({"state": "disabled"})
+        self.mock_user.state = idState.ABSENT
+        self.fake_result["changed"] = True
+
+        user.main()
+
+        self.mock_user.add.assert_called_once_with(
+            False, self.mock_module.params["password"], None, None, None
+        )
+        self.mock_user.disable.assert_called_once()
+        self.mock_module.exit_json.assert_called_with(**self.fake_result)
+
+    def test_enable_disabled_user(self):
+        self.mock_user.state = idState.DISABLED
+        self.fake_result["changed"] = True
+
+        user.main()
+
+        self.mock_user.enable.assert_called_once()
+        self.mock_user.add.assert_not_called()
+        self.mock_module.exit_json.assert_called_once_with(**self.fake_result)
+
+    def test_groups_given_as_string(self):
+        self.mock_module.params.update({"groups": "Ateam"})
+        self.mock_user.groups = []
+        self.mock_user.state = idState.PRESENT
+        self.fake_result["changed"] = True
+
+        user.main()
+
+        self.mock_server.group.assert_called_once_with("Ateam")
+        self.mock_group_add.add_user.assert_called_once_with(self.user_id)
+        self.mock_module.exit_json.assert_called_once_with(**self.fake_result)
+
+    def test_groups_not_a_list(self):
+        self.mock_module.params.update({"groups": 42})
+        self.mock_user.groups = []
+        self.mock_user.state = idState.PRESENT
+
+        user.main()
+
+        self.mock_module.fail_json.assert_called_once_with(
+            msg="The groups argument must be a list"
+        )
+
+    def test_add_user_to_absent_group_fails(self):
+        self.mock_module.params.update({"groups": ["Ateam"]})
+        self.mock_user.groups = []
+        self.mock_user.state = idState.PRESENT
+        absent_group = MagicMock()
+        absent_group.state = idState.ABSENT
+        self.mock_server.group.side_effect = [absent_group]
+
+        user.main()
+
+        self.mock_module.fail_json.assert_called_once_with(
+            "Cannot add user test_user to absent group Ateam."
+        )
+        absent_group.add_user.assert_not_called()
+
+    def test_email_update(self):
+        self.mock_module.params.update({"email": "new@example.com"})
+        self.mock_user.state = idState.PRESENT
+        self.fake_result["changed"] = True
+
+        user.main()
+
+        self.mock_user.edit_settings.assert_called_once_with("email", "new@example.com")
+        self.mock_module.exit_json.assert_called_once_with(**self.fake_result)
+
+    def test_email_update_check_mode(self):
+        self.mock_module.params.update({"email": "new@example.com"})
+        self.mock_module.check_mode = True
+        self.mock_user.state = idState.PRESENT
+        self.fake_result["changed"] = True
+
+        user.main()
+
+        self.mock_user.edit_settings.assert_not_called()
+        self.mock_module.exit_json.assert_called_once_with(**self.fake_result)
+
+    def test_email_update_occ_exception(self):
+        self.mock_module.params.update({"email": "new@example.com"})
+        self.mock_user.state = idState.PRESENT
+        self.mock_user.edit_settings.side_effect = OccExceptions(stderr="boom")
+
+        user.main()
+
+        self.mock_module.fail_json.assert_called_once()
+
+    def test_group_occ_exception(self):
+        self.mock_module.params.update({"groups": ["Ateam"]})
+        self.mock_user.groups = []
+        self.mock_user.state = idState.PRESENT
+        self.mock_group_add.add_user.side_effect = OccExceptions(stderr="boom")
+
+        user.main()
+
+        self.mock_module.fail_json.assert_called_once()
+
+    def test_display_name_occ_exception(self):
+        self.mock_module.params.update({"display_name": "Engineering Team"})
+        self.mock_user.state = idState.PRESENT
+        self.mock_user.edit_settings.side_effect = OccExceptions(stderr="boom")
+
+        user.main()
+
+        self.mock_module.fail_json.assert_called_once()

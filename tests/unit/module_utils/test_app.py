@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from ansible_collections.nextcloud.admin.plugins.module_utils import (
     app as ncapp,
     server as ncserver,
@@ -7,6 +7,10 @@ from ansible_collections.nextcloud.admin.plugins.module_utils import (
 from ansible_collections.nextcloud.admin.plugins.module_utils.exceptions import (
     OccExceptions,
     AppExceptions,
+    AppPSR4InfosNotReadable,
+    AppPSR4InfosUnavailable,
+    PhpInlineExceptions,
+    PhpResultJsonException,
 )
 import unittest.main
 import json
@@ -287,6 +291,68 @@ class TestApp(TestCase):
         self.server.occ.side_effect = [OccExceptions]
         with self.assertRaises(AppExceptions):
             old_version, new_version = self.app_instance.update()
+
+    def test_infos_are_loaded_once(self):
+        self.server.module = MagicMock()
+        with patch.object(ncapp, "run_php_inline") as mock_php:
+            mock_php.return_value = {"appInfo": {"id": self.app_name}, "settings": {}}
+            self.assertEqual(self.app_instance.infos, {"id": self.app_name})
+            self.assertEqual(self.app_instance.infos, {"id": self.app_name})
+            mock_php.assert_called_once()
+
+    def test_default_settings(self):
+        self.server.module = MagicMock()
+        with patch.object(ncapp, "run_php_inline") as mock_php:
+            mock_php.return_value = {"appInfo": {}, "settings": {"admin": {"a": 1}}}
+            self.assertEqual(self.app_instance.default_settings, {"admin": {"a": 1}})
+
+    def test_autoloaded_infos_empty_settings_list_becomes_dict(self):
+        self.server.module = MagicMock()
+        with patch.object(ncapp, "run_php_inline") as mock_php:
+            mock_php.return_value = {"appInfo": {}, "settings": []}
+            self.assertEqual(self.app_instance.autoloaded_infos["settings"], {})
+
+    def test_autoloaded_infos_json_error(self):
+        self.server.module = MagicMock()
+        with patch.object(ncapp, "run_php_inline") as mock_php:
+            mock_php.side_effect = PhpResultJsonException(
+                msg="bad json", stdout="x", stderr="", rc=0
+            )
+            with self.assertRaises(AppPSR4InfosNotReadable):
+                self.app_instance.autoloaded_infos
+
+    def test_autoloaded_infos_php_error(self):
+        self.server.module = MagicMock()
+        with patch.object(ncapp, "run_php_inline") as mock_php:
+            mock_php.side_effect = PhpInlineExceptions(
+                msg="php failed", stdout="", stderr="boom", rc=1
+            )
+            with self.assertRaises(AppPSR4InfosUnavailable):
+                self.app_instance.autoloaded_infos
+
+    def test_current_settings_empty_list(self):
+        self.server.occ.side_effect = [
+            (0, json.dumps({"apps": {self.app_name: []}})),
+        ]
+        self.assertEqual(self.app_instance.current_settings, {})
+
+    def test_current_settings_occ_error(self):
+        self.server.module = MagicMock()
+        self.server.occ.side_effect = [OccExceptions(stderr="boom")]
+        self.assertEqual(self.app_instance.current_settings, {})
+        self.server.module.warn.assert_called_once_with(
+            f"Failed to get current config for {self.app_name}: boom"
+        )
+
+    def test_current_settings_unexpected_error(self):
+        self.server.occ.side_effect = [RuntimeError("unexpected")]
+        with self.assertRaises(AppExceptions):
+            self.app_instance.current_settings
+
+    def test_current_settings_invalid_json(self):
+        self.server.occ.side_effect = [(0, "not json")]
+        with self.assertRaises(AppExceptions):
+            self.app_instance.current_settings
 
 
 if __name__ == "__main__":
