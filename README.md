@@ -29,7 +29,8 @@ Plugins and modules within a collection may be tested with only specific Ansible
 
 ## Supported nextcloud version
 
-This collection supports Nextcloud versions: `33`, `34`, `35(latest)`
+This collection is tested against the three most recent major versions of Nextcloud. The current list is shown in the badge at the top of this page and is stored in [`.github/nextcloud-versions.json`](.github/nextcloud-versions.json), both updated automatically by the `Update Nextcloud versions` workflow.
+
 The community makes it's best efforts to keep tested versions updated with [Nextcloud release schedule](https://github.com/nextcloud/server/wiki/Maintenance-and-Release-Schedule).
 
 ## Included content
