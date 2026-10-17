@@ -7,6 +7,5 @@
 
 [mysqld]
 binlog_format = MIXED
-innodb_large_prefix=on
-innodb_file_format=barracuda
 innodb_file_per_table=true
+
