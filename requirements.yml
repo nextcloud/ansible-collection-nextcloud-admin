@@ -1,9 +1,9 @@
 ---
 collections:
   - name: ansible.utils
-    version: 3.0.0
+    version: 6.1.1
   - name: community.general
-    version: 8.2.0
+    version: 13.5.0
 roles:
   - name: geerlingguy.php-versions
-    version: 7.1.0
+    version: 7.2.0
