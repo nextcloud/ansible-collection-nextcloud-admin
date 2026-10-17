@@ -15,13 +15,24 @@ The role's main actions are:
 
 ### Ansible version
 
-Ansible >= 2.11
+Ansible >= 2.19
 
 ### Python libraries
 To use `ipwrap` filter in Ansible, you need to install the netaddr Python library on a computer on which you use Ansible (it is not required on remote hosts). It can usually be installed with either your system package manager or using pip:
 
 ```bash
 $ pip install netaddr
+```
+
+### Ansible collections
+
+- `ansible.utils` (`ipwrap` filter)
+- `community.general` (`apache2_module` module)
+- `community.mysql` (MySQL/MariaDB database setup)
+- `community.postgresql` (PostgreSQL database setup)
+
+```bash
+$ ansible-galaxy collection install ansible.utils community.general community.mysql community.postgresql
 ```
 
 ### Setup module:

@@ -18,7 +18,7 @@ The collection includes a variety of Ansible content to help automate the manage
 <!--start requires_ansible-->
 ## Ansible version compatibility
 
-This collection has been tested against following Ansible versions: **>=2.15.0**.
+This collection has been tested against following Ansible versions: **>=2.19.0**.
 
 Plugins and modules within a collection may be tested with only specific Ansible versions.
 <!--end requires_ansible-->
@@ -63,20 +63,39 @@ nextcloud.admin.install_nextcloud | Install and configure an Nextcloud instance 
 
 ### Dependencies
 
+The modules only need Python 3.12 or newer on the control node and a Nextcloud server. The roles need additional content, listed below. Nothing is installed automatically with the collection: install what you use.
+
 #### netaddr Python Library
 
-Content in this collection requires the [network address manipulation library](https://pypi.org/project/netaddr/) to manipulate network address. You can install it with:
+The `ipwrap` filter used by the `install_nextcloud` role relies on the [network address manipulation library](https://pypi.org/project/netaddr/). You can install it with:
 ```
     pip3 install netaddr
 ```
 
+#### Ansible collections
+
+| Used by | Collection | Purpose |
+|---|---|---|
+| `install_nextcloud` | `ansible.utils` | `ipwrap` filter |
+| `install_nextcloud` | `community.general` | `apache2_module` module |
+| `install_nextcloud` | `community.mysql` | MySQL/MariaDB database setup |
+| `install_nextcloud` | `community.postgresql` | PostgreSQL database setup |
+| `backup` | `community.general` | `archive` module |
+| `upgrade` | `ansible.utils` | `from_xml` filter |
+| `upgrade` | `community.postgresql` | PostgreSQL upgrade |
+
+Install the collections you need with `ansible-galaxy collection install`. The versions tested by this collection are pinned in [requirements.yml](requirements.yml).
+
 #### required standalone roles
 
-By default, some roles in this collection are dependant of standalone roles from other namespaces. (this can be disabled).
+Some roles in this collection depend on standalone roles from other namespaces (this can be disabled).
 
-Due to some limitations, ansible-galaxy does not install them automatically, them need to be installed afterward.
+- `install_nextcloud`: `geerlingguy.php-versions`
+- `upgrade` (optional): `geerlingguy.php` and `geerlingguy.postgresql`
 
-Once the collection is installed, run the command `ansible-galaxy role install -r <this_collection_folder>/requirements.yml`.
+Due to some limitations, ansible-galaxy does not install them automatically, they need to be installed afterward.
+
+To install the roles pinned in this collection, run `ansible-galaxy role install -r <this_collection_folder>/requirements.yml`. Only `geerlingguy.php-versions` is pinned there for now; install `geerlingguy.php` and `geerlingguy.postgresql` yourself if you use the optional upgrades.
 
 Alternatively, you can also add the content of [this file](requirements.yml) in your own `requirements.yml` file prior to installing the collection
 

@@ -10,6 +10,8 @@ The roles requires the following tools to be available on the host:
 - rsync
 - a mysql or postgreSQL client if the database has to be dumped.
 
+The role also uses the `community.general` Ansible collection (`archive` module). Install it with `ansible-galaxy collection install community.general`.
+
 You'll need enough space on the target file system, depending on the size of your nextcloud server.
 
 ## Role Variables
