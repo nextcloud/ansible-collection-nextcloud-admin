@@ -76,7 +76,7 @@
 - name: Ensure `nextcloud_initial_version` is in the upgrade path
   ansible.builtin.assert:
     that:
-      - _nc_initial_major in nextcloud_upgrade_path
+      - _nc_initial_major | int in nextcloud_upgrade_path
     fail_msg: >-
       nextcloud_initial_version '{{ _nc_initial_major }}' is not in the upgrade path.
       Available versions: {{ nextcloud_upgrade_path | join(', ') }}
@@ -86,7 +86,7 @@
 - name: Ensure `nextcloud_target_version` is in the upgrade path
   ansible.builtin.assert:
     that:
-      - _nc_target_major in nextcloud_upgrade_path
+      - _nc_target_major | int in nextcloud_upgrade_path
     fail_msg: >-
       nextcloud_target_version '{{ _nc_target_major }}' is not present in nextcloud_upgrade_path.
       Available versions: {{ nextcloud_upgrade_path | join(', ') }}
@@ -95,7 +95,7 @@
 - name: Ensure target version is greater than or equal to initial version
   ansible.builtin.assert:
     that:
-      - _nc_target_major >= _nc_initial_major
+      - _nc_target_major | int >= _nc_initial_major | int
     fail_msg: >-
       nextcloud_target_version '{{ _nc_target_major }}' must be greater than or equal to
       nextcloud_initial_version '{{ _nc_initial_major }}'
