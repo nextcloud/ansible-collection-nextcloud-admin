@@ -82,6 +82,7 @@ nextcloud_config_settings:
 nextcloud_install_db: true
 nextcloud_db_host: "127.0.0.1"
 nextcloud_db_backend: "mysql"  # sqlite/mysql/mariadb/pgsql
+nextcloud_mysql_buffer_pool_size: null  # Optional InnoDB buffer pool size, e.g. "512M" or "1G".
 mysql_daemon: >-
   {{
   os_config_ref[ansible_facts['distribution'] | lower][ansible_facts['distribution_release'] | lower].mysql_daemon |
