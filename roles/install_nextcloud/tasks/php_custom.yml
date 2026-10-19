@@ -1,0 +1,32 @@
+---
+#########
+# Add custom php settings if provided
+- name: php_custom | Set custom php config
+  become: true
+  ansible.builtin.lineinfile:
+    path: "{{ php_dir }}/mods-available/nc-custom_{{ nextcloud_instance_name }}.ini"
+    regexp: "{{ item.name }}"
+    line: "{{ item.name }}={{ item.value }}"
+    state: present
+    create: true
+    mode: "0644"
+  with_items:
+    - {name: '; priority', value: '55'}
+    - "{{ custom_php_config_fpm }}"
+  when: custom_php_config_fpm is defined
+  notify: Load php nc-custom modules
+
+- name: php_custom | Set custom php cli config
+  become: true
+  ansible.builtin.lineinfile:
+    path: "{{ php_dir }}/mods-available/nc-cli-custom_{{ nextcloud_instance_name }}.ini"
+    regexp: "{{ item.name }}"
+    line: "{{ item.name }}={{ item.value }}"
+    state: present
+    create: true
+    mode: "0644"
+  with_items:
+    - {name: '; priority', value: '55'}
+    - "{{ custom_php_config_cli }}"
+  when: custom_php_config_cli is defined
+  notify: Load php nc-cli-custom modules
