@@ -388,6 +388,13 @@ The Nextcloud instance's database user's password.
 
 If not defined by the user, a random password will be generated.
 
+```yaml
+nextcloud_mysql_buffer_pool_size: null
+```
+
+Optional InnoDB buffer pool size for the managed MariaDB/MySQL server (e.g. `512M` or `1G`).
+When `null`, the directive is omitted, preserving the server default or external configuration.
+
 ### TLS configuration
 
 ```yaml

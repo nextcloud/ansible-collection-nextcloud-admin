@@ -94,9 +94,9 @@
     state: absent
 
 - name: db_mysql | Set mysql config option for Nextcloud
-  ansible.builtin.copy:
+  ansible.builtin.template:
     dest: /etc/mysql/conf.d/nextcloud.cnf
-    src: files/mysql_nextcloud.cnf
+    src: mysql_nextcloud.cnf.j2
     mode: 0600
   notify: Restart mysql
 

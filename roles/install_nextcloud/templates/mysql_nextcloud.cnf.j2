@@ -6,7 +6,9 @@
 # Nextcloud mysql.cnf
 
 [mysqld]
-binlog_format = MIXED
-innodb_large_prefix=on
-innodb_file_format=barracuda
-innodb_file_per_table=true
+transaction-isolation = READ-COMMITTED
+binlog_format = ROW
+innodb_file_per_table = ON
+{% if nextcloud_mysql_buffer_pool_size is not none %}
+innodb_buffer_pool_size = {{ nextcloud_mysql_buffer_pool_size }}
+{% endif %}
