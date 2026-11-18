@@ -119,7 +119,7 @@ class TestNCServerApps(TestNCServerBase):
         self.assertEqual(self.server._apps["shipped"], self.shipped)
         self.assertEqual(self.server._apps["external"], {})
         command = self.mock_run_occ.call_args.kwargs["command"]
-        self.assertIn("--shipped", command)
+        self.assertIn("--shipped=true", command)
         self.assertIn("--output=json", command)
 
     def test_get_apps_external(self):
@@ -128,7 +128,7 @@ class TestNCServerApps(TestNCServerBase):
         self.assertEqual(self.server._apps["external"], self.external)
         self.assertEqual(self.server._apps["shipped"], {})
         command = self.mock_run_occ.call_args.kwargs["command"]
-        self.assertNotIn("--shipped", command)
+        self.assertIn("--shipped=false", command)
 
     def test_refresh_shipped_apps(self):
         with patch.object(self.server, "_get_apps") as mock_get_apps:

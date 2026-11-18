@@ -80,9 +80,12 @@ class NCServer:
         return result
 
     def _get_apps(self, shipped: bool = True) -> None:
-        command_args = ["app:list", "--output=json", "--no-warning"]
-        if shipped:
-            command_args.append("--shipped")
+        command_args = [
+            "app:list",
+            "--output=json",
+            "--no-warning",
+            f"--shipped={str(shipped).lower()}",
+        ]
         result: dict[str, dict[str, str]] = json.loads(
             self.occ(command=command_args)[1]
         )
