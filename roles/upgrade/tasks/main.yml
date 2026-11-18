@@ -18,8 +18,8 @@
 
 - name: Normalize Nextcloud versions to major integers
   ansible.builtin.set_fact:
-    _nc_initial_major: "{{ (nextcloud_initial_version | string).split('.')[0] | int }}"
-    _nc_target_major: "{{ (nextcloud_target_version | string).split('.')[0] | int }}"
+    _nc_initial_major: "{{ (nextcloud_initial_version | string).split('.')[0] }}"
+    _nc_target_major: "{{ (nextcloud_target_version | string).split('.')[0] }}"
 
 - name: Run pre-upgrade checks
   ansible.builtin.include_tasks: assert.yml
@@ -29,8 +29,8 @@
     current_nextcloud_version: '{{ _nc_initial_major }}'
     current_nextcloud_upgrade_path: >-
       {{ nextcloud_upgrade_path
-         | select('ge', _nc_initial_major)
-         | select('le', _nc_target_major)
+         | select('ge', _nc_initial_major | int)
+         | select('le', _nc_target_major | int)
          | list }}
 
 - name: See `current_nextcloud_upgrade_path`
