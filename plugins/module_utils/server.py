@@ -80,9 +80,12 @@ class NCServer:
         return result
 
     def _get_apps(self, shipped: bool = True) -> None:
-        command_args = ["app:list", "--output=json", "--no-warning"]
-        if shipped:
-            command_args.append("--shipped")
+        command_args = [
+            "app:list",
+            "--output=json",
+            "--no-warnings",
+            f"--shipped={str(shipped).lower()}",
+        ]
         result: dict[str, dict[str, str]] = json.loads(
             self.occ(command=command_args)[1]
         )
@@ -93,7 +96,7 @@ class NCServer:
 
     def run_SetupChecks(self) -> None:
         setup_checks_report: dict[str, dict[str, dict[str, str | None]]] = json.loads(
-            self.occ(command=["setupchecks", "--output=json", "--no-warning"])[1]
+            self.occ(command=["setupchecks", "--output=json", "--no-warnings"])[1]
         )
         result: dict[str, dict[str, list[dict[str, str | None]]]] = {}
         for category, checks in setup_checks_report.items():
