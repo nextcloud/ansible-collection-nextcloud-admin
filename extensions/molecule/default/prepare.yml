@@ -8,11 +8,45 @@
       ansible.builtin.wait_for_connection:
         timeout: 120
 
+    - name: Show connection and become variables
+      ansible.builtin.debug:
+        msg:
+          - "ansible_user={{ ansible_user | default('UNDEFINED') }}"
+          - "ansible_connection={{ ansible_connection | default('UNDEFINED') }}"
+          - "ansible_become={{ ansible_become | default('UNDEFINED') }}"
+          - "ansible_become_user={{ ansible_become_user | default('UNDEFINED') }}"
+
     - name: Wait until privilege escalation works
-      ansible.builtin.command: "true"
-      become: true
-      changed_when: false
-      register: _become_check
-      until: _become_check is success
-      retries: 10
-      delay: 5
+      block:
+        - name: Check privilege escalation
+          ansible.builtin.command: "true"
+          become: true
+          changed_when: false
+          register: _become_check
+          until: _become_check is success
+          retries: 10
+          delay: 5
+      rescue:
+        - name: Collect container diagnostics without become
+          ansible.builtin.raw: |
+            echo "== id =="; id
+            echo "== pid1 =="; ps -p 1 -o comm= 2>&1
+            echo "== systemd state =="; systemctl is-system-running 2>&1
+            echo "== sudo version =="; sudo -V 2>&1 | head -n 1
+            echo "== sudo -n true =="; sudo -n true 2>&1; echo "rc=$?"
+            echo "== passwd status root/ansible/ubuntu =="; for u in root ansible ubuntu; do passwd -S "$u" 2>&1; done
+            echo "== /etc/sudoers.d =="; ls -l /etc/sudoers.d/ 2>&1
+            echo "== sudoers.d content =="; grep -rh . /etc/sudoers.d/ 2>/dev/null
+            echo "== sudoers (non-comment) =="; grep -vE '^[[:space:]]*(#|$)' /etc/sudoers 2>&1
+          become: false
+          changed_when: false
+          failed_when: false
+          register: _diagnostics
+
+        - name: Display diagnostics
+          ansible.builtin.debug:
+            msg: "{{ _diagnostics.stdout_lines }}"
+
+        - name: Fail after collecting diagnostics
+          ansible.builtin.fail:
+            msg: Privilege escalation failed, see the diagnostics above.
