@@ -12,6 +12,10 @@
   tags:
     - install_apps
 
+- name: Configure php custom variables
+  ansible.builtin.include_tasks: php_custom.yml
+  when: (custom_php_config_fpm is defined) or (custom_php_config_cli is defined)
+
 - name: Install web server packages
   when: nextcloud_install_websrv
   ansible.builtin.include_tasks: websrv_install.yml
@@ -124,6 +128,14 @@
   when: nextcloud_install_db
   tags:
     - molecule-idempotence-notest
+
+- name: Migrate mimetypes
+  nextcloud.admin.run_occ:
+    nextcloud_path: "{{ nextcloud_webroot }}"
+    command: maintenance:repair --include-expensive
+  become: true
+  register: nc_mimetypes_cmd
+  changed_when: true
 
 - name: Main | Patch from the app 'user_saml' the file SAMLController.php
   when:
